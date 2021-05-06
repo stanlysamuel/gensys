@@ -2,9 +2,10 @@ from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
 
-#Program Repair example: Beyene et. al. POPL 2014
+#Repair Lock example: Beyene et. al. POPL 2014
 
 # 1. Define Environment moves
+#Environment move is Skip here
 def environment(pc, l, gl, pc_, l_, gl_):
     return And(pc_ == pc, l_ == l, gl_ == gl)
 
