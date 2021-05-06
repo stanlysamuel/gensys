@@ -2,6 +2,8 @@ from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
 
+#Cinderella-Stepmother game of 5 buckets with bucket size of C.
+
 # 1. Define Environment moves
 def environment(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
     return And(b1_ + b2_ + b3_ + b4_ + b5_ == b1 + b2 + b3 + b4 + b5 + 1, b1_>=b1, b2_>=b2, b3_>=b3, b4_>=b4, b5_>=b5)

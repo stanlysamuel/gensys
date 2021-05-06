@@ -80,8 +80,8 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
     g =Goal()
     g.add(wpAssertion)
     wp = tactic_qe_fixpoint(g).as_expr()
-    W = And(wp, guarantee(b1, b2, b3, b4, b5))
-    F = guarantee(b1, b2, b3, b4, b5)
+    W = And(wp, guarantee(*s))
+    F = guarantee(*s)
     i = 0
     print("Iteration", i )
     while(not valid(Implies(F, W),0)):
@@ -146,4 +146,4 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
         #Sanity check: Disjunction of controller conditions is equal to Invariant
         formula = disjunction_of_conditions == Invariant
 
-        valid(formula,1)
+        valid(formula,0)
