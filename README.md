@@ -1,5 +1,5 @@
 # GenSys
-This repository hosts the code for the tool: GenSys as is currently at version 0.1
+This repository hosts the code for the tool: GenSys and is currently at version 0.1
 
 ## Introduction 
 
@@ -12,8 +12,7 @@ GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinit
 - Raghavan Komondoor, Indian Institute of Science, Bangalore
 
 ### Installation
-You should have installed Python 2/3 on your system.
-Currently we successfully ran GenSys with Python 2.7.1.
+You should have installed Python 2/3 on your system. We successfully ran GenSys with Python 2.7.1.
 
 **Install Python packages**
 
@@ -38,6 +37,7 @@ cd benchmarks
 ```
 
 **Run Benchmarks**
+
 The benchmarks are contained in gensys/benchmarks/. 
 The GenSys library and helper functions are contained in gensys/gensys/.
 
@@ -49,7 +49,6 @@ For example, you can run the program Repair example by running:
 
 ```
 python repairLock.py
-
 ```
 You will get the following output
 
@@ -96,7 +95,6 @@ The cinderella example takes as input a parameter for the bucket size of size gr
 
 ```
 python cinderella 1.99999
-
 ```
 
 This returns the output:
@@ -149,4 +147,4 @@ safety_fixedpoint(controller_moves, environment, guarantee)
 - s should follow the same order in every function.
 - s and s_ should not mix orders as well. For example, if s = {b1_, b2_, b3_, b4_, b5_}, s_ cannot be {b2_, b3_, b4_, b5_, b1_}. This will give unsound results in the initial version of GenSys.
 - Error handling for the above cases is left to be handled.
-- Environment can be equal to skip i.e. it performs no updates. Refer to the non cinderella examples for the same.
+- Environment can be equal to skip i.e. it performs no updates. Refer to the non-cinderella examples for the same.
