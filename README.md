@@ -38,10 +38,12 @@ cd benchmarks
 ```
 
 **Run Benchmarks**
+The benchmarks are contained in gensys/benchmarks/. 
+The GenSys library and helper functions are contained in gensys/gensys/.
 
 ***Program Repair example***
 
-The benchmarks are python files that invoke the GenSys API. They can be executed as regular python program.
+The benchmarks are python files that invoke the GenSys API. They can be executed as a regular python program.
 
 For example, you can run the program Repair example by running:
 
