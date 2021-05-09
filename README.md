@@ -13,7 +13,7 @@ GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinit
 
 ### Installation
 You should have installed Python 2/3 on your system.
-Currently we can successfully run SVMRanker with Python 2.7.1.
+Currently we successfully ran GenSys with Python 2.7.1.
 
 **Install Python packages**
 
