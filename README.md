@@ -1,5 +1,5 @@
 # GenSys
-This repository hosts the code for the tool: GenSys and is currently at version 0.1
+This repository hosts the code for the tool: GenSys and is currently at version 0.1.0.
 
 ## Introduction 
 
