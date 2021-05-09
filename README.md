@@ -5,6 +5,12 @@ This repository hosts the code for the tool: GenSys as is currently at version 0
 
 GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinite state games. GenSys currently supports safety as the winning condition. GenSys uses the Z3 theorem prover by Microsoft Research for solving SMT formulae. GenSys is scalable and is validated on two benchmark suites.
 
+## Authors
+
+- Stanly Samuel, Indian Institute of Science, Bangalore
+- Deepak D'Souza, Indian Institute of Science, Bangalore
+- Raghavan Komondoor, Indian Institute of Science, Bangalore
+
 ### Installation
 You should have installed Python 2/3 on your system.
 Currently we can successfully run SVMRanker with Python 2.7.1.
@@ -84,10 +90,10 @@ Each controller move is a function definition in **repairLock.py**.
 
 ***Cinderella example***
 
-The cinderella example takes as input a parameter for the bucket size of size greater than zero. To run the example for bucket size 3.0:
+The cinderella example takes as input a parameter for the bucket size of size greater than zero. To run the example for bucket size 1.99999:
 
 ```
-python cinderella 3.0
+python cinderella 1.99999
 
 ```
 
@@ -98,110 +104,30 @@ This returns the output:
 ('Iteration ', 1)
 ('Iteration ', 2)
 ('Iteration ', 3)
+('Iteration ', 4)
+('Iteration ', 5)
+('Iteration ', 6)
+('Iteration ', 7)
+('Iteration ', 8)
+('Iteration ', 9)
+('Iteration ', 10)
+('Iteration ', 11)
+('Iteration ', 12)
+('Iteration ', 13)
+('Iteration ', 14)
+('Iteration ', 15)
+('Iteration ', 16)
+('Iteration ', 17)
+('Iteration ', 18)
 
-('Number of times projection is done: ', 4)
+('Number of times projection is done: ', 19)
 
-Invariant is Satisfiable
-REALIZABLE
-EXTRACTING CONTROLLER...
+Invariant is Unsatisifiable i.e. False
+UNREALIZABLE
 
-Condition for the controller action: move1
-And(pc == 0, l <= 0)
-
-Condition for the controller action: move2
-And(pc == 0, Or(l >= 1, gl == 0))
-
-Condition for the controller action: move3
-And(l <= 0, pc == 2)
-
-Condition for the controller action: move4
-And(pc == 4, l >= 1, Not(0 == gl))
-
-Condition for the controller action: move5
-And(gl == 0, pc == 4)
-
-Condition for the controller action: move6
-And(l >= 1, pc == 5)
-
-Condition for the controller action: move7
-pc == 6
-stanley@stanley-Vostro-3250:~/Projects/gensysMain/gensys/benchmarks$ python cinderella.py 3.0('Iteration', 0)
-('Iteration ', 1)
-('Iteration ', 2)
-
-('Number of times projection is done: ', 3)
-
-Invariant is Satisfiable
-REALIZABLE
-EXTRACTING CONTROLLER...
-
-Condition for the controller action: move1
-And(b4 <= 2,
-    b5 <= 2,
-    b3 <= 2,
-    -3 <= -1*b5 + -1*b3,
-    b1 <= 3,
-    b2 <= 3,
-    b1 >= 0,
-    b2 >= 0,
-    b3 >= 0,
-    b4 >= 0,
-    b5 >= 0)
-
-Condition for the controller action: move2
-And(b5 <= 2,
-    b4 <= 2,
-    -3 <= -1*b1 + -1*b4,
-    b1 <= 2,
-    b2 <= 3,
-    b3 <= 3,
-    b1 >= 0,
-    b2 >= 0,
-    b3 >= 0,
-    b4 >= 0,
-    b5 >= 0)
-
-Condition for the controller action: move3
-And(b1 <= 2,
-    b5 <= 2,
-    b2 <= 2,
-    -3 <= -1*b2 + -1*b5,
-    b3 <= 3,
-    b4 <= 3,
-    b1 >= 0,
-    b2 >= 0,
-    b3 >= 0,
-    b4 >= 0,
-    b5 >= 0)
-
-Condition for the controller action: move4
-And(b1 <= 2,
-    b3 <= 2,
-    b2 <= 2,
-    -3 <= -1*b1 + -1*b3,
-    b4 <= 3,
-    b5 <= 3,
-    b1 >= 0,
-    b2 >= 0,
-    b3 >= 0,
-    b4 >= 0,
-    b5 >= 0)
-
-Condition for the controller action: move5
-And(b3 <= 2,
-    b4 <= 2,
-    b2 <= 2,
-    -3 <= -1*b4 + -1*b2,
-    b1 <= 3,
-    b5 <= 3,
-    b1 >= 0,
-    b2 >= 0,
-    b3 >= 0,
-    b4 >= 0,
-    b5 >= 0)
 ```
 
-which is interpreted the same way as the previous example.
+Cinderella has no winning strategy for the bucket size of 1.99999 and GenSys witnesses this fact in 19 iterations. It shows that the returns the invariant False and hence returns UNREALIZABLE.
 
 ***Other Benchmarks***
 
@@ -213,5 +139,12 @@ Benchmarks from the DTSynth paper can be found in the gensys/benchmarks/dtsynth.
 ```
 safety_fixedpoint(controller_moves, environment, guarantee)
 ```
+- Let s be the state of the game. In cinderella.py, s={b1, b2, b3, b4, b5}.
+- Let s_ be the post variables after a transition. Thus, in cinderella.py, s_={b1_, b2_, b3_, b4_, b5_}
 - **environment** is a python definition of the form function(s,s_). It is important to name the post variables with an underscore in this version of GenSys.
-- **guarantee** 
+- **guarantee** is a python definition of the form function(s).
+- The controller moves are specified separately here and then stored in a list. This is because the **safety_fixpoint** procedure extracts the strategy for each move. Each move is also of the form function(s,s_). As you can see in cinderella.py, there are five definitions denoting 5 moves which are stored in a list **controller_moves**.
+- s should follow the same order in every function.
+- s and s_ should not mix orders as well. For example, if s = {b1_, b2_, b3_, b4_, b5_}, s_ cannot be {b2_, b3_, b4_, b5_, b1_}. This will give unsound results in the initial version of GenSys.
+- Error handling for the above cases is left to be handled.
+- Environment can be equal to skip i.e. it performs no updates. Refer to the non cinderella examples for the same.
