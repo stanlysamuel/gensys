@@ -133,7 +133,7 @@ Cinderella has no winning strategy for the bucket size of 1.99999 and GenSys wit
 
 Benchmarks from the DTSynth paper can be found in the gensys/benchmarks/dtsynth.
 
-**Rules for creating your own game**
+### Rules for creating your own game
 
 - The safety game consists of three parts: envrionment, controller and guarantee which is to be passed to the safety_fixpoint function as:
 ```
@@ -148,3 +148,99 @@ safety_fixedpoint(controller_moves, environment, guarantee)
 - s and s_ should not mix orders as well. For example, if s = {b1_, b2_, b3_, b4_, b5_}, s_ cannot be {b2_, b3_, b4_, b5_, b1_}. This will give unsound results in the initial version of GenSys.
 - Error handling for the above cases is left to be handled.
 - Environment can be equal to skip i.e. it performs no updates. Refer to the non-cinderella examples for the same.
+
+### Environment playing first
+
+The folder gensys/benchmarks/Env_First contains the encoding for Cinderella where the environment plays first. This is not yet automated but gives a proof of concept of the flexibility of our approach. When you run:
+
+```
+python cinderellaAE.py 3.0
+```
+
+you get the output:
+
+```
+('Iteration', 0)
+('Iteration ', 1)
+('Iteration ', 2)
+('Iteration ', 3)
+
+('Number of times WP computed: ', 4)
+
+Invariant is Satisfiable
+REALIZABLE
+EXTRACTING CONTROLLER...
+MOVE 1 CONDITION:
+And(b5 <= 1,
+    b1 <= 2,
+    b2 <= 2,
+    b4 <= 1,
+    b3 <= 1,
+    b1 >= 0,
+    b2 >= 0,
+    b3 >= 0,
+    b4 >= 0,
+    b5 >= 0)
+
+MOVE 2 CONDITION:
+And(b4 <= 1,
+    b5 <= 1,
+    b1 <= 1,
+    b3 <= 2,
+    b2 <= 2,
+    b1 >= 0,
+    b2 >= 0,
+    b3 >= 0,
+    b4 >= 0,
+    b5 >= 0)
+
+MOVE 3 CONDITION:
+And(b5 <= 1,
+    b2 <= 1,
+    b1 <= 1,
+    b4 <= 2,
+    b3 <= 2,
+    b1 >= 0,
+    b2 >= 0,
+    b3 >= 0,
+    b4 >= 0,
+    b5 >= 0)
+
+MOVE 4 CONDITION:
+And(b2 <= 1,
+    b5 <= 2,
+    b4 <= 2,
+    b1 <= 1,
+    b3 <= 1,
+    b1 >= 0,
+    b2 >= 0,
+    b3 >= 0,
+    b4 >= 0,
+    b5 >= 0)
+
+MOVE 5 CONDITION:
+And(b2 <= 1,
+    b4 <= 1,
+    b1 <= 2,
+    b5 <= 2,
+    b3 <= 1,
+    b1 >= 0,
+    b2 >= 0,
+    b3 >= 0,
+    b4 >= 0,
+    b5 >= 0)
+```
+
+You can see the the controller is now conservative and returns a stronger invariant. This is because from certain states, Cinderella has the advantage of playing first whereas Stepmother would have overflown the buckets if she played first.
+
+For example, from the state:
+
+```
+b1 = 3.0
+b2 = 3.0
+b3 = 0.0
+b4 = 0.0
+b5 = 0.0
+```
+
+Cinderella can empty buckets b1 and b2 and still ensure that the system always satisfies safety whereas Stepmother could have overflowed them, if she started first.
