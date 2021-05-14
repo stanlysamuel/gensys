@@ -133,6 +133,11 @@ Cinderella has no winning strategy for the bucket size of 1.99999 and GenSys wit
 
 Benchmarks from the DTSynth paper can be found in the gensys/benchmarks/dtsynth.
 
+You can run them directly. For example,
+
+```
+python box.py
+```
 ### Rules for creating your own game
 
 - The safety game consists of three parts: envrionment, controller and guarantee which is to be passed to the safety_fixpoint function as:
