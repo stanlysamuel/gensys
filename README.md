@@ -249,7 +249,13 @@ And(b5 <= 2,
     b5 >= 0)
 ```
 
-You can see the the controller is now conservative and returns a stronger invariant. This is because from certain states, Cinderella has the advantage of playing first whereas Stepmother would have overflown the buckets if she played first.
+You can see the the controller is now conservative and the procedure returns a stronger invariant as compared to the case where cinderella plays first. You can try running the latter case as follows, to convince yourself:
+
+```
+python cinderella.py 3.0 0
+```
+
+This is because from certain states, Cinderella has the advantage of playing first whereas Stepmother would have overflown the buckets if she played first.
 
 For example, from the state:
 
@@ -261,4 +267,4 @@ b4 = 0.0
 b5 = 0.0
 ```
 
-Cinderella can empty buckets b1 and b2 and still ensure that the system always satisfies safety whereas Stepmother could have overflowed them, if she started first.
+If Cinderella plays first (EA Formulation), she can empty buckets b1 and b2 and still ensure that the system always satisfies safety. If the Stepmother plays first (AE Formulation), then she will overflow bucket b1 or b2 in the first step. Thus, the state mentioned above will not be in the controller in the AE mode, but will be present in the controller when in EA mode.
