@@ -34,10 +34,10 @@ tactic_simplification = Repeat('ctx-solver-simplify')
 #Options for printing in Z3
 set_option(max_depth=100000, rational_to_decimal = True, precision =40, max_lines=10000)
 
-#1. Safety Fixed-Point Procedure:
+# Safety Fixed-Point Procedure:
 
-def safety_fixedpoint(controller_moves, environment, guarantee):
-    #Get states from envrionment
+def safety_fixedpoint(controller_moves, environment, guarantee, mode):
+    #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
@@ -57,9 +57,21 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
         exec(str(var)+"__" +" = Real('"+str(var)+"__" +"')")
         s__.append(locals()[str(var)+"__"])
 
-    #Declare and define transition variables list for controller and environment
-    envtransitionVars = s_+s__
-    contransitionVars = s+s_
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode
+    if(mode == 0):
+        getFormulation = getFormulationAE
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 1):
+            getFormulation = getFormulationEA
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
+        else:
+            print("Wrong mode entered. Please enter 0 for AE and 1 for EA as the second argument.")
+            return
+    
 
     #0. Create Controller
     # See if List Comprehension (or some better way can make it a single Or formula)
@@ -68,7 +80,9 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
         controller = Or(move(*contransitionVars), controller)
 
     #1. Game Formulation
-    wpAssertion = Exists(s_, And(controller,guarantee(*s_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee(*s__) ) ) ) )
+
+    #Get AE/EA Formula with postcondition guarantee(*s__)
+    wpAssertion = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), guarantee(*s__))
 
     #2. Fixed Point Computation
 
@@ -91,7 +105,8 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
         #Substitute current variables with post variables
         W = substitute(W, *substList)
 
-        wpAssertion = Exists(s_, And(controller,guarantee(*s_), ForAll(s__, Implies(environment(*envtransitionVars), W ) ) ) )
+        #Get AE/EA Formula with postcondition W
+        wpAssertion = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W)
 
         g = Goal()
         g.add(wpAssertion)
@@ -104,7 +119,6 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
     print("")
     print("Number of times projection is done: ", i+1)
     print("")
-
     #3. Output: Controller Extraction or Unrealizable
     if not satisfiable(F,0):
         print("Invariant is Unsatisifiable i.e. False")
@@ -122,8 +136,9 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
         i = 0
         for move_i in controller_moves:
             i = i + 1
-            # WP for each move wrt F
-            condition_move_i = Exists(s_, And(move_i(*contransitionVars),guarantee(*s_), ForAll(s__, Implies(environment(*envtransitionVars), F ) ) ) )
+
+            #Get AE/EA Formula with postcondition F
+            condition_move_i = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F)
 
             #Move i condition extraction
             #Eliminate quantifiers and simplify to get the conditions for each move
@@ -147,3 +162,21 @@ def safety_fixedpoint(controller_moves, environment, guarantee):
         formula = disjunction_of_conditions == Invariant
 
         valid(formula,0)
+
+#Formulation for the game where envrionment plays first
+def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
+    
+    #1. Create the E Formula in the AE formulation
+    ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+
+    #2. Project E-Formula
+    g =Goal()
+    g.add(ExistsFormula)
+    ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+
+    #3. Use Projected E-Formula in AE formulation
+    return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
+
+#Formulation for the game where controller plays first
+def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
+    return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))

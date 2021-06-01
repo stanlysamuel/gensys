@@ -1,5 +1,5 @@
 # GenSys
-This repository hosts the code for the tool: GenSys and is currently at version 0.1.0.
+This repository hosts the code for the tool: GenSys and is currently at version 1.0.
 
 ## Introduction 
 
@@ -23,7 +23,7 @@ pip install z3-solver
 **Add base project directory to PYTHONPATH**
 
 ```
-export PYTHONPATH = ${PYTHONPATH}:/path/to/gensys
+export PYTHONPATH=${PYTHONPATH}:/path/to/gensys
 ```
 
 ### Usage
@@ -50,6 +50,7 @@ For example, you can run the program Repair example by running:
 ```
 python repairLock.py
 ```
+
 You will get the following output
 
 ```
@@ -94,7 +95,7 @@ Each controller move is a function definition in **repairLock.py**.
 The cinderella example takes as input a parameter for the bucket size of size greater than zero. To run the example for bucket size 1.99999:
 
 ```
-python cinderella 1.99999
+python cinderella 1.99999 1
 ```
 
 This returns the output:
@@ -129,6 +130,13 @@ UNREALIZABLE
 
 Cinderella has no winning strategy for the bucket size of 1.99999 and GenSys witnesses this fact in 19 iterations. It shows that the returns the invariant False and hence returns UNREALIZABLE.
 
+The second parameter denotes the mode (or formulation of the game). 
+0 denotes the AE mode i.e. the case where the environment plays first, and
+1 denotes the EA mode i.e. the case where the controller plays first.
+The mode is given as input to the safety fixedpoint algorithm.
+
+Note: In the Program Repair example, both 0 and 1 return the same formulation as the environment move is skip. The same applies for the other benchmarks considered.
+
 ***Other Benchmarks***
 
 Benchmarks from the DTSynth paper can be found in the gensys/benchmarks/dtsynth.
@@ -142,7 +150,7 @@ python box.py
 
 - The safety game consists of three parts: envrionment, controller and guarantee which is to be passed to the safety_fixpoint function as:
 ```
-safety_fixedpoint(controller_moves, environment, guarantee)
+safety_fixedpoint(controller_moves, environment, guarantee, mode)
 ```
 - Let s be the state of the game. In cinderella.py, s={b1, b2, b3, b4, b5}.
 - Let s_ be the post variables after a transition. Thus, in cinderella.py, s_={b1_, b2_, b3_, b4_, b5_}
@@ -153,13 +161,17 @@ safety_fixedpoint(controller_moves, environment, guarantee)
 - s and s_ should not mix orders as well. For example, if s = {b1_, b2_, b3_, b4_, b5_}, s_ cannot be {b2_, b3_, b4_, b5_, b1_}. This will give unsound results in the initial version of GenSys.
 - Error handling for the above cases is left to be handled.
 - Environment can be equal to skip i.e. it performs no updates. Refer to the non-cinderella examples for the same.
+- Mode can be 0 or 1 as explained.
 
 ### Environment playing first
 
-The folder gensys/benchmarks/Env_First contains the encoding for Cinderella where the environment plays first. This is not yet automated but gives a proof of concept of the flexibility of our approach. When you run:
+Although the FSE Tool Submission for GenSys considers the EA case i.e. the case where the controller plays first, we can also have the case where the environment plays first i.e. the AE mode (or formulation). The AE formulation is as follows:
 
+**ForAll s'. environment_moves(s,s') => (guarantee(s') and Exists s''. (controller_moves(s', s'') and guarantee(s'')))**
+
+To run using this formulation, use 0 as the second argument.
 ```
-python cinderellaAE.py 3.0
+python cinderella.py 3.0 0
 ```
 
 you get the output:
@@ -170,36 +182,37 @@ you get the output:
 ('Iteration ', 2)
 ('Iteration ', 3)
 
-('Number of times WP computed: ', 4)
+('Number of times projection is done: ', 4)
 
 Invariant is Satisfiable
 REALIZABLE
 EXTRACTING CONTROLLER...
-MOVE 1 CONDITION:
-And(b5 <= 1,
-    b1 <= 2,
-    b2 <= 2,
-    b4 <= 1,
-    b3 <= 1,
-    b1 >= 0,
-    b2 >= 0,
-    b3 >= 0,
-    b4 >= 0,
-    b5 >= 0)
 
-MOVE 2 CONDITION:
+Condition for the controller action: move1
 And(b4 <= 1,
     b5 <= 1,
-    b1 <= 1,
-    b3 <= 2,
+    b3 <= 1,
     b2 <= 2,
+    b1 <= 2,
     b1 >= 0,
     b2 >= 0,
     b3 >= 0,
     b4 >= 0,
     b5 >= 0)
 
-MOVE 3 CONDITION:
+Condition for the controller action: move2
+And(b1 <= 1,
+    b3 <= 2,
+    b2 <= 2,
+    b4 <= 1,
+    b5 <= 1,
+    b1 >= 0,
+    b2 >= 0,
+    b3 >= 0,
+    b4 >= 0,
+    b5 >= 0)
+
+Condition for the controller action: move3
 And(b5 <= 1,
     b2 <= 1,
     b1 <= 1,
@@ -211,23 +224,23 @@ And(b5 <= 1,
     b4 >= 0,
     b5 >= 0)
 
-MOVE 4 CONDITION:
-And(b2 <= 1,
+Condition for the controller action: move4
+And(b1 <= 1,
+    b3 <= 1,
+    b2 <= 1,
     b5 <= 2,
     b4 <= 2,
-    b1 <= 1,
-    b3 <= 1,
     b1 >= 0,
     b2 >= 0,
     b3 >= 0,
     b4 >= 0,
     b5 >= 0)
 
-MOVE 5 CONDITION:
-And(b2 <= 1,
-    b4 <= 1,
+Condition for the controller action: move5
+And(b5 <= 2,
     b1 <= 2,
-    b5 <= 2,
+    b2 <= 1,
+    b4 <= 1,
     b3 <= 1,
     b1 >= 0,
     b2 >= 0,

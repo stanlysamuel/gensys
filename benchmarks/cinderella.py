@@ -28,9 +28,10 @@ def move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
 controller_moves = [move1, move2, move3, move4, move5]
 
 C = sys.argv[1]
+mode = sys.argv[2]
 
 # 3. Define Guarantee
 def guarantee(b1, b2, b3, b4, b5):
     return And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
 
-safety_fixedpoint(controller_moves, environment, guarantee)
+safety_fixedpoint(controller_moves, environment, guarantee, int(mode))

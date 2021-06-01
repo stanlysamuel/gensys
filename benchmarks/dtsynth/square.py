@@ -47,4 +47,4 @@ controller_moves = [move1, move2, move3, move4, move5, move6, move7, move8, move
 def guarantee(x, y):
     return And(x<=5, x>=0, y<=5, y>=0)
 
-safety_fixedpoint(controller_moves, environment, guarantee)
+safety_fixedpoint(controller_moves, environment, guarantee, 0)

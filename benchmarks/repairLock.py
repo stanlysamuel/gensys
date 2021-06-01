@@ -38,4 +38,4 @@ controller_moves = [move1, move2, move3, move4, move5, move6, move7]
 def guarantee(pc, l, gl):
     return Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))
 
-safety_fixedpoint(controller_moves, environment, guarantee)
+safety_fixedpoint(controller_moves, environment, guarantee, 0)
