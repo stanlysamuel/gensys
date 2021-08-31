@@ -8,7 +8,6 @@ from z3 import *
 # two cells to the environment's robot
 
 # 1. Define Environment moves
-#Environment move is Skip here
 def environment(x1,y1,x2,y2,x1_,y1_,x2_,y2_):
     return And(Or(x1_ == x1 + 1, x1_ == x1 - 1, x1_ == x1), Or(y1_ == y1 + 1, y1_ == y1 - 1, y1_ == y1),x2_==x2, y2_==y2)
 

@@ -9,7 +9,6 @@ from z3 import *
 # within a horizontal stripe of width three.
 
 # 1. Define Environment moves
-#Environment move is Skip here
 def environment(x,y,x_,y_):
     return And(Or(x_ == x + 1, x_ == x - 1, x_ == x), Or(y_ == y + 1, y_ == y - 1, y_ == y))
 
