@@ -95,7 +95,7 @@ Each controller move is a function definition in **repairLock.py**.
 The cinderella example takes as input a parameter for the bucket size of size greater than zero. To run the example for bucket size 1.99999:
 
 ```
-python cinderella 1.99999 1
+python cinderella 1.99999 0
 ```
 
 This returns the output:
@@ -131,11 +131,11 @@ UNREALIZABLE
 Cinderella has no winning strategy for the bucket size of 1.99999 and GenSys witnesses this fact in 19 iterations. It shows that the returns the invariant False and hence returns UNREALIZABLE.
 
 The second parameter denotes the mode (or formulation of the game). 
-0 denotes the AE mode i.e. the case where the environment plays first, and
-1 denotes the EA mode i.e. the case where the controller plays first.
+0 denotes the EA mode i.e. the case where the controller plays first, and
+1 denotes the AE mode i.e. the case where the environment plays first.
 The mode is given as input to the safety fixedpoint algorithm.
 
-Note: In the Program Repair example, both 0 and 1 return the same formulation as the environment move is skip. The same applies for the other benchmarks considered.
+Note: In the Program Repair example, both 0 and 1 return the same formulation as the environment move is skip. The same applies for the other benchmarks where the environment move is skip.
 
 ***Other Benchmarks***
 
@@ -169,9 +169,9 @@ Although the FSE Tool Submission for GenSys considers the EA case i.e. the case 
 
 **ForAll s'. environment_moves(s,s') => (guarantee(s') and Exists s''. (controller_moves(s', s'') and guarantee(s'')))**
 
-To run using this formulation, use 0 as the second argument.
+To run using this formulation, use 1 as the second argument.
 ```
-python cinderella.py 3.0 0
+python cinderella.py 3.0 1
 ```
 
 you get the output:
@@ -252,7 +252,7 @@ And(b5 <= 2,
 You can see the the controller is now conservative and the procedure returns a stronger invariant as compared to the case where cinderella plays first. You can try running the latter case as follows, to convince yourself:
 
 ```
-python cinderella.py 3.0 0
+python cinderella.py 3.0 1
 ```
 
 This is because from certain states, Cinderella has the advantage of playing first whereas Stepmother would have overflown the buckets if she played first.

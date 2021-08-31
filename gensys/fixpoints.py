@@ -42,6 +42,7 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
+            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
             exec(str(var) +"= Real('"+str(var) +"')")
             s.append(locals()[var])
     
@@ -59,17 +60,17 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
 
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode
-    if(mode == 0):
+    if(mode == 1):
         getFormulation = getFormulationAE
         contransitionVars = s_+s__
         envtransitionVars = s+s_
     else: 
-        if(mode == 1):
+        if(mode == 0):
             getFormulation = getFormulationEA
             envtransitionVars = s_+s__
             contransitionVars = s+s_
         else:
-            print("Wrong mode entered. Please enter 0 for AE and 1 for EA as the second argument.")
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
             return
     
 
