@@ -1,0 +1,3 @@
+[submodule "tsltools"]
+	path = tsltools
+	url = https://github.com/reactive-systems/tsltools.git
