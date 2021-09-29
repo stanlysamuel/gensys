@@ -1,19 +1,11 @@
-# GenSys v0.1: Synthesis of Maximal Controllers for Safety Specifications
-# Copyright (C) 2021  Stanly Samuel
+#  GenSys v0.1
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+#  Copyright (C) 2021 Stanly Samuel
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#  This software is available under the MIT license. Please see LICENSE in the
+#  top-level directory for details.
 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>
-
+#  This file is part of gensys.
 from z3 import *
 
 #Function to check validity of a formula
