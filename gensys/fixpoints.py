@@ -115,6 +115,8 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
     print("")
     print("Number of times projection is done: ", i+1)
     print("")
+    print("Invariant is")
+    print(F)
     #3. Output: Controller Extraction or Unrealizable
     if not satisfiable(F,0):
         print("Invariant is Unsatisifiable i.e. False")
