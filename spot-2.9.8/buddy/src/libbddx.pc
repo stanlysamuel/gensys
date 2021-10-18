@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=/usr/local
+includedir=/usr/local/include
+libdir=/usr/local/lib
+
+Name: BuDDyX
+Description: A BDD library (fork of BuDDy for use with Spot)
+URL: https://spot.lrde.epita.fr/
+Version: 2.3a
+Cflags: -I${includedir}
+Libs: -L${libdir} -lbddx
