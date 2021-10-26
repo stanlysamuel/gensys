@@ -157,13 +157,13 @@ class Graph:
             init_state_d[self.init_state] = 0
 
         # States of the deterministic automaton: Int -> Counter State Dict
-        states = {}
+        states_d = {}
         #Initial state is numbered 0
-        states[0] = init_state_d
-        state_count = 1
+        states_d[0] = init_state_d
+        state_count = len(states_d)
         
         #Both contain integers only from 0 onwards.
-        visited_states = []
+        # visited_states = []
         unprocessed_states = collections.deque()
         unprocessed_states.append(0)
 
@@ -182,19 +182,18 @@ class Graph:
         # print(transitions)
         while unprocessed_states:
             processing_state_number = unprocessed_states.popleft()
-            adj_list_d[processing_state_number] = {}
-            visited_states.append(processing_state_number)
-            #Create the state number in the final list
+            # visited_states.append(processing_state_number)
+            #Create the state number in the final list (det automaton)
             adj_list_d[processing_state_number] = {}
             #Proceed only if non final. Else ignore.
             print("CURRENT STATE IS ", processing_state_number)
-            print(states[processing_state_number])
-            for src_vertex in states[processing_state_number].keys():
+            print(states_d[processing_state_number])
+            for src_vertex in states_d[processing_state_number].keys():
                 print("CURRENT SOURCE STATE IS ", src_vertex)
                 # For all 2^AP combinations
                 for transition in transitions:
                     print("T",transition)
-                    dest_vertex_d = {}
+                    dest_state_d = {}
                     # print(states)
                     # print(states[processing_state_number])
                     # print(states[processing_state_number][0])
@@ -215,33 +214,97 @@ class Graph:
 
                             # dest_vertex_d[dest_vertex] = max(dest_vertex_d[dest_vertex],min(k+1,processing_state_number[0]))
                             #(Q: Why not Min Max)
-                            dest_vertex_d[dest_vertex] = min(k+1, states[processing_state_number][src_vertex] + incr)
-                    print("Dest vertex")
-                    print(dest_vertex_d)
+                            dest_state_d[dest_vertex] = min(k+1, states_d[processing_state_number][src_vertex] + incr)
+                    print("Dest state")
+                    print(dest_state_d)
 
                     #Check if generated state is unique
-                    if dest_vertex_d in states.values():
+                    if dest_state_d in states_d.values():
                         print("Present")
-                        #Get key from value dest_vertex_d
-                        new_state_count = list(states.keys())[list(states.values()).index(dest_vertex_d)]
+                        #Get key from value dest_state_d
+                        new_state_count = list(states_d.keys())[list(states_d.values()).index(dest_state_d)]
                         print(new_state_count)
                     else:
                         print("Not present")
                         #New state is generated, incrememnt state counter, add to states dict. Get the new state number. Add to unprocessed list.
-                        states[state_count] = dest_vertex_d
+                        states_d[state_count] = dest_state_d
                         new_state_count = state_count
-                        #Add to unprocessed even if final state. Nah. Check is done iniitally. But add such state to final
-                        unprocessed_states.append(new_state_count)
+                        #Add to unprocessed states on if all count in values of dest_state_d is <k+1
+                        #(See a better way)
+                        to_add = 1
+                        for count in dest_state_d.values():
+                            if count >= k+1:
+                                to_add = 0
+                        if to_add:  
+                            unprocessed_states.append(new_state_count)
                         state_count+=1
 
+                    #Code to handle all the cases of dest_state_d
+
+                    #Case1: If transition t is not present from current processing node.
+                    # (This implies that even dest_state_d is not present)
+                    # => Add state_d, t, dest_state_d i.e. create a new set for transitions
+
+                    # transition_present = 0
+                    # for transitions_ in adj_list_d[processing_state_number].values():
+                    #     if transition in transitions_:
+                    #         transition_present = 1
+                    
+                    # if transition_present == 0:
+                    #     adj_list_d[processing_state_number][new_state_count] = set()
+                    #     adj_list_d[processing_state_number][new_state_count].add(transition)
+                    # #Case2: If transition t is present
+                    # else:
+                    #     #Case 2a: If dest_state_d is present:
+                    #     # if dest_state_d in states_d.values():
+                    #     if new_state_count in adj_list_d[processing_state_number]:
+                    #         #(This implies that dest_state_d is already added for some other transition.)
+                    #         #(Parallel transitions are possible when dealing with transition based automaton.)
+                    #         # => Hence, add transitions to the set of state_d, dest_state_d
+                    #         adj_list_d[processing_state_number][new_state_count].add(transition)
+                        #Case 2b: If dest_state_d is not present:
+                        # else:
+                            #(This implies that transtition t is present for state_d for some other dest_state_d_i)
+                            # => Need to merge dest_state_d and dest_state_d_i
                     # Use state number to create the transition set.
                     # Parallel transitions are possible in this graph.
                     if new_state_count not in adj_list_d[processing_state_number]:
-                        adj_list_d[processing_state_number][new_state_count] = set()
-                        adj_list_d[processing_state_number][new_state_count].add(transition)
+                        transition_present = 0
+                        number_of_state_to_merge = None
+                        for tkey, transitions_ in adj_list_d[processing_state_number].items():
+                            if transition in transitions_:
+                                transition_present = 1
+                                print("Source node is ", states_d[processing_state_number])
+                                print("Transition present with dest state: ", states_d[tkey])
+                                number_of_state_to_merge = tkey
+                        
+                        if transition_present == 0:
+                            adj_list_d[processing_state_number][new_state_count] = set()
+                            adj_list_d[processing_state_number][new_state_count].add(transition)
+                        else:
+                            #Merge dest_state_d with states_d[number_of_state_to_merge]
+                            print("Need to merge", dest_state_d)
+                            merged_state = self.merge_states(dest_state_d, states_d[number_of_state_to_merge])
+                            print("Merged State is: ", merged_state)
+                            #assume merge works well.
+                            #Check if the merged state exists in states_d.
+                            if merged_state in states_d.values():
+                                print("Present")
+                                #If yes, get the number and delete the dest_state_d from the list.
+                                merged_state_number = list(states_d.keys())[list(states_d.values()).index(merged_state)]
+                                print(merged_state_number)
+                                #Remove dest_state_d from the list. Redundant operation as we are adding it once. Not completely as we can reuse it in the other case.
+                                # states_d = {key:val for key, val in states_d.items() if val != dest_state_d}
+                            else:
+                                #If no, then reuse the number of dest_state_d i.e. delete dest_state.
+                                print("Not present")
+                                #New state is generated, incrememnt state counter, add to states dict. Get the new state number. Add to unprocessed list.
+                                # states_d = {key:val for key, val in states_d.items() if val != dest_state_d}
+                                states_d[new_state_count] = merged_state
+    
                     else:
                         adj_list_d[processing_state_number][new_state_count].add(transition)
-                print(states)
+                print(states_d)
                 print(adj_list_d)     
                 # if dest_vertex_d not in visited: #(may have to create eq check)
                     # unprocessed.append(dest_vertex_d)
