@@ -268,3 +268,15 @@ b5 = 0.0
 ```
 
 If Cinderella plays first (EA Formulation), she can empty buckets b1 and b2 and still ensure that the system always satisfies safety. If the Stepmother plays first (AE Formulation), then she will overflow bucket b1 or b2 in the first step. Thus, the state mentioned above will not be in the controller in the AE mode, but will be present in the controller when in EA mode.
+
+## Notes:
+
+# Spot
+
+python3.4 and 3.5 does not work in my computer even after purging and reinstalling. 3.6 has version 3.6.9. I installed python 3.6.7 from source. It replaced 3.6.9.
+
+3.6.7 didnt work . needs python3-defaults_3.6.7-1~18.04
+
+All of the above didn't work. Building from source did.
+
+python3-spot requires python 3.6.7 or less. even 3.6.9 doesn't work
