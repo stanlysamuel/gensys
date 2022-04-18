@@ -12,7 +12,7 @@
 from  gensys.helper import *
 from z3 import *
 #-------------------------------------------------------------------#
-#Initialize the three tactics required for the tool. Assume user cannot controler them now
+#Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
 # Tactics for fixedpoint algorithm
 # tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
