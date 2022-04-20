@@ -15,9 +15,9 @@ from z3 import *
 #Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
 # Tactics for fixedpoint algorithm
-tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
+# tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
-# tactic_qe_fixpoint = Tactic('qe2')
+tactic_qe_fixpoint = Tactic('qe2')
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
 tactic_qe_controller = tactic_qe_fixpoint
@@ -400,6 +400,7 @@ def getFormulationAE_omega(s, s_, s__, controller_moves, environment_moves, guar
     ExistsFormula = tactic_qe_fixpoint(g).as_expr()
 
     #3. Use Projected E-Formula in AE formulation
+    # return ForAll(s_+c_, Implies(And(environment_moves, Succ(c,s,c_)), And(guarantee_s_c_, Exists(s__+c__, And(controller_moves, Succ(c_,s_,c__), postcondition)))))
     return ForAll(s_+c_, Implies(And(environment_moves, Succ(c,s,c_)), And(guarantee_s_c_, ExistsFormula)))
     return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
 
