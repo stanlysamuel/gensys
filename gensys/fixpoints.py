@@ -15,9 +15,9 @@ from z3 import *
 #Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
 # Tactics for fixedpoint algorithm
-# tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
+tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
-tactic_qe_fixpoint = Tactic('qe2')
+# tactic_qe_fixpoint = Tactic('qe2')
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
 tactic_qe_controller = tactic_qe_fixpoint
@@ -216,7 +216,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         return Or([And( substitute(sigma[i], [(s[j], x_subst[j]) for j in range(len(s))] ), succ(c,sigma[i],c_) ) for i in range(len(sigma))])
 
     #Define the k for which this fixedpoint is computed
-    k =0
+    k = 0
 
     #Get states from environment
     s=[]
@@ -224,19 +224,19 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
             #Issue: Can't use variable s in the code because it will get redeclared in this scope.
-            exec(str(var) +"= Real('"+str(var) +"')")
+            exec(str(var) +"= Real('"+str(var) +"')") in globals(), locals()
             s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
     for var in s:
-        exec(str(var)+"_" +" = Real('"+str(var)+"_" +"')")
+        exec(str(var)+"_" +" = Real('"+str(var)+"_" +"')") in globals(), locals()
         s_.append(locals()[str(var)+"_"])
 
     #Declare and define s''
     s__ = []
     for var in s:
-        exec(str(var)+"__" +" = Real('"+str(var)+"__" +"')")
+        exec(str(var)+"__" +" = Real('"+str(var)+"__" +"')") in globals(), locals()
         s__.append(locals()[str(var)+"__"])
 
     # Create determinized automaton state variables as IntVectors
@@ -315,7 +315,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     #Get AE/EA Formula with postcondition guarantee(*s__)
     print("Creating wpAssertion")
     wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), guarantee_(s__,c__), Succ, c, c_, c__)
-
+    
     #2. Fixed Point Computation
 
     #Create list of tuples for substitution pre variables with post
@@ -329,6 +329,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     W = And(wp, guarantee_(s, c))
     F = guarantee_(s, c)
     i = 0
+    print("Created wpAssertion")
     print("Iteration", i )
     while(not valid(Implies(F, W),0)):
     # while(not valid(F == W)): gives same as above so => holds one way
