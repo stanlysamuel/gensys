@@ -211,9 +211,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] == min(c[p] + isFinal(q) , k+1))) for p in range(0, len(c))]) for q in range(0, len(c_))])
 
         return And(range_c, range_c_, reach, det1, det2)
-
-    def Succ(c, x_subst, c_):
-        return Or([And( substitute(sigma[i], [(s[j], x_subst[j]) for j in range(len(s))] ), succ(c,sigma[i],c_) ) for i in range(len(sigma))])
+    
 
     #Define the k for which this fixedpoint is computed
     k = 0
@@ -244,6 +242,22 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     c_ = IntVector('c_', nQ)
     c__ = IntVector('c__', nQ)
 
+    def project(formula):
+        g =Goal()
+        g.add(formula)
+        return tactic_qe_fixpoint(g).as_expr()
+
+    # Retrive determinized predicate list
+    sigma = sigma(*s)
+    
+    # Stores projected succ in a different array (indexed by the same index as sigma) so that project is not called always again and again.
+    # This improves the speed by 2X
+    projected_succ = [project(succ(c,sigma[i],c_)) for i in range(len(sigma))]
+
+    def Succ(c_subst, x_subst, c__subst):
+        #Project quantifers in Succ before forwarding to wpAssertion.
+        return Or([And( substitute(sigma[i], [(s[j], x_subst[j]) for j in range(len(s))] ), substitute(projected_succ[i], [(c[j], c_subst[j]) for j in range(len(c))] + [(c_[j], c__subst[j]) for j in range(len(c_))] ) ) for i in range(len(sigma))])
+
     # Define the guarantee that we will use
 
     # Gurantee over the deterministic automaton states for a given k
@@ -259,9 +273,6 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     # Combine above constraint with the optional safety guarantee, if any
     def guarantee_(s, c):
         return And(guarantee(*s), guarantee_automaton(c))
-
-    # Retrive detrminized predicate list
-    sigma = sigma(*s)
 
     # Utility function to check number of determinized automaton states in a given formula F(s,c)
     def print_automaton_states(formula):
