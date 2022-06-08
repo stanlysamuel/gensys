@@ -1,15 +1,20 @@
 # GenSys Game Specification Format
 # Declare game variables
-var x
+var x;
+var y;
+var z;
 
 # Give controller moves
+controller:
 x := x + 1
 x := x - 1
 
 # Give environment moves
+environment:
 x := x
 
 # Give the temporal specification (G, F, GF, FG). Provide runtime support.
+specification:
 G(0<=x<=10)
 
 OR

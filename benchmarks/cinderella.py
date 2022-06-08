@@ -41,47 +41,16 @@ if spec == "safety":
 else:
     if spec == "omega":
 
-        # Spec 1: Safety, G(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
-        # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
-        # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
-
-        nQ = 2
-        def automaton(q, q_, b1, b2, b3, b4, b5):
-            return Or(
-                    And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-                    And(q == 0, q_==0),
-                    And(q == 1, q_==1),
-                    )
-        # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
-        def isFinal(p):
-            return If(p==1, 1, 0)
-
-        #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
-        def sigma(b1, b2, b3, b4, b5):
-            return [Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)), And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)]
-
-        # (Optional): Explicit safety guarantee that complements the omega-regular formula
-        # Default: Returns the True formula in Z3
-        def guarantee(b1, b2, b3, b4, b5):
-            return And(True)
-
-        # Call the fixpoint engine for omega regular specifications.
-        omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
-
-        # --------------------------------------------------------------------------------------------------------------------------------
-
-        # # Spec 2: Buchi, GF(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
+        # # Spec 1: Safety, G(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
         # # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
         # # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-        # nQ = 3
+        # nQ = 2
         # def automaton(q, q_, b1, b2, b3, b4, b5):
         #     return Or(
-        #             And(q == 0, q_==0),
         #             And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-        #             And(q == 1, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-        #             And(q == 1, q_==2, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
-        #             And(q == 2, q_==2),
+        #             And(q == 0, q_==0),
+        #             And(q == 1, q_==1),
         #             )
         # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
         # def isFinal(p):
@@ -98,6 +67,37 @@ else:
 
         # # Call the fixpoint engine for omega regular specifications.
         # omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+
+        # --------------------------------------------------------------------------------------------------------------------------------
+
+        # Spec 2: Buchi, GF(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
+        # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+        # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+
+        nQ = 3
+        def automaton(q, q_, b1, b2, b3, b4, b5):
+            return Or(
+                    And(q == 0, q_==0),
+                    And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+                    And(q == 1, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+                    And(q == 1, q_==2, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
+                    And(q == 2, q_==2),
+                    )
+        # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+        def isFinal(p):
+            return If(p==1, 1, 0)
+
+        #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
+        def sigma(b1, b2, b3, b4, b5):
+            return [Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)), And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)]
+
+        # (Optional): Explicit safety guarantee that complements the omega-regular formula
+        # Default: Returns the True formula in Z3
+        def guarantee(b1, b2, b3, b4, b5):
+            return And(True)
+
+        # Call the fixpoint engine for omega regular specifications.
+        omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
 
         # --------------------------------------------------------------------------------------------------------------------------------
 

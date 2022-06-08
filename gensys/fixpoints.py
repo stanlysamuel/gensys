@@ -17,7 +17,8 @@ from z3 import *
 # Tactics for fixedpoint algorithm
 # tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
-tactic_qe_fixpoint = Tactic('qe2')
+tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
+# tactic_qe_fixpoint = Tactic('qe2')
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
 tactic_qe_controller = tactic_qe_fixpoint
@@ -214,7 +215,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     
 
     #Define the k for which this fixedpoint is computed
-    k = 0
+    k = 2
 
     #Get states from environment
     s=[]
