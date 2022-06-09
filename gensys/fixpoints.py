@@ -9,15 +9,16 @@
 #  This file is part of gensys.
 
  
+from tabnanny import check
 from  gensys.helper import *
 from z3 import *
 #-------------------------------------------------------------------#
 #Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
 # Tactics for fixedpoint algorithm
-# tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
+tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
-tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
+# tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Tactic('qe2')
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
@@ -206,16 +207,21 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         # 3. Determinization constraint
 
         # This constraint gives the count on valid target states that has >1 input states.
-        det1 = And([And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] == min(c[p] + isFinal(q) , k+1))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
-
+        # det1 = And([And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] == min(c[p] + isFinal(q) , k+1))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
+        
+        det1 = And([And([And([Not(Exists(s, And(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] != min(c[p] + isFinal(q) , k+1)))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
+        
+        
         # This constraint gives the count on valid target states that has 1 input state.
-        det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] == min(c[p] + isFinal(q) , k+1))) for p in range(0, len(c))]) for q in range(0, len(c_))])
-
+        # det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] == min(c[p] + isFinal(q) , k+1))) for p in range(0, len(c))]) for q in range(0, len(c_))])
+        
+        det2 = And([And([Not(Exists(s, And(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] != min(c[p] + isFinal(q) , k+1)))) for p in range(0, len(c))]) for q in range(0, len(c_))])
+        
         return And(range_c, range_c_, reach, det1, det2)
     
 
     #Define the k for which this fixedpoint is computed
-    k = 2
+    k = 5
 
     #Get states from environment
     s=[]
@@ -223,19 +229,19 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
             #Issue: Can't use variable s in the code because it will get redeclared in this scope.
-            exec(str(var) +"= Real('"+str(var) +"')") in globals(), locals()
+            exec(str(var) +"= Int('"+str(var) +"')") in globals(), locals()
             s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
     for var in s:
-        exec(str(var)+"_" +" = Real('"+str(var)+"_" +"')") in globals(), locals()
+        exec(str(var)+"_" +" = Int('"+str(var)+"_" +"')") in globals(), locals()
         s_.append(locals()[str(var)+"_"])
 
     #Declare and define s''
     s__ = []
     for var in s:
-        exec(str(var)+"__" +" = Real('"+str(var)+"__" +"')") in globals(), locals()
+        exec(str(var)+"__" +" = Int('"+str(var)+"__" +"')") in globals(), locals()
         s__.append(locals()[str(var)+"__"])
 
     # Create determinized automaton state variables as IntVectors
@@ -251,10 +257,13 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     # Retrive determinized predicate list
     sigma = sigma(*s)
     
+    print("Projecting Succ to store")
     # Stores projected succ in a different array (indexed by the same index as sigma) so that project is not called always again and again.
     # This improves the speed by 2X
     projected_succ = [project(succ(c,sigma[i],c_)) for i in range(len(sigma))]
 
+    # print(projected_succ[1])
+    # exit()
     def Succ(c_subst, x_subst, c__subst):
         #Project quantifers in Succ before forwarding to wpAssertion.
         return Or([And( substitute(sigma[i], [(s[j], x_subst[j]) for j in range(len(s))] ), substitute(projected_succ[i], [(c[j], c_subst[j]) for j in range(len(c))] + [(c_[j], c__subst[j]) for j in range(len(c_))] ) ) for i in range(len(sigma))])
@@ -300,6 +309,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         # Print total number of states
         print("Number of states:", count)
 
+    print("Getting Formulation")
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode
     if(mode == 1):
@@ -316,6 +326,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
             return
     
 
+    print("Creating controller")
     #0. Create Controller
     # See if List Comprehension (or some better way can make it a single Or formula)
     controller = False
@@ -398,6 +409,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         PF = tactic_qe_fixpoint(g).as_expr()
         print("Projected invariant for initial state is: ")
         print(PF)
+        solve(PF)
 
 #Formulation for the game where envrionment plays first with omega specification
 def getFormulationAE_omega(s, s_, s__, controller_moves, environment_moves, guarantee_s_c_, postcondition, Succ, c, c_, c__):
