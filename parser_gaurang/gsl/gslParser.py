@@ -1,4 +1,4 @@
-# Generated from gsl.g4 by ANTLR 4.9.1
+# Generated from gsl.g4 by ANTLR 4.10.1
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -8,30 +8,26 @@ if sys.version_info[1] > 5:
 else:
 	from typing.io import TextIO
 
-
 def serializedATN():
-    with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13")
-        buf.write("<\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b")
-        buf.write("\t\b\4\t\t\t\3\2\3\2\3\2\3\3\3\3\3\3\3\3\5\3\32\n\3\3")
-        buf.write("\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\5\5$\n\5\3\6\3\6\3\6\3")
-        buf.write("\6\3\7\3\7\3\7\5\7-\n\7\3\7\3\7\3\7\3\7\7\7\63\n\7\f\7")
-        buf.write("\16\7\66\13\7\3\b\3\b\3\t\3\t\3\t\2\3\f\n\2\4\6\b\n\f")
-        buf.write("\16\20\2\4\3\2\5\6\3\2\7\b\2\67\2\22\3\2\2\2\4\31\3\2")
-        buf.write("\2\2\6\33\3\2\2\2\b#\3\2\2\2\n%\3\2\2\2\f,\3\2\2\2\16")
-        buf.write("\67\3\2\2\2\209\3\2\2\2\22\23\5\4\3\2\23\24\5\b\5\2\24")
-        buf.write("\3\3\2\2\2\25\32\5\6\4\2\26\27\5\6\4\2\27\30\5\4\3\2\30")
-        buf.write("\32\3\2\2\2\31\25\3\2\2\2\31\26\3\2\2\2\32\5\3\2\2\2\33")
-        buf.write("\34\5\20\t\2\34\35\7\t\2\2\35\36\7\3\2\2\36\7\3\2\2\2")
-        buf.write("\37$\5\n\6\2 !\5\n\6\2!\"\5\b\5\2\"$\3\2\2\2#\37\3\2\2")
-        buf.write("\2# \3\2\2\2$\t\3\2\2\2%&\7\t\2\2&\'\7\4\2\2\'(\5\f\7")
-        buf.write("\2(\13\3\2\2\2)*\b\7\1\2*-\7\t\2\2+-\7\n\2\2,)\3\2\2\2")
-        buf.write(",+\3\2\2\2-\64\3\2\2\2./\f\3\2\2/\60\5\16\b\2\60\61\5")
-        buf.write("\f\7\4\61\63\3\2\2\2\62.\3\2\2\2\63\66\3\2\2\2\64\62\3")
-        buf.write("\2\2\2\64\65\3\2\2\2\65\r\3\2\2\2\66\64\3\2\2\2\678\t")
-        buf.write("\2\2\28\17\3\2\2\29:\t\3\2\2:\21\3\2\2\2\6\31#,\64")
-        return buf.getvalue()
-
+    return [
+        4,1,9,59,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,
+        2,7,7,7,1,0,1,0,1,0,1,1,1,1,1,1,1,1,3,1,24,8,1,1,2,1,2,1,2,1,2,1,
+        3,1,3,1,3,1,3,3,3,34,8,3,1,4,1,4,1,4,1,4,1,4,1,5,1,5,1,5,3,5,44,
+        8,5,1,5,1,5,1,5,1,5,5,5,50,8,5,10,5,12,5,53,9,5,1,6,1,6,1,7,1,7,
+        1,7,0,1,10,8,0,2,4,6,8,10,12,14,0,2,1,0,3,4,1,0,5,6,54,0,16,1,0,
+        0,0,2,23,1,0,0,0,4,25,1,0,0,0,6,33,1,0,0,0,8,35,1,0,0,0,10,43,1,
+        0,0,0,12,54,1,0,0,0,14,56,1,0,0,0,16,17,3,2,1,0,17,18,3,6,3,0,18,
+        1,1,0,0,0,19,24,3,4,2,0,20,21,3,4,2,0,21,22,3,2,1,0,22,24,1,0,0,
+        0,23,19,1,0,0,0,23,20,1,0,0,0,24,3,1,0,0,0,25,26,3,14,7,0,26,27,
+        5,7,0,0,27,28,5,1,0,0,28,5,1,0,0,0,29,34,3,8,4,0,30,31,3,8,4,0,31,
+        32,3,6,3,0,32,34,1,0,0,0,33,29,1,0,0,0,33,30,1,0,0,0,34,7,1,0,0,
+        0,35,36,5,7,0,0,36,37,5,2,0,0,37,38,3,10,5,0,38,39,5,1,0,0,39,9,
+        1,0,0,0,40,41,6,5,-1,0,41,44,5,7,0,0,42,44,5,8,0,0,43,40,1,0,0,0,
+        43,42,1,0,0,0,44,51,1,0,0,0,45,46,10,1,0,0,46,47,3,12,6,0,47,48,
+        3,10,5,2,48,50,1,0,0,0,49,45,1,0,0,0,50,53,1,0,0,0,51,49,1,0,0,0,
+        51,52,1,0,0,0,52,11,1,0,0,0,53,51,1,0,0,0,54,55,7,0,0,0,55,13,1,
+        0,0,0,56,57,7,1,0,0,57,15,1,0,0,0,4,23,33,43,51
+    ]
 
 class gslParser ( Parser ):
 
@@ -75,7 +71,7 @@ class gslParser ( Parser ):
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.9.1")
+        self.checkVersion("4.10.1")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
@@ -210,7 +206,7 @@ class gslParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def type(self):
+        def type_(self):
             return self.getTypedRuleContext(gslParser.TypeContext,0)
 
 
@@ -244,7 +240,7 @@ class gslParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 25
-            self.type()
+            self.type_()
             self.state = 26
             self.match(gslParser.IDENTIFIER)
             self.state = 27
@@ -371,6 +367,8 @@ class gslParser ( Parser ):
             self.match(gslParser.T__1)
             self.state = 37
             self.expr(0)
+            self.state = 38
+            self.match(gslParser.T__0)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -432,22 +430,22 @@ class gslParser ( Parser ):
         self.enterRecursionRule(localctx, 10, self.RULE_expr, _p)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 42
+            self.state = 43
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [gslParser.IDENTIFIER]:
-                self.state = 40
+                self.state = 41
                 self.match(gslParser.IDENTIFIER)
                 pass
             elif token in [gslParser.NUM]:
-                self.state = 41
+                self.state = 42
                 self.match(gslParser.NUM)
                 pass
             else:
                 raise NoViableAltException(self)
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 50
+            self.state = 51
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,3,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
@@ -457,15 +455,15 @@ class gslParser ( Parser ):
                     _prevctx = localctx
                     localctx = gslParser.ExprContext(self, _parentctx, _parentState)
                     self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
-                    self.state = 44
+                    self.state = 45
                     if not self.precpred(self._ctx, 1):
                         from antlr4.error.Errors import FailedPredicateException
                         raise FailedPredicateException(self, "self.precpred(self._ctx, 1)")
-                    self.state = 45
-                    self.op()
                     self.state = 46
+                    self.op()
+                    self.state = 47
                     self.expr(2) 
-                self.state = 52
+                self.state = 53
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,3,self._ctx)
 
@@ -513,7 +511,7 @@ class gslParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 53
+            self.state = 54
             _la = self._input.LA(1)
             if not(_la==gslParser.T__2 or _la==gslParser.T__3):
                 self._errHandler.recoverInline(self)
@@ -557,14 +555,14 @@ class gslParser ( Parser ):
 
 
 
-    def type(self):
+    def type_(self):
 
         localctx = gslParser.TypeContext(self, self._ctx, self.state)
         self.enterRule(localctx, 14, self.RULE_type)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 55
+            self.state = 56
             _la = self._input.LA(1)
             if not(_la==gslParser.T__4 or _la==gslParser.T__5):
                 self._errHandler.recoverInline(self)

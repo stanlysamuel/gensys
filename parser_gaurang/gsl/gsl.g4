@@ -14,7 +14,7 @@ assignmentList  : assignment
                 | assignment assignmentList
                 ;
 
-assignment  : IDENTIFIER ':=' expr
+assignment  : IDENTIFIER ':=' expr ';'
             ;
 
 expr    : IDENTIFIER 

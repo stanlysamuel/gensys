@@ -1,5 +1,5 @@
 Int x;
 Real y;
 
-x := x + 1
-y := x + 5
+x := x + 1;
+y := x + 5;

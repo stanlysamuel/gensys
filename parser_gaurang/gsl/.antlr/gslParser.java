@@ -1,4 +1,4 @@
-// Generated from /home/stanley/Projects/gensysMain/gensys/parser_gaurang/gsl/gsl.g4 by ANTLR 4.9.2
+// Generated from /mnt/d/gensys/parser_gaurang/gsl/gsl.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -283,6 +283,8 @@ public class gslParser extends Parser {
 			match(T__1);
 			setState(37);
 			expr(0);
+			setState(38);
+			match(T__0);
 			}
 		}
 		catch (RecognitionException re) {
@@ -329,18 +331,18 @@ public class gslParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(42);
+			setState(43);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case IDENTIFIER:
 				{
-				setState(40);
+				setState(41);
 				match(IDENTIFIER);
 				}
 				break;
 			case NUM:
 				{
-				setState(41);
+				setState(42);
 				match(NUM);
 				}
 				break;
@@ -348,7 +350,7 @@ public class gslParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(50);
+			setState(51);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -359,16 +361,16 @@ public class gslParser extends Parser {
 					{
 					_localctx = new ExprContext(_parentctx, _parentState);
 					pushNewRecursionContext(_localctx, _startState, RULE_expr);
-					setState(44);
-					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 					setState(45);
-					op();
+					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 					setState(46);
+					op();
+					setState(47);
 					expr(2);
 					}
 					} 
 				}
-				setState(52);
+				setState(53);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
 			}
@@ -399,7 +401,7 @@ public class gslParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(53);
+			setState(54);
 			_la = _input.LA(1);
 			if ( !(_la==T__2 || _la==T__3) ) {
 			_errHandler.recoverInline(this);
@@ -436,7 +438,7 @@ public class gslParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(55);
+			setState(56);
 			_la = _input.LA(1);
 			if ( !(_la==T__4 || _la==T__5) ) {
 			_errHandler.recoverInline(this);
@@ -475,21 +477,21 @@ public class gslParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13<\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13=\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3\3\3\3"+
 		"\3\3\3\3\5\3\32\n\3\3\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\5\5$\n\5\3\6\3\6\3"+
-		"\6\3\6\3\7\3\7\3\7\5\7-\n\7\3\7\3\7\3\7\3\7\7\7\63\n\7\f\7\16\7\66\13"+
-		"\7\3\b\3\b\3\t\3\t\3\t\2\3\f\n\2\4\6\b\n\f\16\20\2\4\3\2\5\6\3\2\7\b\2"+
-		"\67\2\22\3\2\2\2\4\31\3\2\2\2\6\33\3\2\2\2\b#\3\2\2\2\n%\3\2\2\2\f,\3"+
-		"\2\2\2\16\67\3\2\2\2\209\3\2\2\2\22\23\5\4\3\2\23\24\5\b\5\2\24\3\3\2"+
+		"\6\3\6\3\6\3\7\3\7\3\7\5\7.\n\7\3\7\3\7\3\7\3\7\7\7\64\n\7\f\7\16\7\67"+
+		"\13\7\3\b\3\b\3\t\3\t\3\t\2\3\f\n\2\4\6\b\n\f\16\20\2\4\3\2\5\6\3\2\7"+
+		"\b\28\2\22\3\2\2\2\4\31\3\2\2\2\6\33\3\2\2\2\b#\3\2\2\2\n%\3\2\2\2\f-"+
+		"\3\2\2\2\168\3\2\2\2\20:\3\2\2\2\22\23\5\4\3\2\23\24\5\b\5\2\24\3\3\2"+
 		"\2\2\25\32\5\6\4\2\26\27\5\6\4\2\27\30\5\4\3\2\30\32\3\2\2\2\31\25\3\2"+
 		"\2\2\31\26\3\2\2\2\32\5\3\2\2\2\33\34\5\20\t\2\34\35\7\t\2\2\35\36\7\3"+
 		"\2\2\36\7\3\2\2\2\37$\5\n\6\2 !\5\n\6\2!\"\5\b\5\2\"$\3\2\2\2#\37\3\2"+
-		"\2\2# \3\2\2\2$\t\3\2\2\2%&\7\t\2\2&\'\7\4\2\2\'(\5\f\7\2(\13\3\2\2\2"+
-		")*\b\7\1\2*-\7\t\2\2+-\7\n\2\2,)\3\2\2\2,+\3\2\2\2-\64\3\2\2\2./\f\3\2"+
-		"\2/\60\5\16\b\2\60\61\5\f\7\4\61\63\3\2\2\2\62.\3\2\2\2\63\66\3\2\2\2"+
-		"\64\62\3\2\2\2\64\65\3\2\2\2\65\r\3\2\2\2\66\64\3\2\2\2\678\t\2\2\28\17"+
-		"\3\2\2\29:\t\3\2\2:\21\3\2\2\2\6\31#,\64";
+		"\2\2# \3\2\2\2$\t\3\2\2\2%&\7\t\2\2&\'\7\4\2\2\'(\5\f\7\2()\7\3\2\2)\13"+
+		"\3\2\2\2*+\b\7\1\2+.\7\t\2\2,.\7\n\2\2-*\3\2\2\2-,\3\2\2\2.\65\3\2\2\2"+
+		"/\60\f\3\2\2\60\61\5\16\b\2\61\62\5\f\7\4\62\64\3\2\2\2\63/\3\2\2\2\64"+
+		"\67\3\2\2\2\65\63\3\2\2\2\65\66\3\2\2\2\66\r\3\2\2\2\67\65\3\2\2\289\t"+
+		"\2\2\29\17\3\2\2\2:;\t\3\2\2;\21\3\2\2\2\6\31#-\65";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
