@@ -30,6 +30,6 @@ type        : 'Int'
             | 'Real'
             ; 
 
-IDENTIFIER  : [a-zA-Z0-9_]+;
+IDENTIFIER  : [a-zA-Z_][a-zA-Z0-9_]*;
 NUM         : [0-9]+;
 WS          : [ \r\n\t]+ -> skip;
