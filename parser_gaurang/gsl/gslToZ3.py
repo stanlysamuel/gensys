@@ -1,6 +1,8 @@
+from msilib.schema import File
 import sys
 
 import antlr4
+from jinja2 import FileSystemLoader
 
 from gslLexer import gslLexer
 from gslParser import gslParser
@@ -19,4 +21,3 @@ def preparez3(gsl_spec, gsl_spec_location, no_of_ouputs):
     tree = parser.module_declaration()
     visitor = gslToZ3Visitor(gsl_spec, gsl_spec_location, no_of_ouputs)
     z3filecontent = visitor.visit(tree)
-    file.close()
