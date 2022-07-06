@@ -1,20 +1,35 @@
 grammar gsl;
 
-prog        : (expr1)*expr2;
-
-expr1       : type IDENTIFIER';'
-            | type IDENTIFIER';'
+prog        : declList assignmentList
             ;
 
-expr2       : IDENTIFIER ':=' IDENTIFIER
-            | ('+' | '-') INT
-            | ('*' | '/') INT
+declList    : decl
+            | decl declList
             ;
+
+decl        : type IDENTIFIER';'
+            ;
+
+assignmentList  : assignment 
+                | assignment assignmentList
+                ;
+
+assignment  : IDENTIFIER ':=' expr
+            ;
+
+expr    : IDENTIFIER 
+        | NUM
+        | expr op expr
+        ;
+
+// ( (IDENTIFIER | NUM | NUM IDENTIFIER) op (IDENTIFIER | NUM | NUM IDENTIFIER) op) *
+
+op          : '+' | '-' ;
 
 type        : 'Int'
             | 'Real'
             ; 
 
 IDENTIFIER  : [a-zA-Z0-9_]+;
-INT         : [0-9]+;
+NUM         : [0-9]+;
 WS          : [ \r\n\t]+ -> skip;

@@ -1,4 +1,4 @@
-# Generated from gsl.g4 by ANTLR 4.10.1
+# Generated from gsl.g4 by ANTLR 4.9.1
 from antlr4 import *
 if __name__ is not None and "." in __name__:
     from .gslParser import gslParser
@@ -14,13 +14,33 @@ class gslVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by gslParser#expr1.
-    def visitExpr1(self, ctx:gslParser.Expr1Context):
+    # Visit a parse tree produced by gslParser#declList.
+    def visitDeclList(self, ctx:gslParser.DeclListContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by gslParser#expr2.
-    def visitExpr2(self, ctx:gslParser.Expr2Context):
+    # Visit a parse tree produced by gslParser#decl.
+    def visitDecl(self, ctx:gslParser.DeclContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#assignmentList.
+    def visitAssignmentList(self, ctx:gslParser.AssignmentListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#assignment.
+    def visitAssignment(self, ctx:gslParser.AssignmentContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#expr.
+    def visitExpr(self, ctx:gslParser.ExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#op.
+    def visitOp(self, ctx:gslParser.OpContext):
         return self.visitChildren(ctx)
 
 
@@ -30,3 +50,4 @@ class gslVisitor(ParseTreeVisitor):
 
 
 
+del gslParser

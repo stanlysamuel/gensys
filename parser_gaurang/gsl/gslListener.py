@@ -1,4 +1,4 @@
-# Generated from gsl.g4 by ANTLR 4.10.1
+# Generated from gsl.g4 by ANTLR 4.9.1
 from antlr4 import *
 if __name__ is not None and "." in __name__:
     from .gslParser import gslParser
@@ -17,21 +17,57 @@ class gslListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by gslParser#expr1.
-    def enterExpr1(self, ctx:gslParser.Expr1Context):
+    # Enter a parse tree produced by gslParser#declList.
+    def enterDeclList(self, ctx:gslParser.DeclListContext):
         pass
 
-    # Exit a parse tree produced by gslParser#expr1.
-    def exitExpr1(self, ctx:gslParser.Expr1Context):
+    # Exit a parse tree produced by gslParser#declList.
+    def exitDeclList(self, ctx:gslParser.DeclListContext):
         pass
 
 
-    # Enter a parse tree produced by gslParser#expr2.
-    def enterExpr2(self, ctx:gslParser.Expr2Context):
+    # Enter a parse tree produced by gslParser#decl.
+    def enterDecl(self, ctx:gslParser.DeclContext):
         pass
 
-    # Exit a parse tree produced by gslParser#expr2.
-    def exitExpr2(self, ctx:gslParser.Expr2Context):
+    # Exit a parse tree produced by gslParser#decl.
+    def exitDecl(self, ctx:gslParser.DeclContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#assignmentList.
+    def enterAssignmentList(self, ctx:gslParser.AssignmentListContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#assignmentList.
+    def exitAssignmentList(self, ctx:gslParser.AssignmentListContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#assignment.
+    def enterAssignment(self, ctx:gslParser.AssignmentContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#assignment.
+    def exitAssignment(self, ctx:gslParser.AssignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#expr.
+    def enterExpr(self, ctx:gslParser.ExprContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#expr.
+    def exitExpr(self, ctx:gslParser.ExprContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#op.
+    def enterOp(self, ctx:gslParser.OpContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#op.
+    def exitOp(self, ctx:gslParser.OpContext):
         pass
 
 

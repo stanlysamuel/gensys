@@ -1,4 +1,4 @@
-// Generated from /mnt/d/Antlr4/sample/gsl/gsl.g4 by ANTLR 4.9.2
+// Generated from /home/stanley/Projects/gensysMain/gensys/parser_gaurang/gsl/gsl.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -16,27 +16,27 @@ public class gslParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, IDENTIFIER=9, 
-		INT=10, WS=11;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, IDENTIFIER=7, NUM=8, WS=9;
 	public static final int
-		RULE_prog = 0, RULE_expr1 = 1, RULE_expr2 = 2, RULE_type = 3;
+		RULE_prog = 0, RULE_declList = 1, RULE_decl = 2, RULE_assignmentList = 3, 
+		RULE_assignment = 4, RULE_expr = 5, RULE_op = 6, RULE_type = 7;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"prog", "expr1", "expr2", "type"
+			"prog", "declList", "decl", "assignmentList", "assignment", "expr", "op", 
+			"type"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "';'", "':='", "'+'", "'-'", "'*'", "'/'", "'Int'", "'Real'"
+			null, "';'", "':='", "'+'", "'-'", "'Int'", "'Real'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, "IDENTIFIER", "INT", 
-			"WS"
+			null, null, null, null, null, null, null, "IDENTIFIER", "NUM", "WS"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -91,14 +91,11 @@ public class gslParser extends Parser {
 	}
 
 	public static class ProgContext extends ParserRuleContext {
-		public Expr2Context expr2() {
-			return getRuleContext(Expr2Context.class,0);
+		public DeclListContext declList() {
+			return getRuleContext(DeclListContext.class,0);
 		}
-		public List<Expr1Context> expr1() {
-			return getRuleContexts(Expr1Context.class);
-		}
-		public Expr1Context expr1(int i) {
-			return getRuleContext(Expr1Context.class,i);
+		public AssignmentListContext assignmentList() {
+			return getRuleContext(AssignmentListContext.class,0);
 		}
 		public ProgContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -109,26 +106,13 @@ public class gslParser extends Parser {
 	public final ProgContext prog() throws RecognitionException {
 		ProgContext _localctx = new ProgContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_prog);
-		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(11);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==T__6 || _la==T__7) {
-				{
-				{
-				setState(8);
-				expr1();
-				}
-				}
-				setState(13);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			setState(14);
-			expr2();
+			setState(16);
+			declList();
+			setState(17);
+			assignmentList();
 			}
 		}
 		catch (RecognitionException re) {
@@ -142,44 +126,40 @@ public class gslParser extends Parser {
 		return _localctx;
 	}
 
-	public static class Expr1Context extends ParserRuleContext {
-		public TypeContext type() {
-			return getRuleContext(TypeContext.class,0);
+	public static class DeclListContext extends ParserRuleContext {
+		public DeclContext decl() {
+			return getRuleContext(DeclContext.class,0);
 		}
-		public TerminalNode IDENTIFIER() { return getToken(gslParser.IDENTIFIER, 0); }
-		public Expr1Context(ParserRuleContext parent, int invokingState) {
+		public DeclListContext declList() {
+			return getRuleContext(DeclListContext.class,0);
+		}
+		public DeclListContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_expr1; }
+		@Override public int getRuleIndex() { return RULE_declList; }
 	}
 
-	public final Expr1Context expr1() throws RecognitionException {
-		Expr1Context _localctx = new Expr1Context(_ctx, getState());
-		enterRule(_localctx, 2, RULE_expr1);
+	public final DeclListContext declList() throws RecognitionException {
+		DeclListContext _localctx = new DeclListContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_declList);
 		try {
-			setState(24);
+			setState(23);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(16);
-				type();
-				setState(17);
-				match(IDENTIFIER);
-				setState(18);
-				match(T__0);
+				setState(19);
+				decl();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(20);
-				type();
+				decl();
 				setState(21);
-				match(IDENTIFIER);
-				setState(22);
-				match(T__0);
+				declList();
 				}
 				break;
 			}
@@ -195,75 +175,240 @@ public class gslParser extends Parser {
 		return _localctx;
 	}
 
-	public static class Expr2Context extends ParserRuleContext {
-		public List<TerminalNode> IDENTIFIER() { return getTokens(gslParser.IDENTIFIER); }
-		public TerminalNode IDENTIFIER(int i) {
-			return getToken(gslParser.IDENTIFIER, i);
+	public static class DeclContext extends ParserRuleContext {
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
-		public TerminalNode INT() { return getToken(gslParser.INT, 0); }
-		public Expr2Context(ParserRuleContext parent, int invokingState) {
+		public TerminalNode IDENTIFIER() { return getToken(gslParser.IDENTIFIER, 0); }
+		public DeclContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_expr2; }
+		@Override public int getRuleIndex() { return RULE_decl; }
 	}
 
-	public final Expr2Context expr2() throws RecognitionException {
-		Expr2Context _localctx = new Expr2Context(_ctx, getState());
-		enterRule(_localctx, 4, RULE_expr2);
-		int _la;
+	public final DeclContext decl() throws RecognitionException {
+		DeclContext _localctx = new DeclContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_decl);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(25);
+			type();
+			setState(26);
+			match(IDENTIFIER);
+			setState(27);
+			match(T__0);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class AssignmentListContext extends ParserRuleContext {
+		public AssignmentContext assignment() {
+			return getRuleContext(AssignmentContext.class,0);
+		}
+		public AssignmentListContext assignmentList() {
+			return getRuleContext(AssignmentListContext.class,0);
+		}
+		public AssignmentListContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_assignmentList; }
+	}
+
+	public final AssignmentListContext assignmentList() throws RecognitionException {
+		AssignmentListContext _localctx = new AssignmentListContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_assignmentList);
 		try {
 			setState(33);
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case IDENTIFIER:
+			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
+			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(26);
-				match(IDENTIFIER);
-				setState(27);
-				match(T__1);
-				setState(28);
-				match(IDENTIFIER);
+				setState(29);
+				assignment();
 				}
 				break;
-			case T__2:
-			case T__3:
+			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(29);
-				_la = _input.LA(1);
-				if ( !(_la==T__2 || _la==T__3) ) {
-				_errHandler.recoverInline(this);
-				}
-				else {
-					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-					_errHandler.reportMatch(this);
-					consume();
-				}
 				setState(30);
-				match(INT);
+				assignment();
+				setState(31);
+				assignmentList();
 				}
 				break;
-			case T__4:
-			case T__5:
-				enterOuterAlt(_localctx, 3);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class AssignmentContext extends ParserRuleContext {
+		public TerminalNode IDENTIFIER() { return getToken(gslParser.IDENTIFIER, 0); }
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
+		}
+		public AssignmentContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_assignment; }
+	}
+
+	public final AssignmentContext assignment() throws RecognitionException {
+		AssignmentContext _localctx = new AssignmentContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_assignment);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(35);
+			match(IDENTIFIER);
+			setState(36);
+			match(T__1);
+			setState(37);
+			expr(0);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class ExprContext extends ParserRuleContext {
+		public TerminalNode IDENTIFIER() { return getToken(gslParser.IDENTIFIER, 0); }
+		public TerminalNode NUM() { return getToken(gslParser.NUM, 0); }
+		public List<ExprContext> expr() {
+			return getRuleContexts(ExprContext.class);
+		}
+		public ExprContext expr(int i) {
+			return getRuleContext(ExprContext.class,i);
+		}
+		public OpContext op() {
+			return getRuleContext(OpContext.class,0);
+		}
+		public ExprContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_expr; }
+	}
+
+	public final ExprContext expr() throws RecognitionException {
+		return expr(0);
+	}
+
+	private ExprContext expr(int _p) throws RecognitionException {
+		ParserRuleContext _parentctx = _ctx;
+		int _parentState = getState();
+		ExprContext _localctx = new ExprContext(_ctx, _parentState);
+		ExprContext _prevctx = _localctx;
+		int _startState = 10;
+		enterRecursionRule(_localctx, 10, RULE_expr, _p);
+		try {
+			int _alt;
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(42);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case IDENTIFIER:
 				{
-				setState(31);
-				_la = _input.LA(1);
-				if ( !(_la==T__4 || _la==T__5) ) {
-				_errHandler.recoverInline(this);
+				setState(40);
+				match(IDENTIFIER);
 				}
-				else {
-					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-					_errHandler.reportMatch(this);
-					consume();
-				}
-				setState(32);
-				match(INT);
+				break;
+			case NUM:
+				{
+				setState(41);
+				match(NUM);
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+			_ctx.stop = _input.LT(-1);
+			setState(50);
+			_errHandler.sync(this);
+			_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				if ( _alt==1 ) {
+					if ( _parseListeners!=null ) triggerExitRuleEvent();
+					_prevctx = _localctx;
+					{
+					{
+					_localctx = new ExprContext(_parentctx, _parentState);
+					pushNewRecursionContext(_localctx, _startState, RULE_expr);
+					setState(44);
+					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+					setState(45);
+					op();
+					setState(46);
+					expr(2);
+					}
+					} 
+				}
+				setState(52);
+				_errHandler.sync(this);
+				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			unrollRecursionContexts(_parentctx);
+		}
+		return _localctx;
+	}
+
+	public static class OpContext extends ParserRuleContext {
+		public OpContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_op; }
+	}
+
+	public final OpContext op() throws RecognitionException {
+		OpContext _localctx = new OpContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_op);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(53);
+			_la = _input.LA(1);
+			if ( !(_la==T__2 || _la==T__3) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -286,14 +431,14 @@ public class gslParser extends Parser {
 
 	public final TypeContext type() throws RecognitionException {
 		TypeContext _localctx = new TypeContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_type);
+		enterRule(_localctx, 14, RULE_type);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(35);
+			setState(55);
 			_la = _input.LA(1);
-			if ( !(_la==T__6 || _la==T__7) ) {
+			if ( !(_la==T__4 || _la==T__5) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -314,18 +459,37 @@ public class gslParser extends Parser {
 		return _localctx;
 	}
 
+	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+		switch (ruleIndex) {
+		case 5:
+			return expr_sempred((ExprContext)_localctx, predIndex);
+		}
+		return true;
+	}
+	private boolean expr_sempred(ExprContext _localctx, int predIndex) {
+		switch (predIndex) {
+		case 0:
+			return precpred(_ctx, 1);
+		}
+		return true;
+	}
+
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\r(\4\2\t\2\4\3\t"+
-		"\3\4\4\t\4\4\5\t\5\3\2\7\2\f\n\2\f\2\16\2\17\13\2\3\2\3\2\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\5\3\33\n\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4$\n\4\3"+
-		"\5\3\5\3\5\2\2\6\2\4\6\b\2\5\3\2\5\6\3\2\7\b\3\2\t\n\2\'\2\r\3\2\2\2\4"+
-		"\32\3\2\2\2\6#\3\2\2\2\b%\3\2\2\2\n\f\5\4\3\2\13\n\3\2\2\2\f\17\3\2\2"+
-		"\2\r\13\3\2\2\2\r\16\3\2\2\2\16\20\3\2\2\2\17\r\3\2\2\2\20\21\5\6\4\2"+
-		"\21\3\3\2\2\2\22\23\5\b\5\2\23\24\7\13\2\2\24\25\7\3\2\2\25\33\3\2\2\2"+
-		"\26\27\5\b\5\2\27\30\7\13\2\2\30\31\7\3\2\2\31\33\3\2\2\2\32\22\3\2\2"+
-		"\2\32\26\3\2\2\2\33\5\3\2\2\2\34\35\7\13\2\2\35\36\7\4\2\2\36$\7\13\2"+
-		"\2\37 \t\2\2\2 $\7\f\2\2!\"\t\3\2\2\"$\7\f\2\2#\34\3\2\2\2#\37\3\2\2\2"+
-		"#!\3\2\2\2$\7\3\2\2\2%&\t\4\2\2&\t\3\2\2\2\5\r\32#";
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13<\4\2\t\2\4\3\t"+
+		"\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3\3\3\3"+
+		"\3\3\3\3\5\3\32\n\3\3\4\3\4\3\4\3\4\3\5\3\5\3\5\3\5\5\5$\n\5\3\6\3\6\3"+
+		"\6\3\6\3\7\3\7\3\7\5\7-\n\7\3\7\3\7\3\7\3\7\7\7\63\n\7\f\7\16\7\66\13"+
+		"\7\3\b\3\b\3\t\3\t\3\t\2\3\f\n\2\4\6\b\n\f\16\20\2\4\3\2\5\6\3\2\7\b\2"+
+		"\67\2\22\3\2\2\2\4\31\3\2\2\2\6\33\3\2\2\2\b#\3\2\2\2\n%\3\2\2\2\f,\3"+
+		"\2\2\2\16\67\3\2\2\2\209\3\2\2\2\22\23\5\4\3\2\23\24\5\b\5\2\24\3\3\2"+
+		"\2\2\25\32\5\6\4\2\26\27\5\6\4\2\27\30\5\4\3\2\30\32\3\2\2\2\31\25\3\2"+
+		"\2\2\31\26\3\2\2\2\32\5\3\2\2\2\33\34\5\20\t\2\34\35\7\t\2\2\35\36\7\3"+
+		"\2\2\36\7\3\2\2\2\37$\5\n\6\2 !\5\n\6\2!\"\5\b\5\2\"$\3\2\2\2#\37\3\2"+
+		"\2\2# \3\2\2\2$\t\3\2\2\2%&\7\t\2\2&\'\7\4\2\2\'(\5\f\7\2(\13\3\2\2\2"+
+		")*\b\7\1\2*-\7\t\2\2+-\7\n\2\2,)\3\2\2\2,+\3\2\2\2-\64\3\2\2\2./\f\3\2"+
+		"\2/\60\5\16\b\2\60\61\5\f\7\4\61\63\3\2\2\2\62.\3\2\2\2\63\66\3\2\2\2"+
+		"\64\62\3\2\2\2\64\65\3\2\2\2\65\r\3\2\2\2\66\64\3\2\2\2\678\t\2\2\28\17"+
+		"\3\2\2\29:\t\3\2\2:\21\3\2\2\2\6\31#,\64";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
