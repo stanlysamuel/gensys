@@ -1,11 +1,9 @@
 from antlr4 import *
-if __name__ is not None and "." in __name__:
-    from .gslParser import gslParser
-else:
-    from gslParser import gslParser
+from gslParser import gslParser
+from gslVisitor import gslVisitor
 
 
-class gslVisitor(ParseTreeVisitor):
+class gslToZ3Visitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by gslParser#prog.
     def visitProg(self, ctx:gslParser.ProgContext):
