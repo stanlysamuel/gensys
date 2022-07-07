@@ -16,4 +16,4 @@ def parseGsl(filepath):
     visitor = gslToZ3Visitor()
     visitor.visit(tree)
 
-parseGsl("benchmarks/test/test1.gsl")
+parseGsl("./benchmarks/test/test1.gsl")
