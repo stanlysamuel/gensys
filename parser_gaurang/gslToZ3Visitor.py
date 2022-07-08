@@ -74,7 +74,7 @@ class gslToZ3Visitor(gslVisitor):
         for i in range(len(self.symbolTable)):
             print(self.symbolTable[i])
 
-# Visit a parse tree produced by gslParser#expr.
+    # Visit a parse tree produced by gslParser#expr.
     def visitExpr(self, ctx:gslParser.ExprContext):
         if ctx.IDENTIFIER():
             return str(ctx.IDENTIFIER())

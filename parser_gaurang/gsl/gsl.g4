@@ -23,6 +23,7 @@ identifierList: IDENTIFIER ';'
 expr     : IDENTIFIER 
          | NUM
          | expr op expr
+
          ;
 
 op          : '+' | '-' ;
@@ -34,10 +35,10 @@ cmoveList       : cmove
 cmove           : 'cmove ' (NUM|IDENTIFIER) ':' z3Formula
                 ;
 
-environmentMove : 'enviroment: ' z3Formula 
+environmentMove : 'environment: ' z3Formula 
                 ;
 
-specification   : 'specification: ' ltlformula 
+specification   : 'specification:' ltlformula 
                 ;
 
 type        : 'Int'
@@ -49,15 +50,15 @@ type        : 'Int'
 z3Formula       :  'And(' predicateList ')'     
                 ;
 
-predicateList   : predicate
-                | predicate predicateList
+predicateList   : predicate 
+                | predicate ',' predicateList
                 ;
 
 // Spot's LTL formula reference
 ltlformula
         : '(' ltlformula ')'                               #BracketFormula
         | ('G' | 'F' | '!' | 'X') ltlformula             #UnaryOp
-        | ltlformula ('&' | 'xor' | '|') ltlformula             #BinaryLogicOp
+        | ltlformula ('and' | 'xor' | '|') ltlformula             #BinaryLogicOp
         | ltlformula ('->' | '<->' | 'U' | 'W') ltlformula    #BinaryOp
         | predicate                                          #Atom
         ;

@@ -62,24 +62,6 @@ class gslListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by gslParser#assignmentList.
-    def enterAssignmentList(self, ctx:gslParser.AssignmentListContext):
-        pass
-
-    # Exit a parse tree produced by gslParser#assignmentList.
-    def exitAssignmentList(self, ctx:gslParser.AssignmentListContext):
-        pass
-
-
-    # Enter a parse tree produced by gslParser#assignment.
-    def enterAssignment(self, ctx:gslParser.AssignmentContext):
-        pass
-
-    # Exit a parse tree produced by gslParser#assignment.
-    def exitAssignment(self, ctx:gslParser.AssignmentContext):
-        pass
-
-
     # Enter a parse tree produced by gslParser#expr.
     def enterExpr(self, ctx:gslParser.ExprContext):
         pass
@@ -98,12 +80,66 @@ class gslListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by gslParser#cmoveList.
+    def enterCmoveList(self, ctx:gslParser.CmoveListContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#cmoveList.
+    def exitCmoveList(self, ctx:gslParser.CmoveListContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#cmove.
+    def enterCmove(self, ctx:gslParser.CmoveContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#cmove.
+    def exitCmove(self, ctx:gslParser.CmoveContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#environmentMove.
+    def enterEnvironmentMove(self, ctx:gslParser.EnvironmentMoveContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#environmentMove.
+    def exitEnvironmentMove(self, ctx:gslParser.EnvironmentMoveContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#specification.
+    def enterSpecification(self, ctx:gslParser.SpecificationContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#specification.
+    def exitSpecification(self, ctx:gslParser.SpecificationContext):
+        pass
+
+
     # Enter a parse tree produced by gslParser#type.
     def enterType(self, ctx:gslParser.TypeContext):
         pass
 
     # Exit a parse tree produced by gslParser#type.
     def exitType(self, ctx:gslParser.TypeContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#z3Formula.
+    def enterZ3Formula(self, ctx:gslParser.Z3FormulaContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#z3Formula.
+    def exitZ3Formula(self, ctx:gslParser.Z3FormulaContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#predicateList.
+    def enterPredicateList(self, ctx:gslParser.PredicateListContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#predicateList.
+    def exitPredicateList(self, ctx:gslParser.PredicateListContext):
         pass
 
 

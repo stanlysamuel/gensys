@@ -39,16 +39,6 @@ class gslVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by gslParser#assignmentList.
-    def visitAssignmentList(self, ctx:gslParser.AssignmentListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by gslParser#assignment.
-    def visitAssignment(self, ctx:gslParser.AssignmentContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by gslParser#expr.
     def visitExpr(self, ctx:gslParser.ExprContext):
         return self.visitChildren(ctx)
@@ -59,8 +49,38 @@ class gslVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by gslParser#cmoveList.
+    def visitCmoveList(self, ctx:gslParser.CmoveListContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#cmove.
+    def visitCmove(self, ctx:gslParser.CmoveContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#environmentMove.
+    def visitEnvironmentMove(self, ctx:gslParser.EnvironmentMoveContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#specification.
+    def visitSpecification(self, ctx:gslParser.SpecificationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by gslParser#type.
     def visitType(self, ctx:gslParser.TypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#z3Formula.
+    def visitZ3Formula(self, ctx:gslParser.Z3FormulaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#predicateList.
+    def visitPredicateList(self, ctx:gslParser.PredicateListContext):
         return self.visitChildren(ctx)
 
 
