@@ -1,0 +1,12 @@
+Int x;
+Real y;
+
+Con:
+x := x + 1;
+y := x + 5.0;
+
+Env:
+x:=x
+
+Spec:
+G(x>=5)
