@@ -13,12 +13,6 @@ declList1   : decl
 decl        : type IDENTIFIER';'
             ;
 
-// declList2   : type identifierList ';'
-//             ;
-
-// identifierList: IDENTIFIER 
-//               | identifierList ',' identifierList
-//               ;
 declList2   : type identifierList 
             ;
 
@@ -26,19 +20,10 @@ identifierList: IDENTIFIER ';'
               | IDENTIFIER ',' identifierList
               ;
 
-// assignmentList  : assignment 
-//                 | assignment assignmentList
-//                 ;
-
-// assignment  : IDENTIFIER ':=' expr ';'
-//             ;
-
 expr     : IDENTIFIER 
          | NUM
          | expr op expr
          ;
-
-// ( (IDENTIFIER | NUM | NUM IDENTIFIER) op (IDENTIFIER | NUM | NUM IDENTIFIER) op) *
 
 op          : '+' | '-' ;
 
@@ -46,25 +31,34 @@ cmoveList       : cmove
                 | cmoveList cmove
                 ;
 
-cmove           : 'cmove ' (NUM|IDENTIFIER) ':' formula
+cmove           : 'cmove ' (NUM|IDENTIFIER) ':' z3Formula
                 ;
 
-environmentMove : 'enviroment: ' formula 
+environmentMove : 'enviroment: ' z3Formula 
                 ;
 
-specification   : 'specification: ' formula 
+specification   : 'specification: ' ltlformula 
                 ;
 
 type        : 'Int'
             | 'Real'
             ; 
 
+//Z3 formula
+
+z3Formula       :  'And(' predicateList ')'     
+                ;
+
+predicateList   : predicate
+                | predicate predicateList
+                ;
+
 // Spot's LTL formula reference
-formula
-        : '(' formula ')'                               #BracketFormula
-        | ('G' | 'F' | '!' | 'X') formula             #UnaryOp
-        | formula ('&' | 'xor' | '|') formula             #BinaryLogicOp
-        | formula ('->' | '<->' | 'U' | 'W') formula    #BinaryOp
+ltlformula
+        : '(' ltlformula ')'                               #BracketFormula
+        | ('G' | 'F' | '!' | 'X') ltlformula             #UnaryOp
+        | ltlformula ('&' | 'xor' | '|') ltlformula             #BinaryLogicOp
+        | ltlformula ('->' | '<->' | 'U' | 'W') ltlformula    #BinaryOp
         | predicate                                          #Atom
         ;
 

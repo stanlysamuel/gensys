@@ -9,19 +9,19 @@ Real b5;
 // Define the controller moves as a set of deterministic assignments
 
 cmove 1:
-And( b1_ == 0.0,  b2_ == 0.0, b3_ == b3, b4_ == b4, b5_ == b5)
+And( b1_ == 0,  b2_ == 0, b3_ == b3, b4_ == b4, b5_ == b5)
 
 cmove 2:
-And( b2_ == 0.0,  b3_ == 0.0, b4_ == b4, b5_ == b5, b1_ == b1)
+And( b2_ == 0,  b3_ == 0, b4_ == b4, b5_ == b5, b1_ == b1)
 
 cmove 3: 
-And( b3_ == 0.0,  b4_ == 0.0, b5_ == b5, b1_ == b1, b2_ == b2)
+And( b3_ == 0,  b4_ == 0, b5_ == b5, b1_ == b1, b2_ == b2)
 
 cmove 4: 
-And( b4_ == 0.0,  b5_ == 0.0, b1_ == b1, b2_ == b2, b3_ == b3)
+And( b4_ == 0,  b5_ == 0, b1_ == b1, b2_ == b2, b3_ == b3)
 
 cmove 5:
-And( b5_ == 0.0,  b1_ == 0.0, b2_ == b2, b3_ == b3, b4_ == b4)
+And( b5_ == 0,  b1_ == 0, b2_ == b2, b3_ == b3, b4_ == b4)
 
 // Define the environment moves as a relation between the pre/post game states
 
@@ -31,4 +31,4 @@ And(b1_ + b2_ + b3_ + b4_ + b5_ == b1 + b2 + b3 + b4 + b5 + 1, b1_>=b1, b2_>=b2,
 // Give the LTL specification
 
 specification:
-G(b1 <= C and b2 <= C and b3 <= C and b4 <= C and b5 <= C)
+G(b1 <= 3 and b2 <= 3 and b3 <= 3 and b4 <= 3 and b5 <= 3)
