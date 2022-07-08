@@ -26,12 +26,39 @@ class gslListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by gslParser#declList1.
+    def enterDeclList1(self, ctx:gslParser.DeclList1Context):
+        pass
+
+    # Exit a parse tree produced by gslParser#declList1.
+    def exitDeclList1(self, ctx:gslParser.DeclList1Context):
+        pass
+
+
     # Enter a parse tree produced by gslParser#decl.
     def enterDecl(self, ctx:gslParser.DeclContext):
         pass
 
     # Exit a parse tree produced by gslParser#decl.
     def exitDecl(self, ctx:gslParser.DeclContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#declList2.
+    def enterDeclList2(self, ctx:gslParser.DeclList2Context):
+        pass
+
+    # Exit a parse tree produced by gslParser#declList2.
+    def exitDeclList2(self, ctx:gslParser.DeclList2Context):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#identifierList.
+    def enterIdentifierList(self, ctx:gslParser.IdentifierListContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#identifierList.
+    def exitIdentifierList(self, ctx:gslParser.IdentifierListContext):
         pass
 
 
@@ -77,6 +104,69 @@ class gslListener(ParseTreeListener):
 
     # Exit a parse tree produced by gslParser#type.
     def exitType(self, ctx:gslParser.TypeContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#UnaryOp.
+    def enterUnaryOp(self, ctx:gslParser.UnaryOpContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#UnaryOp.
+    def exitUnaryOp(self, ctx:gslParser.UnaryOpContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#BracketFormula.
+    def enterBracketFormula(self, ctx:gslParser.BracketFormulaContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#BracketFormula.
+    def exitBracketFormula(self, ctx:gslParser.BracketFormulaContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#BinaryLogicOp.
+    def enterBinaryLogicOp(self, ctx:gslParser.BinaryLogicOpContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#BinaryLogicOp.
+    def exitBinaryLogicOp(self, ctx:gslParser.BinaryLogicOpContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#Atom.
+    def enterAtom(self, ctx:gslParser.AtomContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#Atom.
+    def exitAtom(self, ctx:gslParser.AtomContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#BinaryOp.
+    def enterBinaryOp(self, ctx:gslParser.BinaryOpContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#BinaryOp.
+    def exitBinaryOp(self, ctx:gslParser.BinaryOpContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#predicate.
+    def enterPredicate(self, ctx:gslParser.PredicateContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#predicate.
+    def exitPredicate(self, ctx:gslParser.PredicateContext):
+        pass
+
+
+    # Enter a parse tree produced by gslParser#relOp.
+    def enterRelOp(self, ctx:gslParser.RelOpContext):
+        pass
+
+    # Exit a parse tree produced by gslParser#relOp.
+    def exitRelOp(self, ctx:gslParser.RelOpContext):
         pass
 
 

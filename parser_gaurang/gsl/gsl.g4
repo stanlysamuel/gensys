@@ -1,30 +1,59 @@
 grammar gsl;
 
-prog        : declList assignmentList
+prog        : declList+ cmoveList environmentMove specification
             ;
 
-declList    : decl
-            | decl declList
-            ;
+declList    : declList1
+            | declList2
+            ;    
+declList1   : decl
+            | decl declList1
+            ;   
 
 decl        : type IDENTIFIER';'
             ;
 
-assignmentList  : assignment 
-                | assignment assignmentList
-                ;
+// declList2   : type identifierList ';'
+//             ;
 
-assignment  : IDENTIFIER ':=' expr ';'
+// identifierList: IDENTIFIER 
+//               | identifierList ',' identifierList
+//               ;
+declList2   : type identifierList 
             ;
 
-expr    : IDENTIFIER 
-        | NUM
-        | expr op expr
-        ;
+identifierList: IDENTIFIER ';'
+              | IDENTIFIER ',' identifierList
+              ;
+
+// assignmentList  : assignment 
+//                 | assignment assignmentList
+//                 ;
+
+// assignment  : IDENTIFIER ':=' expr ';'
+//             ;
+
+expr     : IDENTIFIER 
+         | NUM
+         | expr op expr
+         ;
 
 // ( (IDENTIFIER | NUM | NUM IDENTIFIER) op (IDENTIFIER | NUM | NUM IDENTIFIER) op) *
 
 op          : '+' | '-' ;
+
+cmoveList       : cmove
+                | cmoveList cmove
+                ;
+
+cmove           : 'cmove ' (NUM|IDENTIFIER) ':' formula
+                ;
+
+environmentMove : 'enviroment: ' formula 
+                ;
+
+specification   : 'specification: ' formula 
+                ;
 
 type        : 'Int'
             | 'Real'
@@ -41,13 +70,15 @@ formula
 
 // Atoms of the LTL formula are predicates
 predicate: expr relOp expr 
-        | '!' predicate
-        | predicate '&' predicate
-        | predicate '|' predicate         
-        ;
+         | '!' predicate
+         | predicate '&' predicate
+         | predicate '|' predicate         
+         ;
 
 relOp : '>=' | '<=' | '==' | '>' | '<' ;
 
+COMMENT     :   '/*' .*? '*/' -> skip;
+LINE_COMMENT:   '//' ~[\r\n]* -> skip;
 IDENTIFIER  : [a-zA-Z_][a-zA-Z0-9_]*;
 NUM         : [0-9]+;
 WS          : [ \r\n\t]+ -> skip;

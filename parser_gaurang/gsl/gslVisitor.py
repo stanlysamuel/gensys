@@ -19,8 +19,23 @@ class gslVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by gslParser#declList1.
+    def visitDeclList1(self, ctx:gslParser.DeclList1Context):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by gslParser#decl.
     def visitDecl(self, ctx:gslParser.DeclContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#declList2.
+    def visitDeclList2(self, ctx:gslParser.DeclList2Context):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#identifierList.
+    def visitIdentifierList(self, ctx:gslParser.IdentifierListContext):
         return self.visitChildren(ctx)
 
 
@@ -46,6 +61,41 @@ class gslVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by gslParser#type.
     def visitType(self, ctx:gslParser.TypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#UnaryOp.
+    def visitUnaryOp(self, ctx:gslParser.UnaryOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#BracketFormula.
+    def visitBracketFormula(self, ctx:gslParser.BracketFormulaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#BinaryLogicOp.
+    def visitBinaryLogicOp(self, ctx:gslParser.BinaryLogicOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#Atom.
+    def visitAtom(self, ctx:gslParser.AtomContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#BinaryOp.
+    def visitBinaryOp(self, ctx:gslParser.BinaryOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#predicate.
+    def visitPredicate(self, ctx:gslParser.PredicateContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by gslParser#relOp.
+    def visitRelOp(self, ctx:gslParser.RelOpContext):
         return self.visitChildren(ctx)
 
 
