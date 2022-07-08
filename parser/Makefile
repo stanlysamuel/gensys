@@ -7,3 +7,7 @@ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.9.1-complete.jar:$CLASSPAT
 
 antlr4 -visitor GenSys.g4
 javac GenSys*.java
+
+antlr4 -Dlanguage=Python3 -visitor gsl.g4 
+grun gsl prog test
+alias grun='/home/gaurang/.local/bin/pygrun'

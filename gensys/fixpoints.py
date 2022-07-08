@@ -8,8 +8,7 @@
 
 #  This file is part of gensys.
 
- 
-from tabnanny import check
+
 from  gensys.helper import *
 from z3 import *
 #-------------------------------------------------------------------#
@@ -219,9 +218,27 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         
         return And(range_c, range_c_, reach, det1, det2)
     
+    def antichain_optimization(wp, c, c_, substList, k):
+        
+        # Antichain Optimization
+        wpc_ = substitute(wp, *substList+[(c[j], c_[j]) for j in range(nQ)])
+
+        range_c = And([And(c[q] >= -1, c[q] <= k+1) for q in range(0, len(c))])
+        range_c_ = And([And(c_[q] >= -1, c_[q] <= k+1) for q in range(0, len(c))])
+
+        notDominating = Or([And(wpc_, And([c[q] <= c_[p] for q in range(0, len(c))]), Or([c[q] < c_[p] for q in range(0, len(c))]) ) for p in range(0, len(c_))])
+
+        g =Goal()
+        g.add(And(Not(notDominating), wp, range_c, range_c_))
+        print("Projecting notDominating")
+        notDominating = tactic_qe_fixpoint(g).as_expr()
+        
+
+        return notDominating
+        
 
     #Define the k for which this fixedpoint is computed
-    k = 5
+    k = 4
 
     #Get states from environment
     s=[]
@@ -335,8 +352,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
 
     #1. Game Formulation
 
-    #Get AE/EA Formula with postcondition guarantee(*s__)
-    print("Creating wpAssertion")
+    # Get AE/EA Formula with postcondition guarantee(*s__)
     wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), guarantee_(s__,c__), Succ, c, c_, c__)
     
     #2. Fixed Point Computation
@@ -348,11 +364,22 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
 
     g =Goal()
     g.add(wpAssertion)
+    print("Projecting wpAssertion")
     wp = tactic_qe_fixpoint(g).as_expr()
+
+    print(wp)
+    print_automaton_states(wp)
+
+    wp1 = antichain_optimization(wp, c, c_, substList, k)
+
+    print(wp1)
+    print_automaton_states(wp1)
+
+    exit()
+    print("Projected wpAssertion")
     W = And(wp, guarantee_(s, c))
     F = guarantee_(s, c)
     i = 0
-    print("Created wpAssertion")
     print("Iteration", i )
     while(not valid(Implies(F, W),0)):
     # while(not valid(F == W)): gives same as above so => holds one way
@@ -430,5 +457,13 @@ def getFormulationAE_omega(s, s_, s__, controller_moves, environment_moves, guar
 
 #Formulation for the game where controller plays first with omega specification
 def getFormulationEA_omega(s, s_, s__, controller_moves, environment_moves, guarantee_s_c_, postcondition, Succ, c, c_, c__):
+
+    # Projecting Forall first was not fast 
+    # ForAllFormula = ForAll(s__+c__, Implies(And(environment_moves, Succ(c_,s_,c__)), postcondition))
+    # #2. Project FA-Formula
+    # g =Goal()
+    # g.add(ForAllFormula)
+    # ForAllFormula = tactic_qe_fixpoint(g).as_expr()
+    # return Exists(s_+c_, And(controller_moves, Succ(c,s,c_), guarantee_s_c_, ForAllFormula))
     return Exists(s_+c_, And(controller_moves, Succ(c,s,c_), guarantee_s_c_, ForAll(s__+c__, Implies(And(environment_moves, Succ(c_,s_,c__)), postcondition))))
     return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))

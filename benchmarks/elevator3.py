@@ -10,16 +10,17 @@ def environment(x,x_):
 
 #2. Define Controller moves
 
-def move1(x,x_):
-    return And(x_ == x)
+# def move1(x,x_):
+#     return And(x_ == x)
 
 def move2(x,x_):
     return And(x_ == x+1)
 
 def move3(x,x_):
-    return And(x_ == x-1)
+    return And(x_ == x-2)
 
-controller_moves = [move1, move2, move3]
+# controller_moves = [move1, move2, move3]
+controller_moves = [move2, move3]
 
 mode = sys.argv[1]
 spec = sys.argv[2]
