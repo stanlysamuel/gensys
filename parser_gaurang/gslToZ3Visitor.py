@@ -47,6 +47,8 @@ class gslToZ3Visitor(gslVisitor):
         new2=eq.replace(eq,"==")
        # print(new2)
         #print(ctx.expr().)
+        f.write("def move1 ("+var+","+new1+"):\n" )
+        f.write("  return ")
         f.write(new1)
         f.write(new2)
         f.write(str(self.visit(ctx.children[2])))

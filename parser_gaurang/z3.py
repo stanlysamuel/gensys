@@ -1,1 +1,2 @@
-x_==x+1
+def move1 (x,x_):
+  return x_==x+1
