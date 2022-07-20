@@ -1,3 +1,5 @@
+#from logging.config import IDENTIFIER
+from symtable import SymbolTable
 from antlr4 import *
 from gsl.gslVisitor import *
 from gsl.gslParser import *
@@ -28,34 +30,34 @@ class gslToZ3Visitor(gslVisitor):
         return str(ctx.children[0])
     
     # Visit a parse tree produced by gslParser#assignment.
-    def visitAssignment(self, ctx:gslParser.AssignmentContext):
-        f=open('z3.py','w')
-        #data=f.read()
-        print(ctx.getText())
-        # print(self.symbolTable[0])
-        varPresent = False
-        for symbol in self.symbolTable:
-            print(symbol)
-            if str(ctx.IDENTIFIER()) in symbol[0]:
-                varPresent = True
-        if(not varPresent):
-            print("Error: Identifier not declared")
-        var=str(ctx.children[0])
-        new1=var.replace(var,var+'_')  
-        #print(new1)
-        eq=str(ctx.children[1])
-        new2=eq.replace(eq,"==")
-       # print(new2)
-        #print(ctx.expr().)
-        f.write("def move1 ("+var+","+new1+"):\n" )
-        f.write("  return ")
-        f.write(new1)
-        f.write(new2)
-        f.write(str(self.visit(ctx.children[2])))
-        print(ctx.children[2])
-        f.close()
-        exit()
-        return self.visitChildren(ctx)
+    # def visitAssignment(self, ctx:gslParser.AssignmentContext):
+    #     f=open('z3.py','w')
+    #     #data=f.read()
+    #     print(ctx.getText())
+    #     # print(self.symbolTable[0])
+    #     varPresent = False
+    #     for symbol in self.symbolTable:
+    #         print(symbol)
+    #         if str(ctx.IDENTIFIER()) in symbol[0]:
+    #             varPresent = True
+    #     if(not varPresent):
+    #         print("Error: Identifier not declared")
+    #     var=str(ctx.children[0])
+    #     new1=var.replace(var,var+'_')  
+    #     #print(new1)
+    #     eq=str(ctx.children[1])
+    #     new2=eq.replace(eq,"==")
+    #    # print(new2)
+    #     #print(ctx.expr().)
+    #     f.write("def move1 ("+var+","+new1+"):\n" )
+    #     f.write("  return ")
+    #     f.write(new1)
+    #     f.write(new2)
+    #     f.write(str(self.visit(ctx.children[2])))
+    #     print(ctx.children[2])
+    #     f.close()
+    #     exit()
+    #     return self.visitChildren(ctx)
 
     # Visit a parse tree produced by gslParser#expr.
     def visitExpr(self, ctx:gslParser.ExprContext):
@@ -89,3 +91,25 @@ class gslToZ3Visitor(gslVisitor):
     # Visit a parse tree produced by gslParser#op.
     def visitOp(self, ctx:gslParser.OpContext):
         return str(ctx.children[0])
+
+    def checkID(self, ctx:gslParser.ExprContext):
+        IDENTIFIER= str(ctx.IDENTIFIER())
+       
+        IDENTIFIERORPLUS = ctx.IDENTIFIER | ctx.IDENTIFIER + '_'
+
+        var=str(ctx.IDENTIFIER())
+
+        if var in self.symbolTable:
+            return var
+        if var == IDENTIFIERORPLUS in self.visitCmoveList(ctx):
+            return var
+        # else:
+        #     print("Error")
+        elif var == IDENTIFIERORPLUS in self.visitEnvironmentMove(ctx):
+            return var
+        # else:
+        #     print("Error")
+        elif var == IDENTIFIERORPLUS in self.visitSpecification(ctx):
+            return var
+        # else: 
+        #     print("Error")

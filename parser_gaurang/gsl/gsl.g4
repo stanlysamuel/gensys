@@ -23,7 +23,6 @@ identifierList: IDENTIFIER ';'
 expr     : IDENTIFIER 
          | NUM
          | expr op expr
-
          ;
 
 op          : '+' | '-' ;
