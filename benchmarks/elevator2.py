@@ -60,6 +60,8 @@ else:
         #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
         def sigma(x):
             return [x == 1, x == 2, Not(And(x>=1, x<=2))]
+            # return [And(x>=1, x<=2), Not(And(x>=1, x<=2))] # This is expensive to project for some reason
+            # return [Or(x == 1, x == 2), Not(And(x>=1, x<=2))]
 
         # (Optional): Explicit safety guarantee that complements the omega-regular formula
         # Default: Returns the True formula in Z3
@@ -67,7 +69,8 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        # omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        omega_fixedpoint_antichain(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
 
     else:
         print("Not a valid input: Please enter \"safety\" or \"omega\" as the third argument")

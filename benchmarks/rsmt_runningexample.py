@@ -20,6 +20,6 @@ spec = sys.argv[2]
 if spec == "safety":
     # 3. Define Guarantee
     def guarantee(x, i):
-        return And(x>=0, x<=100, i>=0, i< 5)
+        return And(x>=0, x<=100, i>=0, i< 50)
 
     safety_fixedpoint(controller_moves, environment, guarantee, int(mode))
