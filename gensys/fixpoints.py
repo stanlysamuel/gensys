@@ -479,6 +479,10 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     def max(x,y):
         return If(x > y, x, y)
 
+    # Used for glb
+    def min(x,y):
+        return If(x <= y, x, y)
+        
     # Plug in sigma_x and c_ to get c
     def omega(c_, sigma_x, c):
 
@@ -726,10 +730,35 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     # Get AE/EA Formula with postcondition guarantee(*s__)
     # wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), guarantee_(s__,c__), Succ, c, c_, c__)
 
-    # def glb(conPost_c_):
-    #     conPost_c__ = substitute(conPost_c_, [(c_[j], c__[j]) for j in range(len(c))])
-    #     c_[i] <= 
-    #     return And(True)
+    def glb(conPost_c_, c_):
+        conPost_c__ = substitute(conPost_c_, [(c_[j], c__[j]) for j in range(len(c))])
+
+        print(conPost_c_)
+        print(conPost_c__)
+        print_automaton_states_c(conPost_c_, c_)
+        print_automaton_states_c(conPost_c__, c__)
+
+        cpg = Exists(c_+c__, And(And(conPost_c_, conPost_c__), And([And(c[k] == min(c_[k], c__[k]) ) for k in range(0, len(c))])))
+        
+        cpg_c_ = substitute(cpg, [(c[j], c_[j]) for j in range(len(c))])
+        cpg_c = ForAll(c_, Implies(And(cpg_c_), And(cpg, And([c[k]<= c_[k] for k in range(0,len(c))]))   ))
+
+        # Use
+        # min = And([c[k]<=c_[k] for k in range(0,len(c_))])
+        # some = And([Or([c[k]==c_[l] for l in range(0,len(c_))]) for k in range(0,len(c))])
+        # cpg = And(min, some, conPost_c_)
+
+        # wp = Exists(c_, cpg)
+        g =Goal()
+        g.add(cpg_c)
+        wp = tactic_qe_fixpoint(g).as_expr()
+        print(wp)
+        print_automaton_states_c(wp, c)
+
+        wp = substitute(wp, [(c[j], c_[j]) for j in range(len(c))])
+        # exit()
+
+        return wp
     #2. Fixed Point Computation
 
     #Create list of tuples for substitution pre variables with post
@@ -738,17 +767,19 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         substList = substList+[(var,var__)]
 
     #Decide more if ForAll needed and how the intersection is computed
-    envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), guarantee_antichain_(s__,c__))))
-
+    # envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), guarantee_antichain_(s__,c__))))
+    envPre = Exists(c__, And(Omega(c__, s_, c_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee_antichain_(s__,c__)))))
     #Project envPre(s_,c_) 
     g =Goal()
     g.add(envPre)
     conPost = tactic_qe_fixpoint(g).as_expr()
     # print(conPost)
     #Seems expensive and it also seems like glb is needed.
-    # conPost = keep_maximal(conPost, c_, c__, substList, k)
-    # conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost)))
-    
+    conPost = keep_maximal(conPost, c_, c__, substList, k)
+    conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_))
+    # After removing non-maximal and after taking glb
+    # conPost = And(And([c_[k] ==0 for k in range(0,5)]), c_[5] == 1, s_[0] >=1, s_[0] <=3)
+    print(conPost)
     # print_automaton_states_c(conPost, c_)
     print_automaton_states_c_s(conPost, c_, s_)
     # exit()
@@ -761,6 +792,7 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     wp = keep_maximal(wp, c, c_, substList, k)
     # controller maximal solution
     print_automaton_states_c_s(wp, c, s)
+
     # exit()
     W = wp
     F = guarantee_antichain_(s,c)
@@ -771,14 +803,16 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         W = substitute(W, *substList+[(c[j], c__[j]) for j in range(nQ)])
 
         #Decide more if ForAll needed and how the intersection is computed
-        envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), W)))
+        # envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), W)))
 
+        envPre = Exists(c__, And(Omega(c__, s_, c_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee_antichain_(s__,c__)))))
         #Project envPre(s_,c_) 
         g =Goal()
         g.add(envPre)
         conPost = tactic_qe_fixpoint(g).as_expr()
         # print(conPost)
         conPost = keep_maximal(conPost, c_, c__, substList, k)
+        conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_))
         # print_automaton_states_c(conPost, c_)
         print_automaton_states_c_s(conPost, c_, s_)
 
