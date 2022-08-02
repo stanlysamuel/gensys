@@ -9,6 +9,8 @@
 #  This file is part of gensys.
 
 
+from os import W_OK
+from pkgutil import ImpLoader
 from  gensys.helper import *
 from z3 import *
 #-------------------------------------------------------------------#
@@ -523,50 +525,35 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         # return And( det1, det2)
         return And(range_c, range_c_, det1, det2)
     
-    def keep_maximal(wp, c, c_, substList, k):
+    def maximal(W, v, v_, c, c_):
+        # Input: W(v,c)
+        # Ouput: M(v,c) representing the maximal states in W(v,c)
+        # v_ and c_ represent the temporary variables to be replaced with.
+
+        # Create a list for substitution of game states
+        substList_vv_ = []
+        for (var, var_) in zip(v,v_):
+            substList_vv_ = substList_vv_+[(var,var_)]
+
+        # Create W_ = W(v_,c_)
+        W_ = substitute(W, *substList_vv_+[(c[j], c_[j]) for j in range(nQ)])
+
+        # s_dominates(c,c') is the predicate that states that c' strictly dominates c.
+        # s_dominates(c,c') := ForAll q. c[q] <= c_[q] and Exists q. c[q] < c_[q]
+        s_dominates = And(And([c[q] <= c_[q] for q in range(0, len(c))]), Or([c[q] < c_[q] for q in range(0, len(c))]))
+
+        # dominated(c) := Exists v. W(v,c) and W(v_,c_) and sDominates(c,c')
+        dominated = Exists(v+v_+c_, And(W, W_, s_dominates))
         
-        # Antichain Optimization
+        # Eliminate dominated states from W(v,c). This will also remove the corresponding predicate associated with the states.
+        # maximal_states(v,c) = W(v,c) and !dominated(c)
+        maximal_states = And(W, Not(dominated))
 
-
-            #Create list of tuples for substitution pre variables with post
-        substList = []
-        for (var, var_) in zip(s,s_):
-            substList = substList+[(var,var_)]
-        # wpc_ = substitute(wp, *substList+[(c[j], c_[j]) for j in range(nQ)])
-        # WP(c')
-        # print_automaton_states_c(wp,c)
-        # WP(c) WP(c') D(c',c)
-        # D(c', c) and WP(c) and WP(c') => Not(WP(c))
-        # exit()
-        wpc_ = substitute(wp, *substList+[(c[j], c_[j]) for j in range(nQ)])
-        # print(wpc_)
-        # solve(wpc_)
-        # exit()
-        # print_automaton_states_c(wpc_, c_)
-        # D(c,c') = ForAll q. c[q] <= c_[q] and Exists q. c[q] < c_[q]
-        strictlyDominates = And(And([c[q] <= c_[q] for q in range(0, len(c))]), Or([c[q] < c_[q] for q in range(0, len(c))]))
-        # print_automaton_states_c(Exists(c_, And(Not(dominates), wpc_)), c)
-        # exit()
-        # print_automaton_states_c(And(wp, Exists(c_, And(wpc_, strictlyDominates))), c)
-
-        g = Goal()
-        g.add(Exists(s,And(wp, Exists(c_+s_, And(wpc_, strictlyDominates)))) )
-        negation = tactic_qe_fixpoint(g).as_expr()
-        # print(negation)
-        # solve(negation)
-        # print_automaton_states_c(negation, c)
-        # notDominating = Not(Exists(c_, And(wpc_, strictlyDominates)))
-        
-
+        # Project formula to get dominating 
         g =Goal()
-        # print_automaton_states_c(notDominating, c)
-        g.add(And(wp, Not(negation)))
-        dominating = tactic_qe_fixpoint(g).as_expr()
-        # print(dominating)
-        # print_automaton_states_c(dominating, c)
-        # print_automaton_states_c(And(wp, Not(Exists(c_, And(wpc_, strictlyDominates)))), c)
-        
-        return dominating
+        g.add(maximal_states)
+        maximal_states = tactic_qe_fixpoint(g).as_expr()
+        return maximal_states
         
 
     #Define the k for which this fixedpoint is computed
@@ -730,36 +717,36 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     # Get AE/EA Formula with postcondition guarantee(*s__)
     # wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), guarantee_(s__,c__), Succ, c, c_, c__)
 
-    def glb(conPost_c_, c_):
-        conPost_c__ = substitute(conPost_c_, [(c_[j], c__[j]) for j in range(len(c))])
+    def glb(W, c, c_):
+        # Input: W(c)
+        # Ouput: G(c) representing the maximal states in W(v,c)
+        # c_ represent the temporary variables to be replaced with.
 
-        print(conPost_c_)
-        print(conPost_c__)
-        print_automaton_states_c(conPost_c_, c_)
-        print_automaton_states_c(conPost_c__, c__)
+        # Create W(c_)
+        W_ = substitute(W, [(c[j], c_[j]) for j in range(len(c))])
 
-        cpg = Exists(c_+c__, And(And(conPost_c_, conPost_c__), And([And(c[k] == min(c_[k], c__[k]) ) for k in range(0, len(c))])))
-        
-        cpg_c_ = substitute(cpg, [(c[j], c_[j]) for j in range(len(c))])
-        cpg_c = ForAll(c_, Implies(And(cpg_c_), And(cpg, And([c[k]<= c_[k] for k in range(0,len(c))]))   ))
-
-        # Use
-        # min = And([c[k]<=c_[k] for k in range(0,len(c_))])
-        # some = And([Or([c[k]==c_[l] for l in range(0,len(c_))]) for k in range(0,len(c))])
-        # cpg = And(min, some, conPost_c_)
-
-        # wp = Exists(c_, cpg)
+        # Find all the lower bounds L(c) of W(c)
+        L = ForAll(c_, Implies(W_, And([And(c[k] <= c_[k], c[k]>=-1) for k in range(0, len(c))])))
         g =Goal()
-        g.add(cpg_c)
-        wp = tactic_qe_fixpoint(g).as_expr()
-        print(wp)
-        print_automaton_states_c(wp, c)
+        g.add(L)
+        L = tactic_qe_fixpoint(g).as_expr()
 
-        wp = substitute(wp, [(c[j], c_[j]) for j in range(len(c))])
-        # exit()
+        # Create L(c_)
+        L_ = substitute(L, [(c[j], c_[j]) for j in range(len(c))])
 
-        return wp
+        # Find greatest lower bound G(c). It must exist.
+        G = ForAll(c_, Implies(L_, And(L, And([c[k] >= c_[k] for k in range(0, len(c))]))))
+        g =Goal()
+        g.add(G)
+        G = tactic_qe_fixpoint(g).as_expr()
+
+        return G
+        
     #2. Fixed Point Computation
+
+    #GLB TESTING CORNER CASE
+    # formula = Or(And(c[0]==0, c[1]==1, c[2]==3, c[3]==0, c[4]==0, c[5]==0), And(c[0]==1, c[1]==0, c[2]==0, c[3]==0, c[4]==0, c[5]==0), And(c[0]==2, c[1]==1, c[2]==1, c[3]==0, c[4]==0, c[5]==0))
+    # glb(formula, c, c_)
 
     #Create list of tuples for substitution pre variables with post
     substList = []
@@ -775,8 +762,8 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     conPost = tactic_qe_fixpoint(g).as_expr()
     # print(conPost)
     #Seems expensive and it also seems like glb is needed.
-    conPost = keep_maximal(conPost, c_, c__, substList, k)
-    conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_))
+    conPost = maximal(conPost,s_, s__, c_, c__)
+    conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
     # After removing non-maximal and after taking glb
     # conPost = And(And([c_[k] ==0 for k in range(0,5)]), c_[5] == 1, s_[0] >=1, s_[0] <=3)
     print(conPost)
@@ -789,11 +776,10 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     g.add(wp)
     wp = tactic_qe_fixpoint(g).as_expr()
     # print(wp)
-    wp = keep_maximal(wp, c, c_, substList, k)
+    wp = maximal(wp, s, s_, c, c_)
     # controller maximal solution
     print_automaton_states_c_s(wp, c, s)
 
-    # exit()
     W = wp
     F = guarantee_antichain_(s,c)
     i = 0
@@ -811,8 +797,8 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         g.add(envPre)
         conPost = tactic_qe_fixpoint(g).as_expr()
         # print(conPost)
-        conPost = keep_maximal(conPost, c_, c__, substList, k)
-        conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_))
+        conPost = maximal(conPost,s_, s__, c_, c__)
+        conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
         # print_automaton_states_c(conPost, c_)
         print_automaton_states_c_s(conPost, c_, s_)
 
@@ -821,7 +807,7 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         g.add(wp)
         wp = tactic_qe_fixpoint(g).as_expr()
         # print(wp)
-        wp = keep_maximal(wp, c, c_, substList, k)
+        wp = maximal(wp, s, s_, c, c_)
         # controller maximal solution
         # print_automaton_states_c(wp, c)
         print_automaton_states_c_s(wp, c, s)
