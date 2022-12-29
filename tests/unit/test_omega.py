@@ -27,6 +27,7 @@ c = IntVector('c', nQ)
 c_ = IntVector('c_', nQ)
 
 x = Int('x')
+sigma = [x == 1, x == 2, Not(And(x>=1, x<=2))]
 state=[]
 state.append(x)
 
@@ -71,6 +72,30 @@ def omega_function(c_post, sigma):
         s.add(constraints)
     return c_list
 
-def test_omega():
-    sigma = [x == 1, x == 2, Not(And(x>=1, x<=2))]
-    assert omega_function([(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)], sigma[0]) == [(0, 0), (1, -1), (2, 1), (3, 0), (4, 1)]
+def test_1():
+    assert omega_function([(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)], x == 1) == [(0, 0), (1, -1), (2, 1), (3, 0), (4, 1)]
+def test_2():
+    assert omega_function([(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)], x == 2) == [(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)]
+def test_3():
+    assert omega_function([(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)], Not(And(x>=1, x<=2))) == [(0, -1), (1, -1), (2, -1), (3, 0), (4, 1)]
+
+def test_4():
+    assert omega_function([(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)], x == 1) == [(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)]
+def test_5():
+    assert omega_function([(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)], x == 2) == [(0, 0), (1, -1), (2, 0), (3, 1), (4, 1)]
+def test_6():
+    assert omega_function([(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)], Not(And(x>=1, x<=2))) == [(0, -1), (1, -1), (2, 0), (3, -1), (4, 1)]
+
+def test_7_bot():
+    assert omega_function([(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)], x == 1) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)]
+def test_8_bot():
+    assert omega_function([(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)], x == 2) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)]
+def test_9_bot():
+    assert omega_function([(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)], Not(And(x>=1, x<=2))) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)]
+
+def test_10_top():
+    assert omega_function([(0, k), (1, k), (2, k), (3, k), (4, k)], x == 1) == [(0, 1), (1, 1), (2, 2), (3, 1), (4, 2)]
+def test_11_top():
+    assert omega_function([(0, k), (1, k), (2, k), (3, k), (4, k)], x == 2) == [(0, 1), (1, 1), (2, 1), (3, 2), (4, 2)]
+def test_12_top():
+    assert omega_function([(0, k), (1, k), (2, k), (3, k), (4, k)], Not(And(x>=1, x<=2))) == [(0, 1), (1, 1), (2, 1), (3, 1), (4, 2)]
