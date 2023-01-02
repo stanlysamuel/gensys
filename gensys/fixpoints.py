@@ -220,20 +220,20 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         
         return And(range_c, range_c_, reach, det1, det2)
     
-    def antichain_optimization(wp, c, c_, substList, k):
+    # def antichain_optimization(wp, c, c_, substList, k):
         
-        # Antichain Optimization
-        # wpc_ = substitute(wp, *substList+[(c[j], c_[j]) for j in range(nQ)])
-        wpc_ = substitute(wp, *[(c[j], c_[j]) for j in range(nQ)])
-        dominates = And(And([c[q] <= c_[q] for q in range(0, len(c))]), Or([c[q] < c_[q] for q in range(0, len(c))]))
-        notDominating = Not(Exists(c_, And(wpc_, dominates)))
+    #     # Antichain Optimization
+    #     # wpc_ = substitute(wp, *substList+[(c[j], c_[j]) for j in range(nQ)])
+    #     wpc_ = substitute(wp, *[(c[j], c_[j]) for j in range(nQ)])
+    #     dominates = And(And([c[q] <= c_[q] for q in range(0, len(c))]), Or([c[q] < c_[q] for q in range(0, len(c))]))
+    #     notDominating = Not(Exists(c_, And(wpc_, dominates)))
 
-        g =Goal()
-        g.add(And(wp, notDominating))
-        print("Projecting notDominating")
-        notDominating = tactic_qe_fixpoint(g).as_expr()
+    #     g =Goal()
+    #     g.add(And(wp, notDominating))
+    #     print("Projecting notDominating")
+    #     notDominating = tactic_qe_fixpoint(g).as_expr()
         
-        return notDominating
+    #     return notDominating
         
 
     #Define the k for which this fixedpoint is computed
@@ -546,15 +546,26 @@ def omega(c_, sigma_x, c, k, automaton, isFinal, s):
     # This constraint gives count for p where p -> q and p-> q'
     # det1 = ForAll([q,q_,s], Implies(And(automaton(p,q,*s), sigma_x, automaton(p,q_,*s), sigma_x, q!=q_, c_(q) - isFinal(q) <= c_(q_) - isFinal(q_) ), c(p) == max(c_(q) - isFinal(q) , -1) ) )
         
-    det1 = And([And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, automaton(p,q_,*s), sigma_x, q!=q_, c_[q] - isFinal(q) <= c_[q_] - isFinal(q_) ), c[p] == max(c_[q] - isFinal(q) , -1) ) ) for q_ in range(0, len(c_))]) for q in range(0, len(c_))]) for p in range(0,len(c)) ])
+    # det1 = And([And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, automaton(p,q_,*s), sigma_x, q!=q_, c_[q] - isFinal(q) <= c_[q_] - isFinal(q_) ), c[p] == max(c_[q] - isFinal(q) , -1) ) ) for q_ in range(0, len(c_))]) for q in range(0, len(c_))]) for p in range(0,len(c)) ])
 
     # This constraint gives count for p where p -> q
     # det2 = ForAll([q,s], Implies(And(automaton(p,q,*s), sigma_x, Not(Exists([q_], And(automaton(p,q_,*s), sigma_x, q!=q_)))), c(p) == max(c_(q) - isFinal(q) , -1) ))
-    det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, Not( Or([And(automaton(p,q_,*s), sigma_x, q!=q_) for q_ in range(0,len(c_))]) ) ), c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) for p in range(0,len(c))])
+    # det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, Not( Or([And(automaton(p,q_,*s), sigma_x, q!=q_) for q_ in range(0,len(c_))]) ) ), c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) for p in range(0,len(c))])
 
     # Quantifiers are only over game variables. Rest are blasted are the domain and range is finite (expensive)
     # return And( det1, det2)
-    return And(range_c, range_c_, det1, det2)
+
+    # det = ForAll([q,x], Implies(And(automaton(p,q,x), sig, c_(q) != -1), c(p) <= max(c_(q) - isFinal(q) , -1) ))
+    det = And([And([ForAll(s, Implies(And(automaton(p,q, *s), sigma_x, c_[q] != -1), c[p] <= max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) for p in range(0, len(c)) ])
+    # unreach = Implies(c(p) == -1, Not(Exists([q,x], And(automaton(p,q,x), sig, c_(q) != -1))))
+    unreach = And([Implies(c[p] == -1, Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c_[q] != -1)) for q in range(0, len(c_)) ]) )) for p in range(0, len(c))])
+    # reach = Implies(c(p) != -1, Exists([q,x], And(automaton(p,q,x), sig, c(p) == max(c_(q) - isFinal(q) , -1) )))
+    reach = And([Implies(c[p] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) ) for p in range(0, len(c))])
+
+    # s.add(ForAll([p], Implies(range_p, And(det, reach, unreach))))
+
+    # return And(range_c, range_c_, det1, det2)
+    return And(range_c, range_c_, det, reach, unreach)
 
 def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
 
