@@ -502,7 +502,7 @@ def max(x,y):
         return If(x > y, x, y)
         
 # Plug in sigma_x and c_ to get c
-def omega(c_, sigma_x, c, k, automaton, isFinal, s):
+def omega(c_, sigma_x, c, automaton, isFinal, s):
 
     # 1. Range Constraints
 
@@ -644,7 +644,7 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     print("Projecting Omega to store")
     # Stores projected omega in a different array (indexed by the same index as sigma) so that project is not called always again and again.
     # This improves the speed by 2X
-    projected_omega = [project(omega(c_,sigma[i],c, k , automaton, isFinal, s)) for i in range(len(sigma))]
+    projected_omega = [project(omega(c_,sigma[i],c, automaton, isFinal, s)) for i in range(len(sigma))]
 
     # print(projected_succ[1])
     # exit()
