@@ -184,60 +184,45 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 
 # Omega Fixed-Point Procedure:
 
+# Plug in sigma_x and c to get c_
+
+# Define the k for which all fixedpoints (regular + antichain) is computed
+k = 2
+
+def min(x,y):
+        return If(x < y, x, y)
+
+def succ(c, sigma_x, c_, automaton, isFinal, s):
+
+    # 1. Range Constraints
+
+    range_c = And([And(c[q] >= -1, c[q] <= k+1) for q in range(0, len(c))])
+    range_c_ = And([And(c_[q] >= -1, c_[q] <= k+1) for q in range(0, len(c))])
+
+    # 2. Reachability constraint
+    # Target state number is reachable iff ( exists some transition to it on some input)
+    # One direction is enough. The other is implied from the determinization constraint
+    
+    reach = And([Implies(c_[q] != -1,  Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1)) for p in range(0, len(c))])) for q in range(0, len(c_))])
+
+    # 3. Determinization constraint
+
+    # This constraint gives the count on valid target states that has >1 input states.
+    # det1 = And([And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] == min(c[p] + isFinal(q) , k+1))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
+    
+    det1 = And([And([And([Not(Exists(s, And(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] != min(c[p] + isFinal(q) , k+1)))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
+    
+    
+    # This constraint gives the count on valid target states that has 1 input state.
+    # det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] == min(c[p] + isFinal(q) , k+1))) for p in range(0, len(c))]) for q in range(0, len(c_))])
+    
+    det2 = And([And([Not(Exists(s, And(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] != min(c[p] + isFinal(q) , k+1)))) for p in range(0, len(c))]) for q in range(0, len(c_))])
+    
+    return And(range_c, range_c_, reach, det1, det2)
+
 def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
 
     # Define Succ function for determinization (depends on succ (depends on min))
-
-    def min(x,y):
-        return If(x < y, x, y)
-
-    # Plug in sigma_x and c_ to get c
-    def succ(c, sigma_x, c_):
-
-        # 1. Range Constraints
-
-        range_c = And([And(c[q] >= -1, c[q] <= k+1) for q in range(0, len(c))])
-        range_c_ = And([And(c_[q] >= -1, c_[q] <= k+1) for q in range(0, len(c))])
-
-        # 2. Reachability constraint
-        # Target state number is reachable iff ( exists some transition to it on some input)
-        # One direction is enough. The other is implied from the determinization constraint
-        
-        reach = And([Implies(c_[q] != -1,  Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1)) for p in range(0, len(c))])) for q in range(0, len(c_))])
-
-        # 3. Determinization constraint
-
-        # This constraint gives the count on valid target states that has >1 input states.
-        # det1 = And([And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] == min(c[p] + isFinal(q) , k+1))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
-        
-        det1 = And([And([And([Not(Exists(s, And(And(automaton(p,q,*s), sigma_x, c[p] != -1, automaton(p_,q,*s), sigma_x, c[p_] <= c[p], c[p_] != -1, p!=p_), c_[q] != min(c[p] + isFinal(q) , k+1)))) for p_ in range(0, len(c))]) for p in range(0, len(c))]) for q in range(0, len(c_))])
-        
-        
-        # This constraint gives the count on valid target states that has 1 input state.
-        # det2 = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] == min(c[p] + isFinal(q) , k+1))) for p in range(0, len(c))]) for q in range(0, len(c_))])
-        
-        det2 = And([And([Not(Exists(s, And(And(automaton(p,q,*s), sigma_x, c[p] != -1, Not(Or([ And(automaton(p_,q,*s), sigma_x, c[p_] != -1, p!=p_) for p_ in range(0, len(c))]) )), c_[q] != min(c[p] + isFinal(q) , k+1)))) for p in range(0, len(c))]) for q in range(0, len(c_))])
-        
-        return And(range_c, range_c_, reach, det1, det2)
-    
-    # def antichain_optimization(wp, c, c_, substList, k):
-        
-    #     # Antichain Optimization
-    #     # wpc_ = substitute(wp, *substList+[(c[j], c_[j]) for j in range(nQ)])
-    #     wpc_ = substitute(wp, *[(c[j], c_[j]) for j in range(nQ)])
-    #     dominates = And(And([c[q] <= c_[q] for q in range(0, len(c))]), Or([c[q] < c_[q] for q in range(0, len(c))]))
-    #     notDominating = Not(Exists(c_, And(wpc_, dominates)))
-
-    #     g =Goal()
-    #     g.add(And(wp, notDominating))
-    #     print("Projecting notDominating")
-    #     notDominating = tactic_qe_fixpoint(g).as_expr()
-        
-    #     return notDominating
-        
-
-    #Define the k for which this fixedpoint is computed
-    k = 2
 
     #Get states from environment
     s=[]
@@ -276,7 +261,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     print("Projecting Succ to store")
     # Stores projected succ in a different array (indexed by the same index as sigma) so that project is not called always again and again.
     # This improves the speed by 2X
-    projected_succ = [project(succ(c,sigma[i],c_)) for i in range(len(sigma))]
+    projected_succ = [project(succ(c,sigma[i],c_, automaton, isFinal, s)) for i in range(len(sigma))]
 
     # print(projected_succ[1])
     # exit()
@@ -626,10 +611,6 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         # Project formula to get dominating 
         maximal_states = project(maximal_states)
         return maximal_states
-        
-
-    #Define the k for which this fixedpoint is computed
-    k = 2
 
     #Get states from environment
     s=[]
