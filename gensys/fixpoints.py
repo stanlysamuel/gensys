@@ -187,7 +187,7 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 # Plug in sigma_x and c to get c_
 
 # Define the k for which all fixedpoints (regular + antichain) is computed
-k = 3
+k = 2
 
 def min(x,y):
         return If(x < y, x, y)
@@ -196,7 +196,7 @@ def succ(c, sigma_x, c_, automaton, isFinal, s):
 
     # 1. Range Constraints
 
-    range_c = And([And(c[q] >= -1, c[q] <= k+1) for q in range(0, len(c))])
+    range_c = And([And(c[p] >= -1, c[p] <= k+1) for p in range(0, len(c))])
     range_c_ = And([And(c_[q] >= -1, c_[q] <= k+1) for q in range(0, len(c))])
 
     # 2. Reachability constraint
@@ -221,13 +221,14 @@ def succ(c, sigma_x, c_, automaton, isFinal, s):
     # return And(range_c, range_c_, reach, det1, det2)
 
     # det = ForAll([p,x], Implies(And(automaton(p,q,x), sigma_x, c(p) != -1), c_(q) >= min(c(p) + isFinal(q) , k) ))
-    det = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1), c_[q] >= min(c[p] + isFinal(q) , k) )) for p in range(0, len(c))]) for q in range(0, len(c_))])
+    det = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1), c_[q] >= min(c[p] + isFinal(q) , k+1) )) for p in range(0, len(c))]) for q in range(0, len(c_))])
     # unreach = Implies(c_(q) == -1, Not(Exists([p,x], And(automaton(p,q,x), sigma_x, c(p) != -1))))
     unreach = And([Implies(c_[q] == -1, Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1)) for p in range(0, len(c))]) )) for q in range(0, len(c_))])
     # reach = Implies(c_(q) != -1, Exists([p,x], And(automaton(p,q,x), sigma_x, c_(q) == min(c(p) + isFinal(q) , k) )))
-    reach = And([Implies(c_[q] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1,  c_[q] == min(c[p] + isFinal(q) , k) )) for p in range(0, len(c))]) ) for q in range(0, len(c_))])
+    reach = And([Implies(c_[q] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1,  c_[q] == min(c[p] + isFinal(q) , k+1) )) for p in range(0, len(c))]) ) for q in range(0, len(c_))])
 
     return And(range_c, range_c_, det, unreach, reach)
+    # return And(det, unreach, reach)
 
 def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
 
@@ -280,7 +281,7 @@ def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
 
     # Define the guarantee that we will use
 
-    # Gurantee over the deterministic automaton states for a given k
+    # Guarantee over the deterministic automaton states for a given k
     def guarantee_automaton(c):
         # Bounds on the range of the deterministic automaton states (functions)
         l_bound = And([c[q] >= -1 for q in range(0, len(c))])
@@ -515,7 +516,7 @@ def omega(c_, sigma_x, c, automaton, isFinal, s):
 
     # 1. Range Constraints
 
-    range_c = And([And(c[q] >= -1, c[q] <= k+1) for q in range(0, len(c))])
+    range_c = And([And(c[p] >= -1, c[p] <= k+1) for p in range(0, len(c))])
     range_c_ = And([And(c_[q] >= -1, c_[q] <= k+1) for q in range(0, len(c))])
 
     # 2. Reachability constraint
@@ -559,7 +560,7 @@ def omega(c_, sigma_x, c, automaton, isFinal, s):
     # s.add(ForAll([p], Implies(range_p, And(det, reach, unreach))))
 
     # return And(range_c, range_c_, det1, det2)
-    return And(range_c, range_c_, det, reach, unreach)
+    return And(det, reach, unreach)
 
 def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
 
