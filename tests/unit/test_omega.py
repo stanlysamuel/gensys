@@ -184,7 +184,7 @@ class TestOmegaElevator3Floor:
     #     assert self.omega_function([(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)], Not(And(self.x>=1, self.x<=2))) == [(0, -1), (1, -1), (2, -1), (3, 0), (4, 1)]
 
     # def test_4(self):
-    #     assert self.omega_function([(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)], self.x == 1) == [(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)]
+    #     assert self.omega_function([(0, -1), (1, -1), (2, 1), (3, 2), (4, 3), (5, -1)], self.x == 1) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1), (5, 3)]
     # def test_5(self):
     #     assert self.omega_function([(0, 0), (1, -1), (2, 1), (3, -1), (4, 1)], self.x == 2) == [(0, 0), (1, -1), (2, 0), (3, 1), (4, 1)]
     # def test_6(self):
