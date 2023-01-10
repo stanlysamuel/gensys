@@ -561,38 +561,13 @@ def omega(c_, sigma_x, c, automaton, isFinal, s):
 
     # return And(range_c, range_c_, det1, det2)
     return And(det, reach, unreach)
-
-def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
-
-    # Define Omega function for determinization (depends on omega (depends on max))
     
-    def project(formula):
-        g =Goal()
-        g.add(formula)
-        return tactic_qe_fixpoint(g).as_expr()
+def project(formula):
+    g =Goal()
+    g.add(formula)
+    return tactic_qe_fixpoint(g).as_expr()
 
-    def glb(W, c, c_):
-        # Input: W(c)
-        # Ouput: G(c) representing the maximal states in W(v,c)
-        # c_ represent the temporary variables to be replaced with.
-
-        # Create W(c_)
-        W_ = substitute(W, [(c[j], c_[j]) for j in range(len(c))])
-
-        # Find all the lower bounds L(c) of W(c)
-        L = ForAll(c_, Implies(W_, And([And(c[k] <= c_[k], c[k]>=-1) for k in range(0, len(c))])))
-        L = project(L)
-
-        # Create L(c_)
-        L_ = substitute(L, [(c[j], c_[j]) for j in range(len(c))])
-
-        # Find greatest lower bound G(c). It must exist.
-        G = ForAll(c_, Implies(L_, And(L, And([c[k] >= c_[k] for k in range(0, len(c))]))))
-        G = project(G)
-
-        return G
-
-    def maximal(W, v, v_, c, c_):
+def maximal(W, v, v_, c, c_, nQ):
         # Input: W(v,c)
         # Ouput: M(v,c) representing the maximal states in W(v,c)
         # v_ and c_ represent the temporary variables to be replaced with.
@@ -611,16 +586,48 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         # s_dominates(v, c, v', c') is the predicate that states that c' strictly dominates c and v == v'
         s_dominates = And(And([c[q] <= c_[q] for q in range(0, len(c))]), Or([c[q] < c_[q] for q in range(0, len(c))]), v == v_)
 
-        # dominated(c) := Exists v. W(v,c) and W(v_,c_) and sDominates(c,c')
-        dominated = Exists(v+v_+c_, And(W, W_, s_dominates))
+        # dominated(c) := Exists v', c'. W(v,c) and W(v_,c_) and sDominates(v,c,v',c')
+        dominated = Exists(v_+c_, And(W, W_, s_dominates))
         
-        # Eliminate dominated states from W(v,c). This will also remove the corresponding predicate associated with the states.
-        # maximal_states(v,c) = W(v,c) and !dominated(c)
+        # Eliminate dominated states from W(v,c).
+        # maximal_states(v,c) = W(v,c) and !dominated(v, c)
         maximal_states = And(W, Not(dominated))
 
-        # Project formula to get dominating 
+        # Project formula to get dominating (may not be needed)
         maximal_states = project(maximal_states)
         return maximal_states
+
+def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
+
+    # Define Omega function for determinization (depends on omega (depends on max))
+
+    def glb(W, v, v_, c, c_):
+        # Input: W(V, c)
+        # Ouput: G(V, c) representing the maximal states in W(v,c)
+        # c_ represent the temporary variables to be replaced with.
+
+        # Create a list for substitution of game states
+        substList_vv_ = []
+        for (var, var_) in zip(v,v_):
+            substList_vv_ = substList_vv_+[(var,var_)]
+
+        # Create W(v_,c_)
+        W_ = substitute(W, *substList_vv_+[(c[j], c_[j]) for j in range(len(c))])
+        
+        # Find all the lower bounds L(c) of W(c)
+        L = Exists(v_+c_, And(W_, And(And([v[k] == v_[k] for k in range(0,len(v))]), And([And(c[k] <= c_[k], c[k]>=-1) for k in range(0, len(c))]))))
+        L = project(L)
+        # Create L(v_,c_)
+        L_ = substitute(L, *substList_vv_+[(c[j], c_[j]) for j in range(len(c))])
+
+        # Find greatest lower bound G(V,c). It must exist.
+        G = Not(Exists(v_+c_, And(L_, L, And([v[k] == v_[k] for k in range(0,len(v))]), And([c_[k] > c[k] for k in range(0, len(c))]))))
+        G = And(W,G)
+        G = project(G)
+        # print(G)
+        # exit()
+
+        return G
 
     #Get states from environment
     s=[]
@@ -768,7 +775,10 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
 
     i = 0
     print("Iteration", i )
-    
+    print_automaton_states_c_s(guarantee_antichain_(s,c), c, s)
+    guarantee_mod = glb(guarantee_antichain_(s,c),s, s_, c, c_)
+    print_automaton_states_c_s(guarantee_mod, c, s)
+    # exit()
     #Decide more if ForAll needed and how the intersection is computed
     # envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), guarantee_antichain_(s__,c__))))
     envPre = Exists(c__, And(Omega(c__, s_, c_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee_antichain_(s__,c__)))))
@@ -778,13 +788,16 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     conPost = tactic_qe_fixpoint(g).as_expr()
     # print(conPost)
     #Seems expensive and it also seems like glb is needed.
-    # conPost = maximal(conPost,s_, s__, c_, c__)
-    conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
+    conPost = maximal(conPost,s_, s__, c_, c__, nQ)
+    # print(conPost)
+    # conPost(s_, c_)
+    # conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
+    conPost = glb(conPost, s_, s__ , c_, c__)
     # After removing non-maximal and after taking glb
     # conPost = And(And([c_[k] ==0 for k in range(0,5)]), c_[5] == 1, s_[0] >=1, s_[0] <=3)
     # print(conPost)
     # print_automaton_states_c(conPost, c_)
-    print_automaton_states_c_s(conPost, c_, s_)
+    # print_automaton_states_c_s(conPost, c_, s_)
     # exit()
 
     # wp = Exists(s_, Exists(c_, And(Omega(c_, s, c), controller, conPost)))
@@ -794,7 +807,7 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     g.add(wp)
     wp = tactic_qe_fixpoint(g).as_expr()
     # print(wp)
-    wp = maximal(wp, s, s_, c, c_)
+    wp = maximal(wp, s, s_, c, c_, nQ)
     # controller maximal solution
     print_automaton_states_c_s(wp, c, s)
     print(wp)
@@ -817,8 +830,9 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         g.add(envPre)
         conPost = tactic_qe_fixpoint(g).as_expr()
         # print(conPost)
-        conPost = maximal(conPost,s_, s__, c_, c__)
-        conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
+        conPost = maximal(conPost,s_, s__, c_, c__, nQ)
+        # conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
+        # conPost = glb(conPost, s_, s__ , c_, c__)
         # print_automaton_states_c(conPost, c_)
         print_automaton_states_c_s(conPost, c_, s_)
 
@@ -827,7 +841,7 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
         g.add(wp)
         wp = tactic_qe_fixpoint(g).as_expr()
         # print(wp)
-        wp = maximal(wp, s, s_, c, c_)
+        wp = maximal(wp, s, s_, c, c_, nQ)
         # controller maximal solution
         # print_automaton_states_c(wp, c)
         print_automaton_states_c_s(wp, c, s)
