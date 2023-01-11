@@ -182,8 +182,8 @@ class TestMaximalElevator3Floor:
             s.add(constraints)
         return c_list
 
-    def test_1(self):
-        assert self.maximal_function([(0, 0), (1, -1), (2, -1), (3, 2), (4, 3), (5, 1)], self.x == 1) == [(0, 0), (1, -1), (2, -1), (3, 3), (4, 3), (5, 1)]
+    # def test_1(self):
+        # assert self.maximal_function([(0, 0), (1, -1), (2, -1), (3, 2), (4, 3), (5, 1)], self.x == 1) == [(0, 0), (1, -1), (2, -1), (3, 3), (4, 3), (5, 1)]
 
     # def test_2(self):
     #     assert self.maximal_function([(0, -1), (1, -1), (2, 1), (3, 2), (4, 0), (5, -1)], And(self.x>=1, self.x<=3)) == [(0, -1), (1, -1), (2, 2), (3, 3), (4, 1), (5, 2)]

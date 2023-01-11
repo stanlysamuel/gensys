@@ -223,11 +223,11 @@ def succ(c, sigma_x, c_, automaton, isFinal, s):
     # det = ForAll([p,x], Implies(And(automaton(p,q,x), sigma_x, c(p) != -1), c_(q) >= min(c(p) + isFinal(q) , k) ))
     det = And([And([ForAll(s, Implies(And(automaton(p,q,*s), sigma_x, c[p] != -1), c_[q] >= min(c[p] + isFinal(q) , k+1) )) for p in range(0, len(c))]) for q in range(0, len(c_))])
     # unreach = Implies(c_(q) == -1, Not(Exists([p,x], And(automaton(p,q,x), sigma_x, c(p) != -1))))
-    unreach = And([Implies(c_[q] == -1, Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1)) for p in range(0, len(c))]) )) for q in range(0, len(c_))])
+    # unreach = And([Implies(c_[q] == -1, Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1)) for p in range(0, len(c))]) )) for q in range(0, len(c_))])
     # reach = Implies(c_(q) != -1, Exists([p,x], And(automaton(p,q,x), sigma_x, c_(q) == min(c(p) + isFinal(q) , k) )))
     reach = And([Implies(c_[q] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1,  c_[q] == min(c[p] + isFinal(q) , k+1) )) for p in range(0, len(c))]) ) for q in range(0, len(c_))])
 
-    return And(range_c, range_c_, det, unreach, reach)
+    return And(range_c, range_c_, det,  reach)
     # return And(det, unreach, reach)
 
 def omega_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
@@ -674,8 +674,8 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     # Gurantee over the deterministic automaton states for a given k, using antichains
     def guarantee_automaton_antichain(c):
         # Bounds on the range of the deterministic automaton states (functions)
-        init = And([c[q] == k for q in range(0, len(c))])
-        # init = And(c[0] == 1, c[1] == 1, c[2] == 1, c[3] == 1, c[4] == 2 )
+        # init = And([c[q] == k for q in range(0, len(c))])
+        init = Or(And(c[0] == 1, c[1] == 0, c[2] == 1, c[3] == 1, c[4] == 2 ), And(c[0] == 0, c[1] == 1, c[2] == 1, c[3] == 1, c[4] == 2 ))
         return And(init)
 
     # Combine above constraint with the optional safety guarantee, if any
@@ -778,7 +778,7 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
     print_automaton_states_c_s(guarantee_antichain_(s,c), c, s)
     guarantee_mod = glb(guarantee_antichain_(s,c),s, s_, c, c_)
     print_automaton_states_c_s(guarantee_mod, c, s)
-    # exit()
+    exit()
     #Decide more if ForAll needed and how the intersection is computed
     # envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), guarantee_antichain_(s__,c__))))
     envPre = Exists(c__, And(Omega(c__, s_, c_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee_antichain_(s__,c__)))))
