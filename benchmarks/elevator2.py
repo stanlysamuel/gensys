@@ -13,11 +13,11 @@ def environment(x,x_):
 def move1(x,x_):
     return And(x_ == x)
 
-# def move2(x,x_):
-#     return And(x_ == x+1)
+def move2(x,x_):
+    return And(x_ == x+1)
 
-# def move3(x,x_):
-#     return And(x_ == x-1)
+def move3(x,x_):
+    return And(x_ == x-1)
 
 # controller_moves = [move1, move2, move3]
 # controller_moves = [move2, move3]
@@ -71,8 +71,9 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
-        # omega_fixedpoint_antichain(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        # omega_fixedpoint_maximal(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        # omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        omega_fixedpoint_antichain(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
 
     else:
         print("Not a valid input: Please enter \"safety\" or \"omega\" as the third argument")
