@@ -101,6 +101,9 @@ class TestOmegaElevator2Floor:
     def test_12_top(self):
         assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], Not(And(self.x>=1, self.x<=2))) == [(0, 1), (1, 1), (2, 1), (3, 1), (4, 2)]
 
+    def test_12_top(self):
+        assert self.omega_function([(0, 0), (1, 0), (2, 0), (3, 0), (4, 1)], self.x == 1) == [(0, -1), (1, -1), (2, 1), (3, -1), (4, 1)]
+
 
 # Test case for 3 floor elevator automaton with k = 2
 

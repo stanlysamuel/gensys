@@ -187,7 +187,7 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 # Plug in sigma_x and c to get c_
 
 # Define the k for which all fixedpoints (regular + antichain) is computed
-k = 1
+k = 2
 
 def min(x,y):
         return If(x < y, x, y)
@@ -848,15 +848,18 @@ def omega(c_, sigma_x, c, automaton, isFinal, s):
 
     # det = ForAll([q,x], Implies(And(automaton(p,q,x), sig, c_(q) != -1), c(p) <= max(c_(q) - isFinal(q) , -1) ))
     det = And([And([ForAll(s, Implies(And(automaton(p,q, *s), sigma_x, c_[q] != -1), c[p] <= max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) for p in range(0, len(c)) ])
-    # unreach = Implies(c(p) == -1, Not(Exists([q,x], And(automaton(p,q,x), sig, c_(q) != -1))))
-    unreach = And([Implies(c[p] == -1, Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c_[q] != -1)) for q in range(0, len(c_)) ]) )) for p in range(0, len(c))])
+    # unreach = Implies(c(p) == -1, Or(Not(Exists([q,x], And(automaton(p,q,x), sig, c_(q) != -1))), Exists([q,x], And(automaton(p,q,x), sig, c_(q) == 0)) ) )
+    # unreach = And([Implies(c[p] == -1, Or(Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c_[q] != -1)) for q in range(0, len(c_)) ]) ), Or([Exists(s, And(automaton(p,q,*s), sigma_x, c_[q] == 0)) for q in range(0, len(c_))]) )) for p in range(0, len(c))])
+    # unreach = And([Implies(c[p] == -1, Not( Or([Exists(s, And(automaton(p,q,*s), sigma_x, c_[q] != -1)) for q in range(0, len(c_)) ]) ) ) for p in range(0, len(c))])
     # reach = Implies(c(p) != -1, Exists([q,x], And(automaton(p,q,x), sig, c(p) == max(c_(q) - isFinal(q) , -1) )))
-    reach = And([Implies(c[p] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) ) for p in range(0, len(c))])
+    # reach = And([Implies(c[p] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) ) for p in range(0, len(c))])
+    reach = And([Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) for p in range(0, len(c))])
+    # reach = And([Implies(c[p] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] == max(c_[q] - isFinal(q) , -1) )) for q in range(0, len(c_))]) ) for p in range(0, len(c))])
 
     # s.add(ForAll([p], Implies(range_p, And(det, reach, unreach))))
 
     # return And(range_c, range_c_, det1, det2)
-    return And(det, reach, unreach)
+    return And(det, reach)
     
 def project(formula):
     g =Goal()
@@ -925,6 +928,60 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
 
         return G
 
+    def glb_bin(W1, W2, v, c):
+        # Input: W1(V, c), W2(V,c)
+        # Ouput: L(V, c) representing the lowerbounds antichain of W1 and W2.
+
+        #Declare and define v1
+        v1 = []
+        for var in v:
+            exec(str(var)+"1" +" = Int('"+str(var)+"1" +"')") in globals(), locals()
+            v1.append(locals()[str(var)+"1"])
+
+        #Declare and define v2
+        v2 = []
+        for var in v:
+            exec(str(var)+"2" +" = Int('"+str(var)+"2" +"')") in globals(), locals()
+            v2.append(locals()[str(var)+"2"])
+        print(v1)
+        print(v2)
+        # exit()
+        c1 = IntVector('c1', nQ)
+        c2 = IntVector('c2', nQ)
+
+        # Create a list for substitution of game states
+        substList_vv1 = []
+        for (var, var1) in zip(v,v1):
+            substList_vv1 = substList_vv1+[(var,var1)]
+        
+        substList_vv2 = []
+        for (var, var2) in zip(v,v2):
+            substList_vv2 = substList_vv2+[(var,var2)]
+
+        # Create W1(v1,c1) from W1(v,c)
+        W1 = substitute(W1, *substList_vv1+[(c[j], c1[j]) for j in range(len(c))])
+
+        # Create W2(v1,c1) from W2(v,c)
+        W2 = substitute(W2, *substList_vv2+[(c[j], c2[j]) for j in range(len(c))])
+        print(W1)
+        print(W2)
+        # exit()
+        # Find all the lower bounds L(v,c) of W1(v1, c1) and W2(v2, c2).
+        L = Exists(v1+c1+v2+c2, And(W1, W2, And(And([And(v[k] == v1[k], v[k] == v2[k])  for k in range(0,len(v))]), And([And(c[k] <= c1[k], c[k] <= c2[k], c[k]>=-1) for k in range(0, len(c))]))))
+        L = project(L)
+        # # Create L(v1,c1)
+        # L_ = substitute(L, *substList_vv1+[(c[j], c1[j]) for j in range(len(c))])
+
+        # # Find greatest lower bound G(V,c). It must exist. (Just taking maximal should suffice I think)
+        # G = Not(Exists(v1+c1, And(L_, L, And([v[k] == v1[k] for k in range(0,len(v))]), And([c1[k] > c[k] for k in range(0, len(c))]))))
+        # G = And(W,G)
+        # G = project(G)
+        # # print(G)
+        # # exit()
+
+        # return G
+        return L
+    
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
@@ -1071,48 +1128,147 @@ def omega_fixedpoint_antichain(controller_moves, environment, guarantee, mode, a
 
     i = 0
     print("Iteration", i )
-    print_automaton_states_c_s(guarantee_antichain_(s,c), c, s)
-    guarantee_mod = glb(guarantee_antichain_(s,c),s, s_, c, c_)
-    print_automaton_states_c_s(guarantee_mod, c, s)
-    # exit()
-    #Decide more if ForAll needed and how the intersection is computed
-    # envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), guarantee_antichain_(s__,c__))))
-    envPre = Exists(c__, And(Omega(c__, s_, c_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee_antichain_(s__,c__)))))
-    #Project envPre(s_,c_) 
+    # print_automaton_states_c_s(guarantee_antichain_(s,c), c, s)
+    # guarantee_mod = glb(guarantee_antichain_(s,c),s, s_, c, c_)
+    # print_automaton_states_c_s(guarantee_mod, c, s)
+    # # exit()
+    # #Decide more if ForAll needed and how the intersection is computed
+    # # envPre = Exists(s__, Exists(c__, And(Omega(c__, s_, c_), environment(*envtransitionVars), guarantee_antichain_(s__,c__))))
+    # envPre = Exists(c__, And(Omega(c__, s_, c_), ForAll(s__, Implies(environment(*envtransitionVars), guarantee_antichain_(s__,c__)))))
+
+    # # Omega(c__, s_, c_)
+    # omega_0 = And( substitute(sigma[2], [(s[j], s_[j]) for j in range(len(s))] ), substitute(projected_omega[0], [(c[j], c_[j]) for j in range(len(c))] + [(c_[j], c__[j]) for j in range(len(c_))] ) )
+
+    # envPre = Exists(c__+s_, And(omega_0, guarantee_antichain_(s__,c__), ForAll(s__, Implies(And(substitute(sigma[0], [(s[j], s_[j]) for j in range(len(s))] ), environment(*envtransitionVars)), guarantee_antichain_(s__,c__)))))
+
+    # envPre = Exists(c__, And(omega_0, ForAll(s__, Implies( environment(*envtransitionVars), guarantee_antichain_(s__,c__) ))))
+
+    # sigma0_s_ = substitute(sigma[2], [(s[j], s_[j]) for j in range(len(s))] )
+    # print(environment(*envtransitionVars))
+    # # exit()
+    
+    # # x__ = Int('x__')
+    # # x_ = Int('x_')
+    
+    # envPre = ForAll(s__+c__, Implies(And(sigma0_s_, environment(*envtransitionVars)), And([c__[k1] == -1 for k1 in range(0,4)]) ))
+
+    # projected_omega0 = substitute(projected_omega[2], [(c[j], c_[j]) for j in range(len(c))] + [(c_[j], c__[j]) for j in range(len(c_))] )
+    # print(projected_omega0)
+    # # exit()
+    # envPre = ForAll(s__[0], Implies(And(s_[0]==1, s__[0] == s_[0]), Exists(c__, And(projected_omega0, And([c__[k1] == 1 for k1 in range(0,5)])) )))
+    
+    # #Got True here
+    # envPre = ForAll(s__, Implies(And(Exists(c__, And(projected_omega0, And([c__[k1] == 1 for k1 in range(0,5)]))),s_[0]==1, s__[0] == s_[0]), And([c__[k1] == 1 for k1 in range(0,5)])) ) 
+    # envPre = And(Exists(c__+s__, And(projected_omega0, guarantee_antichain_(s__,c__) ))  ,  ForAll(s__[0], Implies(And(sigma0_s_, environment(*envtransitionVars)), Exists(c__, guarantee_antichain_(s__,c__) ))))
+
+    # envPre = Exists(c__, And( Exists(s__, And(projected_omega0, guarantee_antichain_(s__,c__)) ) , ForAll(s__, Implies(And(sigma0_s_, environment(*envtransitionVars)), guarantee_antichain_(s__,c__))) ))
+    # envPost = Or(And(c__[0]==-1, c__[1]==-1, c__[2]==1, c__[3]==-1, c__[4]==1, s__[0]==1), And(c__[0]==-1, c__[1]==-1, c__[2]==-1, c__[3]==1, c__[4]==1, s__[0] ==2 ), And(c__[0]==-1, c__[1]==-1, c__[2]==-1, c__[3]==-1, c__[4]==1, And(s__[0]!=1, s__[0] !=2 ) ))
+    
+    # projected_omega0 = substitute(projected_omega[0], [(c[j], c_[j]) for j in range(len(c))] + [(c_[j], c__[j]) for j in range(len(c_))] )
+    # sigma0_s_ = substitute(sigma[0], [(s[j], s_[j]) for j in range(len(s))] )
+    # envPre0 = Exists(c__, And( Exists(s__, And(projected_omega0, envPost) ) , ForAll(s__, Implies(And(sigma0_s_, environment(*envtransitionVars)), envPost)) ))
+    # g =Goal()
+    # g.add(envPre0)
+    # envPre0 = tactic_qe_fixpoint(g).as_expr()
+    # # envPre0 = maximal(envPre0,s_, s__, c_, c__, nQ)
+
+    # projected_omega1 = substitute(projected_omega[1], [(c[j], c_[j]) for j in range(len(c))] + [(c_[j], c__[j]) for j in range(len(c_))] )
+    # sigma1_s_ = substitute(sigma[1], [(s[j], s_[j]) for j in range(len(s))] )
+    # envPre1 = Exists(c__, And( Exists(s__, And(projected_omega1, envPost) ) , ForAll(s__, Implies(And(sigma1_s_, environment(*envtransitionVars)), envPost)) ))
+    # g =Goal()
+    # g.add(envPre1)
+    # envPre1 = tactic_qe_fixpoint(g).as_expr()
+    # # envPre1 = maximal(envPre1,s_, s__, c_, c__, nQ)
+
+    # projected_omega2 = substitute(projected_omega[2], [(c[j], c_[j]) for j in range(len(c))] + [(c_[j], c__[j]) for j in range(len(c_))] )
+    # sigma2_s_ = substitute(sigma[2], [(s[j], s_[j]) for j in range(len(s))] )
+    # envPre2 = Exists(c__, And( Exists(s__, And(projected_omega2, envPost) ) , ForAll(s__, Implies(And(sigma2_s_, environment(*envtransitionVars)), envPost)) ))
+    # g =Goal()
+    # g.add(envPre2)
+    # envPre2 = tactic_qe_fixpoint(g).as_expr()
+    # # envPre2 = maximal(envPre2,s_, s__, c_, c__, nQ)
+
+    # envPre = glb_bin(envPre0, envPre1, s_, c_)
+    # # envPre = maximal(envPre,s_, s__, c_, c__, nQ)
+    # envPre = glb_bin(envPre, envPre2, s_, c_)
+    # envPre = maximal(envPre,s_, s__, c_, c__, nQ)
+
+    # Compute envPre for each move separately.
+
+    envPre = And(True)
+
+    for i in range(0, len(sigma)):
+        projected_omega_i = substitute(projected_omega[i], [(c[j], c_[j]) for j in range(len(c))] + [(c_[j], c__[j]) for j in range(len(c_))] )
+        sigma_i = substitute(sigma[i], [(s[j], s_[j]) for j in range(len(s))] )
+        envPre_ = Exists(c__, And( Exists(s__, And(projected_omega_i, guarantee_antichain_(s__,c__)) ) , ForAll(s__, Implies(And(sigma_i, environment(*envtransitionVars)), guarantee_antichain_(s__,c__)) )))
+        g =Goal()
+        g.add(envPre_)
+        envPre_ = tactic_qe_fixpoint(g).as_expr()
+        envPre = glb_bin(envPre, envPre_, s_, c_)
+    
+    envPre = maximal(envPre,s_, s__, c_, c__, nQ)
+    #Project envPre(s_,c_)
     g =Goal()
     g.add(envPre)
     conPost = tactic_qe_fixpoint(g).as_expr()
     # print(conPost)
-    #Seems expensive and it also seems like glb is needed.
-    conPost = Or(And(c_[4]==1, And([c_[k1] == -1 for k1 in range(0,4)]), s_[0] ==1), And(c_[4]==0, And([c_[k1] == -1 for k1 in range(0,4)]), True))
-    print(conPost)
-    print_automaton_states_c_s(conPost, c_, s_)
-    conPost = maximal(conPost,s_, s__, c_, c__, nQ)
+    # Seems expensive and it also seems like glb is needed.
+
+    # Maximality test cases
+    # conPost = Or(And(c_[4]==1, And([c_[k1] == -1 for k1 in range(0,4)]), s_[0] ==1), And(c_[4]==0, And([c_[k1] == -1 for k1 in range(0,4)]), True))
+
+    # conPost = Or(And(c_[0]==-1, c_[1]==-1, c_[2]==1, c_[3]==-1, c_[4]==1, True), And(c_[0]==-1, c_[1]==-1, c_[2]==1, c_[3]==-1, c_[4]==1, s_[0] !=1 ), And(c_[0]==0, c_[1]==-1, c_[2]==1, c_[3]==0, c_[4]==1, s_[0] !=1 ))
+
+    # conPost = Or(And(c_[4]==1, And([c_[k1] == -1 for k1 in range(0,4)]), True), 
+    # And(c_[0]==0, c_[1]==-1, c_[2]==-1, c_[3]==0, c_[4]==1, And(s_[0] >=1, s_[0] <=2) ), And(c_[0]==0, c_[1]==-1, c_[2]==0, c_[3]==-1, c_[4]==1, And(s_[0] >=1, s_[0] <=2) ))
     # print(conPost)
-    print_automaton_states_c_s(conPost, c_, s_)
-    exit()
+    # print_automaton_states_c_s(conPost, c_, s_)
+    # conPost = maximal(conPost,s_, s__, c_, c__, nQ)
+    # print(conPost)
+    # print_automaton_states_c_s(conPost, c_, s_)
+    # exit()
     # conPost(s_, c_)
     # conPost = And(Exists(c_, conPost), glb(Exists(s_, conPost), c_, c__))
-    conPost = glb(conPost, s_, s__ , c_, c__)
+    # conPost = glb(conPost, s_, s__ , c_, c__)
     # After removing non-maximal and after taking glb
     # conPost = And(And([c_[k] ==0 for k in range(0,5)]), c_[5] == 1, s_[0] >=1, s_[0] <=3)
-    # print(conPost)
+    # print("Conpost")
+    print(conPost)
     # print_automaton_states_c(conPost, c_)
-    # print_automaton_states_c_s(conPost, c_, s_)
+    print_automaton_states_c_s(conPost, c_, s_)
     # exit()
 
     # wp = Exists(s_, Exists(c_, And(Omega(c_, s, c), controller, conPost)))
-    wp = Exists(s_+c_, And(Omega(c_, s, c), controller, conPost))
+    # wp = Exists(s_+c_, And(Omega(c_, s, c), controller, conPost))
+
+
+    conPre = Or(False)
+
+    for i in range(0, len(sigma)):
+        projected_omega_i = projected_omega[i]
+        sigma_i = sigma[i]
+        print(controller)
+        conPre_ = Exists(c_, And( Exists(s_, And(projected_omega_i, conPost) ) , Exists(s_, And(sigma_i, controller, conPost)) ))
+        # conPre_ = Exists(c_+s_, And(projected_omega_i, sigma_i, controller, conPost))
+        conPre_ = Exists(s_, And(sigma_i, controller, True))
+        conPre_ = Exists(c_+s_, And(projected_omega_i, conPost))
+        g =Goal()
+        g.add(conPre_)
+        conPre_ = tactic_qe_fixpoint(g).as_expr()
+        print(conPre_)
+        conPre = Or(conPre, conPre_)
+    
+    wp = maximal(conPre, s, s_, c, c_, nQ)
     # print(wp)
     g =Goal()
     g.add(wp)
     wp = tactic_qe_fixpoint(g).as_expr()
     # print(wp)
-    wp = maximal(wp, s, s_, c, c_, nQ)
+    
     # controller maximal solution
     print_automaton_states_c_s(wp, c, s)
     print(wp)
-    # exit()
+    exit()
     W = wp
     F = guarantee_antichain_(s,c)
 
