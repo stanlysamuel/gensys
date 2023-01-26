@@ -2,6 +2,15 @@ from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
 
+
+# Maximality test cases
+# conPost = Or(And(c_[4]==1, And([c_[k1] == -1 for k1 in range(0,4)]), s_[0] ==1), And(c_[4]==0, And([c_[k1] == -1 for k1 in range(0,4)]), True))
+
+# conPost = Or(And(c_[0]==-1, c_[1]==-1, c_[2]==1, c_[3]==-1, c_[4]==1, True), And(c_[0]==-1, c_[1]==-1, c_[2]==1, c_[3]==-1, c_[4]==1, s_[0] !=1 ), And(c_[0]==0, c_[1]==-1, c_[2]==1, c_[3]==0, c_[4]==1, s_[0] !=1 ))
+
+# conPost = Or(And(c_[4]==1, And([c_[k1] == -1 for k1 in range(0,4)]), True), 
+# And(c_[0]==0, c_[1]==-1, c_[2]==-1, c_[3]==0, c_[4]==1, And(s_[0] >=1, s_[0] <=2) ), And(c_[0]==0, c_[1]==-1, c_[2]==0, c_[3]==-1, c_[4]==1, And(s_[0] >=1, s_[0] <=2) ))
+
 # Test case for 2 floor elevator automaton with k = 2
 
 class TestMaximalElevator2Floor:
