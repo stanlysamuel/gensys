@@ -195,7 +195,7 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 
 # Define the k for which all fixedpoints (otfd + antichain) are computed
 
-k = 1
+k = 2
 
 # Projection function that uses the selected tactic
 
@@ -258,6 +258,36 @@ def succ(c, sigma_x, c_, automaton, isFinal, s):
     reach = And([Implies(c_[q] != -1, Or([Exists(s, And(automaton(p,q,*s), sigma_x, c[p] != -1,  c_[q] == min(c[p] + isFinal(q) , k+1) )) for p in range(0, len(c))]) ) for q in range(0, len(c_))])
 
     return And(range_c, range_c_, det,  reach)
+
+def is_downward_closed(W, v, c, nQ):
+    # Input: W(V,c)
+    # Output: True if downward closed, else counterexample model.
+
+    # Declare and define v1
+    v1 = []
+    for var in v:
+        exec(str(var)+"1" +" = Int('"+str(var)+"1" +"')") in globals(), locals()
+        v1.append(locals()[str(var)+"1"])
+
+    c1 = IntVector('c1', nQ)
+
+    # Create a list for substitution of game states
+    substList_vv1 = []
+    for (var, var1) in zip(v,v1):
+        substList_vv1 = substList_vv1+[(var,var1)]
+
+    # Create W_(v1,c1) from W(v,c)
+    W_ = substitute(W, *substList_vv1+[(c[j], c1[j]) for j in range(len(c))])
+
+    # Find model (v,c) which is not present in W but should have been (i.e., there exists a v'c' that dominates it)
+    L = Exists(v1+c1, And(W_, Not(W), And(And([v[k] == v1[k]  for k in range(0,len(v))]), And([And(c[k] <= c1[k], c[k]>=-1) for k in range(0, len(c))]))))
+    s = Solver()
+    if s.check(L) == unsat:
+        return True
+    else:
+        # L = project(L)
+        # print_automaton_states(L,c,nQ)
+        return False
 
 def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ):
 
@@ -355,6 +385,9 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     g =Goal()
     g.add(wpAssertion)
     wp = tactic_qe_fixpoint(g).as_expr()
+    print_automaton_states(wp,c,nQ)
+    # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
+    assert is_downward_closed(wp, s, c, nQ)
     W = And(wp, guarantee_(s, c))
     F = guarantee_(s, c)
     i = 1
@@ -373,7 +406,9 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
         g = Goal()
         g.add(wpAssertion)
         wp = tactic_qe_fixpoint(g).as_expr()
-        # print_automaton_states(wp,c,nQ)
+        print_automaton_states(wp,c,nQ)
+        # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
+        assert is_downward_closed(wp, s, c, nQ)
         W = And(wp, guarantee_(s, c))
         F = temp
         print("Iteration ", i )
@@ -381,7 +416,8 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
 
     print("Invariant is")
     print(F)
-    
+    print_automaton_states(F,c,nQ)
+
     #3. Output: Controller Extraction or Unrealizable
     # Create constraint for the initial state of the automaton. 
     # For example,
@@ -648,14 +684,14 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
     g =Goal()
     g.add(envPre)
     conPost = tactic_qe_fixpoint(g).as_expr()
+    print_automaton_states(conPost, c_, nQ)
 
     wp = Exists(s_+c_, And(Omega(c_, s, c), controller, conPost))
-    
     wp = maximal(wp, s, s_, c, c_, nQ)
-    # print(wp)
     g =Goal()
     g.add(wp)
     wp = tactic_qe_fixpoint(g).as_expr()
+    print_automaton_states(wp, c, nQ)
 
     W = wp
     F = guarantee_antichain_(s,c)
@@ -686,21 +722,20 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         g =Goal()
         g.add(envPre)
         conPost = tactic_qe_fixpoint(g).as_expr()
+        print_automaton_states(conPost, c_, nQ)
 
-        # print_automaton_states(conPost, c_, nQ)
-
-        wp = Exists(s_, Exists(c_, And(Omega(c_, s, c), controller, conPost)))
+        wp = Exists(s_+c_, And(Omega(c_, s, c), controller, conPost))
         g =Goal()
         g.add(wp)
         wp = tactic_qe_fixpoint(g).as_expr()
         wp = maximal(wp, s, s_, c, c_, nQ)
-        # print_automaton_states(wp, c. NQ)
+        print_automaton_states(wp, c, nQ)
 
         W = wp
         F = temp
         print("Iteration", i )
         i = i + 1
-
+        # exit()
     print("Invariant is")
     print_automaton_states(wp, c, nQ)
 
