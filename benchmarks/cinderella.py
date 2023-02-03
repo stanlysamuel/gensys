@@ -66,7 +66,8 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
 
         # --------------------------------------------------------------------------------------------------------------------------------
 

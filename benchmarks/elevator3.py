@@ -10,8 +10,8 @@ def environment(x,x_):
 
 #2. Define Controller moves
 
-# def move1(x,x_):
-#     return And(x_ == x)
+def move1(x,x_):
+    return And(x_ == x)
 
 def move2(x,x_):
     return And(x_ == x+1)
@@ -19,7 +19,7 @@ def move2(x,x_):
 def move3(x,x_):
     return And(x_ == x-1)
 
-controller_moves = [move2, move3]
+controller_moves = [move1, move2, move3]
 # controller_moves = [move2, move3]
 
 mode = sys.argv[1]
@@ -71,7 +71,7 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
         antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
 
     else:
