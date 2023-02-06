@@ -195,7 +195,7 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 
 # Define the k for which all fixedpoints (otfd + antichain) are computed
 
-k = 5
+k = 6
 
 # Projection function that uses the selected tactic
 
@@ -446,7 +446,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
         # print("Maximal states are: ")
         # m =  maximal(F,s, s_, c, c_, nQ)
         # print_automaton_states(m,c,nQ)
-        # print_automaton_states(F,c,nQ)
+        print_automaton_states(F,c,nQ)
         g = Goal()
         
         g.add(Exists(c, F))
@@ -754,7 +754,7 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
     # print_automaton_states(conPost, c_, nQ)
     # exit()
     wp = Exists(s_+c_, And(Omega(c_, s, c), controller, conPost))
-    wp = maximal(wp, s, s_, c, c_, nQ)
+    # wp = maximal(wp, s, s_, c, c_, nQ)
     g =Goal()
     g.add(wp)
     wp = tactic_qe_fixpoint(g).as_expr()
@@ -816,7 +816,7 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         g =Goal()
         g.add(wp)
         wp = tactic_qe_fixpoint(g).as_expr()
-        wp = maximal(wp, s, s_, c, c_, nQ)
+        # wp = maximal(wp, s, s_, c, c_, nQ)
         # print_automaton_states(wp, c, nQ)
         W = wp
         F = temp
@@ -825,6 +825,7 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         # exit()
 
     print("Invariant is")
+    wp = maximal(wp, s, s_, c, c_, nQ)
     print_automaton_states(wp, c, nQ)
 
     start_val = Int('start_val')
