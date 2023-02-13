@@ -2,10 +2,9 @@ from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
 
-# Test case for 2 floor elevator automaton with k = 2
+# Test case for 2 floor elevator automaton. k doesn't matter for omega. 
 
 class TestOmegaElevator2Floor:
-    k = 2
     nQ = 5
     def automaton(self, q, q_, x):
         return Or(
@@ -95,11 +94,11 @@ class TestOmegaElevator2Floor:
         assert self.omega_function([(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)], Not(And(self.x>=1, self.x<=2))) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)]
 
     def test_10_top(self):
-        assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], self.x == 1) == [(0, 1), (1, 1), (2, 2), (3, 1), (4, 2)]
+        assert self.omega_function([(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)], self.x == 1) == [(0, 1), (1, 1), (2, 2), (3, 1), (4, 2)]
     def test_11_top(self):
-        assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], self.x == 2) == [(0, 1), (1, 1), (2, 1), (3, 2), (4, 2)]
+        assert self.omega_function([(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)], self.x == 2) == [(0, 1), (1, 1), (2, 1), (3, 2), (4, 2)]
     def test_12_top(self):
-        assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], Not(And(self.x>=1, self.x<=2))) == [(0, 1), (1, 1), (2, 1), (3, 1), (4, 2)]
+        assert self.omega_function([(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)], Not(And(self.x>=1, self.x<=2))) == [(0, 1), (1, 1), (2, 1), (3, 1), (4, 2)]
 
     def test_13(self):
         assert self.omega_function([(0, 0), (1, 0), (2, 0), (3, 0), (4, 1)], self.x == 1) == [(0, -1), (1, -1), (2, 1), (3, -1), (4, 1)]
@@ -108,10 +107,9 @@ class TestOmegaElevator2Floor:
         assert self.omega_function([(0, -1), (1, -1), (2, 1), (3, -1), (4, 1)], self.x == 2) == [(0, -1), (1, -1), (2, 0), (3, 1), (4, 1)]
 
 
-# Test case for 3 floor elevator automaton with k = 2
+# Test case for 3 floor elevator automaton.
 
 class TestOmegaElevator3Floor:
-    k = 3
     nQ = 6
     def automaton(self, q, q_, x):
         return Or(
@@ -202,10 +200,3 @@ class TestOmegaElevator3Floor:
     #     assert self.omega_function([(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)], self.x == 2) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)]
     # def test_9_bot(self):
     #     assert self.omega_function([(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)], Not(And(self.x>=1, self.x<=2))) == [(0, -1), (1, -1), (2, -1), (3, -1), (4, -1)]
-
-    # def test_10_top(self):
-    #     assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], self.x == 1) == [(0, 1), (1, 1), (2, 2), (3, 1), (4, 2)]
-    # def test_11_top(self):
-    #     assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], self.x == 2) == [(0, 1), (1, 1), (2, 1), (3, 2), (4, 2)]
-    # def test_12_top(self):
-    #     assert self.omega_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], Not(And(self.x>=1, self.x<=2))) == [(0, 1), (1, 1), (2, 1), (3, 1), (4, 2)]

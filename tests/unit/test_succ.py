@@ -35,7 +35,7 @@ class TestSuccElevator2Floor:
 
     def succ_function(self, c_post, sigma):
         
-        formula = succ(self.c_, sigma, self.c, self.automaton, self.isFinal, self.state)
+        formula = succ(self.c_, sigma, self.c, self.automaton, self.isFinal, self.state, self.k)
         s = Solver()
         s.add(formula)
         # s.add(And(c_[0]==0, c_[1]==-1, c_[2]==-1, c_[3]==1, c_[4]==1))
@@ -104,10 +104,9 @@ class TestSuccElevator2Floor:
         assert self.succ_function([(0, self.k), (1, self.k), (2, self.k), (3, self.k), (4, self.k)], Not(And(self.x>=1, self.x<=2))) == [(0, -1), (1, 3), (2, 3), (3, 3), (4, 2)]
 
 
-# Test case for 3 floor elevator automaton with k = 2
+# Test case for 3 floor elevator automaton with k = 3
 
 class TestSuccElevator3Floor:
-    # This k is not used
     k = 3
     nQ = 6
     def automaton(self, q, q_, x):
@@ -139,7 +138,7 @@ class TestSuccElevator3Floor:
     state.append(x)
 
     def succ_function(self, c_post, sigma):
-        formula = succ(self.c_, sigma, self.c, self.automaton, self.isFinal, self.state)
+        formula = succ(self.c_, sigma, self.c, self.automaton, self.isFinal, self.state, self.k)
         s = Solver()
         s.add(formula)
         # s.add(And(c_[0]==0, c_[1]==-1, c_[2]==-1, c_[3]==1, c_[4]==1))
@@ -180,7 +179,7 @@ class TestSuccElevator3Floor:
         return c_list
 
     def test_1(self):
-        assert self.succ_function([(0, 0), (1, -1), (2, -1), (3, 2), (4, 3), (5, 1)], self.x == 1) == [(0, 0), (1, -1), (2, -1), (3, 3), (4, 3), (5, 1)]
+        assert self.succ_function([(0, 0), (1, -1), (2, -1), (3, 2), (4, 3), (5, 1)], self.x == 1) == [(0, 0), (1, -1), (2, -1), (3, 3), (4, 4), (5, 1)]
     # def test_2(self):
     #     assert self.succ_function([(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)], self.x == 2) == [(0, 0), (1, -1), (2, -1), (3, 1), (4, 1)]
     # def test_3(self):
