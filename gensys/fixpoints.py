@@ -255,14 +255,14 @@ def succ(c, sigma_x, c_, automaton, isFinal, s, k):
 
     return And(range_c, range_c_, det,  reach)
 
-def is_downward_closed(W, v, c, nQ):
+def is_downward_closed(W, v, c, nQ, game_type):
     # Input: W(V,c)
     # Output: True if downward closed, else counterexample model.
 
     # Declare and define v1
     v1 = []
     for var in v:
-        exec(str(var)+"1" +" = Int('"+str(var)+"1" +"')") in globals(), locals()
+        exec(str(var)+"1" +" = "+game_type+"('"+str(var)+"1" +"')") in globals(), locals()
         v1.append(locals()[str(var)+"1"])
 
     c1 = IntVector('c1', nQ)
@@ -386,7 +386,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     # print_automaton_states(m,c,nQ)
     # print_automaton_states(wp,c,nQ)
     # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
-    # assert is_downward_closed(wp, s, c, nQ)
+    assert is_downward_closed(wp, s, c, nQ, game_type)
     W = And(wp, guarantee_(s, c))
     F = guarantee_(s, c)
     i = 1
@@ -409,7 +409,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
         # print_automaton_states(m,c,nQ)
         # print_automaton_states(wp,c,nQ)
         # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
-        # assert is_downward_closed(wp, s, c, nQ)
+        assert is_downward_closed(wp, s, c, nQ, game_type)
         W = And(wp, guarantee_(s, c))
         F = temp
         print("Iteration ", i )
@@ -688,8 +688,8 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
     g =Goal()
     g.add(wp)
     wp = tactic_qe_fixpoint(g).as_expr()
-    # print_automaton_states(wp, c, nQ)
-
+    print_automaton_states(wp, c, nQ)
+    # exit()
     W = wp
     F = guarantee_antichain_(s,c)
 
