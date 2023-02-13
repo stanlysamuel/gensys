@@ -285,7 +285,7 @@ def is_downward_closed(W, v, c, nQ):
         # print_automaton_states(L,c,nQ)
         return False
 
-def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k):
+def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type):
 
     #Get states from environment
     s=[]
@@ -293,19 +293,19 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
             #Issue: Can't use variable s in the code because it will get redeclared in this scope.
-            exec(str(var) +"= Int('"+str(var) +"')") in globals(), locals()
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
             s.append(locals()[var])
     
-    #Declare and define s'
+    #Declare and define s' of type game_type
     s_ = []
     for var in s:
-        exec(str(var)+"_" +" = Int('"+str(var)+"_" +"')") in globals(), locals()
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
         s_.append(locals()[str(var)+"_"])
 
-    #Declare and define s''
+    #Declare and define s'' of type game_type
     s__ = []
     for var in s:
-        exec(str(var)+"__" +" = Int('"+str(var)+"__" +"')") in globals(), locals()
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
         s__.append(locals()[str(var)+"__"])
 
     # Create determinized automaton state variables as IntVectors
@@ -436,7 +436,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
         # print("Maximal states are: ")
         # m =  maximal(F,s, s_, c, c_, nQ)
         # print_automaton_states(And(m, init),c,nQ)
-        # print_automaton_states(And(F, init),c,nQ)
+        print_automaton_states(And(F, init),c,nQ)
         # g = Goal()
         
         # g.add(Exists(c, F))
@@ -534,7 +534,7 @@ def maximal(W, v, v_, c, c_, nQ):
 
         return maximal_states
 
-def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k):
+def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type):
 
     # Define Omega function for determinization (depends on omega (depends on max))
 
@@ -545,13 +545,13 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         # Declare and define v1
         v1 = []
         for var in v:
-            exec(str(var)+"1" +" = Int('"+str(var)+"1" +"')") in globals(), locals()
+            exec(str(var)+"1" +" = "+game_type+"('"+str(var)+"1" +"')") in globals(), locals()
             v1.append(locals()[str(var)+"1"])
 
         # Declare and define v2
         v2 = []
         for var in v:
-            exec(str(var)+"2" +" = Int('"+str(var)+"2" +"')") in globals(), locals()
+            exec(str(var)+"2" +" = "+game_type+"('"+str(var)+"2" +"')") in globals(), locals()
             v2.append(locals()[str(var)+"2"])
         c1 = IntVector('c1', nQ)
         c2 = IntVector('c2', nQ)
@@ -593,19 +593,19 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
             #Issue: Can't use variable s in the code because it will get redeclared in this scope.
-            exec(str(var) +"= Int('"+str(var) +"')") in globals(), locals()
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
             s.append(locals()[var])
     
-    #Declare and define s'
+    #Declare and define s' of type game_type
     s_ = []
     for var in s:
-        exec(str(var)+"_" +" = Int('"+str(var)+"_" +"')") in globals(), locals()
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
         s_.append(locals()[str(var)+"_"])
 
-    #Declare and define s''
+    #Declare and define s'' of type game_type
     s__ = []
     for var in s:
-        exec(str(var)+"__" +" = Int('"+str(var)+"__" +"')") in globals(), locals()
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
         s__.append(locals()[str(var)+"__"])
 
     # Create determinized automaton state variables as IntVectors
