@@ -71,8 +71,8 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
-        antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6)
+        otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6)
+        # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6)
 
     else:
         print("Not a valid input: Please enter \"safety\" or \"omega\" as the third argument")

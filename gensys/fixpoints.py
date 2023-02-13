@@ -324,7 +324,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     print("Projecting Succ to store")
     # Stores projected succ in a different array (indexed by the same index as sigma) so that project is not called always again and again.
     # This improves the speed by 2X
-    projected_succ = [project(succ(c,sigma[i],c_, automaton, isFinal, s)) for i in range(len(sigma))]
+    projected_succ = [project(succ(c,sigma[i],c_, automaton, isFinal, s, k)) for i in range(len(sigma))]
 
     # Define Succ function for determinization (depends on projected_succ (depends on succ (depends on min)))
     def Succ(c_subst, x_subst, c__subst):
@@ -421,7 +421,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     # init = And(c[0]==0, c[1]==-1) for 2 states 
     # init = And(c[0]==0, c[1]==-1, c[2]==-1, c[3]==-1, c[4]==-1, c[5]==-1) for 6 states 
     init = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
-
+    init = c[0]!=-1
     if not satisfiable(And(F, init),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
@@ -435,8 +435,8 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
         # print(F)
         # print("Maximal states are: ")
         # m =  maximal(F,s, s_, c, c_, nQ)
-        # print_automaton_states(m,c,nQ)
-        # print_automaton_states(F,c,nQ)
+        # print_automaton_states(And(m, init),c,nQ)
+        # print_automaton_states(And(F, init),c,nQ)
         # g = Goal()
         
         # g.add(Exists(c, F))
@@ -730,8 +730,7 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         i = i + 1 
 
     # The winning region in the antichain computation must contain states where c[0] is non-negative, for realizability. 0 is the start state of the automaton.
-    start_val = Int('start_val')
-    init = Exists(start_val, c[0]!=-1)
+    init = c[0]!=-1
 
     if not satisfiable(And(F, init),0):
         print("Invariant is Unsatisifiable i.e. False")
@@ -740,7 +739,7 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         print("Invariant is Satisfiable")
         print("REALIZABLE")
         print("Winning region is:")
-        print_automaton_states(F, c, nQ)
+        print_automaton_states(And(F, init), c, nQ)
 
     print("")
     print("Number of iterations: ", i-1)
