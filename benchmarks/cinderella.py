@@ -67,10 +67,11 @@ else:
         # Default: Returns the True formula in Z3
         def guarantee(b1, b2, b3, b4, b5):
             return And(True)
-
+        import cProfile
+        describe_tactics()
         # Call the fixpoint engine for omega regular specifications.
-        # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)
-        antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)
+        # cProfile.run('otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)')
+        cProfile.run('antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)')
 
         # --------------------------------------------------------------------------------------------------------------------------------
 

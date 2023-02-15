@@ -292,7 +292,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
             s.append(locals()[var])
     
@@ -325,12 +325,11 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     # Stores projected succ in a different array (indexed by the same index as sigma) so that project is not called always again and again.
     # This improves the speed by 2X
     projected_succ = [project(succ(c,sigma[i],c_, automaton, isFinal, s, k)) for i in range(len(sigma))]
-
     # Define Succ function for determinization (depends on projected_succ (depends on succ (depends on min)))
     def Succ(c_subst, x_subst, c__subst):
         #Project quantifers in Succ before forwarding to wpAssertion.
         return Or([And( substitute(sigma[i], [(s[j], x_subst[j]) for j in range(len(s))] ), substitute(projected_succ[i], [(c[j], c_subst[j]) for j in range(len(c))] + [(c_[j], c__subst[j]) for j in range(len(c_))] ) ) for i in range(len(sigma))])
-
+    
     # Define the guarantee that we will use
 
     # Guarantee over the deterministic automaton states for a given k
@@ -344,7 +343,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     # Combine above constraint with the optional safety guarantee, if any
     def guarantee_(s, c):
         return And(guarantee(*s), guarantee_automaton(c))
-
+    
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode
     if(mode == 1):
@@ -376,8 +375,7 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     #Create list of tuples for substitution pre variables with post
     substList = []
     for (var, var__) in zip(s,s__):
-        substList = substList+[(var,var__)]
-
+        substList = substList+[(var,var__)]  
     g =Goal()
     g.add(wpAssertion)
     wp = tactic_qe_fixpoint(g).as_expr()
@@ -723,11 +721,12 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         g.add(wp)
         wp = tactic_qe_fixpoint(g).as_expr()
         wp = maximal(wp, s, s_, c, c_, nQ)
-        # print_automaton_states(wp, c, nQ)
+        print_automaton_states(wp, c, nQ)
         W = wp
         F = temp
         print("Iteration", i )
         i = i + 1 
+        # exit()
 
     # The winning region in the antichain computation must contain states where c[0] is non-negative, for realizability. 0 is the start state of the automaton.
     init = c[0]!=-1
