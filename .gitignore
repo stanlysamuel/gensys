@@ -1,6 +1,6 @@
 #Author defined files
 
-benchmarks/miscellaneous/*
+# benchmarks/miscellaneous/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
