@@ -1,6 +1,6 @@
-# GenSys
-This repository hosts the code for the tool: GenSys and is currently at version 1.0.
-
+# GenSys-LTL
+This repository hosts the code for the tool: GenSys-LTL which is essentially GenSys v2.0.
+<!-- 
 ## Introduction 
 
 GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinite state games. GenSys currently supports safety as the winning condition. GenSys uses the Z3 theorem prover by Microsoft Research for solving SMT formulae. GenSys is scalable and is validated on two benchmark suites.
@@ -12,12 +12,13 @@ GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinit
 - Raghavan Komondoor, Indian Institute of Science, Bangalore
 
 ### Installation
-You should have installed Python 2/3 on your system. We successfully ran GenSys with Python 2.7.1.
+You should have installed Python 3 on your system. We successfully ran GenSys with Python 3.10.6.
+(The tactic `qe_rec` gave a segmentation fault in python2.7 for projecting QBF+LIA formulas.)
 
 **Install Python packages**
 
 ```
-pip install z3-solver
+pip3 install z3-solver
 ```
 
 **Add base project directory to PYTHONPATH**
@@ -48,7 +49,7 @@ The benchmarks are python files that invoke the GenSys API. They can be executed
 For example, you can run the program Repair example by running:
 
 ```
-python repairLock.py
+python3 repairLock.py
 ```
 
 You will get the following output
@@ -95,7 +96,7 @@ Each controller move is a function definition in **repairLock.py**.
 The cinderella example takes as input a parameter for the bucket size of size greater than zero. To run the example for bucket size 1.99999:
 
 ```
-python cinderella 1.99999 0
+python3 cinderella 1.99999 0
 ```
 
 This returns the output:
@@ -144,7 +145,7 @@ Benchmarks from the DTSynth paper can be found in the gensys/benchmarks/dtsynth.
 You can run them directly. For example,
 
 ```
-python box.py
+python3 box.py
 ```
 ### Rules for creating your own game
 
@@ -171,7 +172,7 @@ Although the FSE Tool Submission for GenSys considers the EA case i.e. the case 
 
 To run using this formulation, use 1 as the second argument.
 ```
-python cinderella.py 3.0 1
+python3 cinderella.py 3.0 1
 ```
 
 you get the output:
@@ -279,4 +280,4 @@ python3.4 and 3.5 does not work in my computer even after purging and reinstalli
 
 All of the above didn't work. Building from source did.
 
-python3-spot requires python 3.6.7 or less. even 3.6.9 doesn't work
+python3-spot requires python 3.6.7 or less. even 3.6.9 doesn't work -->

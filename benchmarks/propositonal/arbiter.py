@@ -1,20 +1,20 @@
 from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
-import faulthandler
+# import faulthandler
 
-faulthandler.enable()
+# faulthandler.enable()
 # 0. Define game type (Int/ Real/ Bool)
 game_type = "Bool"
 
 # 1. Define Environment moves
 def environment(req, gra, req_, gra_):
-    return And(gra_ == gra)
+    return And(req_ == req, gra_ == gra)
 
 #2. Define Controller moves
 
 def move(req, gra, req_, gra_):
-    return And(req_ == req)
+    return And(req_ == req, gra_ == gra)
 
 controller_moves = [move]
 
@@ -62,8 +62,8 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ,1, game_type)
-        antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 1, game_type)
+        otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ,0, game_type)
+        antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)
 
     else:
         print("Not a valid input: Please enter \"safety\" or \"omega\" as the third argument")
