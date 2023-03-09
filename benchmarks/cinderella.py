@@ -39,7 +39,13 @@ if spec == "safety":
     def guarantee(b1, b2, b3, b4, b5):
         return And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
 
-    safety_fixedpoint(controller_moves, environment, guarantee, int(mode))
+    # safety_fixedpoint(controller_moves, environment, guarantee, int(mode))
+
+    def guarantee_reach(b1, b2, b3, b4, b5):
+        return Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))
+    def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
+        return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
+    reachability_fixedpoint([environment], controller, guarantee_reach, int(mode))
 
 else:
     if spec == "omega":
