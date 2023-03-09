@@ -229,6 +229,17 @@ def print_automaton_states(formula, c, nQ):
     # Print total number of states
     print("Number of states:", count)
 
+# def gensys_ltl(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, game_type, approach):
+    
+#     if approach == "otfd":
+#         function = otfd_fixedpoint
+#     elif approach == "antichain":
+#         function = antichain_fixedpoint
+#     else:
+#         print("Invalid approach")
+#         return
+
+
 # ---------------------------------------------------------
 # 2.1. On The Fly Determinization Approach (OTFD) for LTL specs
 # ---------------------------------------------------------
@@ -740,6 +751,174 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
         print("REALIZABLE")
         print("Winning region is:")
         print_automaton_states(And(F, init), c, nQ)
+
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+
+
+def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
+    print("Buchi Fixed Point Computation")
+    exit()
+    #Get states from environment
+    s=[]
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            #Dynamic variable declaration
+            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
+            s.append(locals()[var])
+    
+    #Declare and define s' of type game_type
+    s_ = []
+    for var in s:
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
+        s_.append(locals()[str(var)+"_"])
+
+    #Declare and define s'' of type game_type
+    s__ = []
+    for var in s:
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
+        s__.append(locals()[str(var)+"__"])
+
+    # Create determinized automaton state variables as IntVectors
+    c = IntVector('c', nQ)
+    c_ = IntVector('c_', nQ)
+    c__ = IntVector('c__', nQ)
+
+    def project(formula):
+        g =Goal()
+        g.add(formula)
+        return tactic_qe_fixpoint(g).as_expr()
+
+    # Retrive determinized predicate list
+    sigma = sigma(*s)
+    
+    print("Projecting Succ to store")
+    # Stores projected succ in a different array (indexed by the same index as sigma) so that project is not called always again and again.
+    # This improves the speed by 2X
+    projected_succ = [project(succ(c,sigma[i],c_, automaton, isFinal, s, k)) for i in range(len(sigma))]
+    # Define Succ function for determinization (depends on projected_succ (depends on succ (depends on min)))
+    def Succ(c_subst, x_subst, c__subst):
+        #Project quantifers in Succ before forwarding to wpAssertion.
+        return Or([And( substitute(sigma[i], [(s[j], x_subst[j]) for j in range(len(s))] ), substitute(projected_succ[i], [(c[j], c_subst[j]) for j in range(len(c))] + [(c_[j], c__subst[j]) for j in range(len(c_))] ) ) for i in range(len(sigma))])
+    
+    # Define the guarantee that we will use
+
+    # Guarantee over the deterministic automaton states for a given k
+    def guarantee_automaton(c):
+        # Bounds on the range of the deterministic automaton states (functions)
+        l_bound = And([c[q] >= -1 for q in range(0, len(c))])
+        u_bound = And([c[q] < k+1 for q in range(0, len(c))])
+
+        return And(l_bound, u_bound)
+
+    # Combine above constraint with the optional safety guarantee, if any
+    def guarantee_(s, c):
+        return And(guarantee(*s), guarantee_automaton(c))
+    
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode
+    if(mode == 1):
+        getFormulation = getFormulationAE_otfd
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 0):
+            getFormulation = getFormulationEA_otfd
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
+        else:
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
+            return
+    
+    #0. Create Controller
+    # See if List Comprehension (or some better way can make it a single Or formula)
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    #1. Game Formulation
+
+    # Get AE/EA Formula with postcondition guarantee(*s__)
+    wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), guarantee_(s__,c__), Succ, c, c_, c__)
+    
+    #2. Fixed Point Computation
+
+    #Create list of tuples for substitution pre variables with post
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]  
+    g =Goal()
+    g.add(wpAssertion)
+    wp = tactic_qe_fixpoint(g).as_expr()
+    print("Maximal states are: ")
+    m =  maximal(wp,s, s_, c, c_, nQ)
+    print_automaton_states(m,c,nQ)
+    # print_automaton_states(wp,c,nQ)
+    # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
+    assert is_downward_closed(wp, s, c, nQ, game_type)
+    W = And(wp, guarantee_(s, c))
+    F = guarantee_(s, c)
+    i = 1
+    print("Iteration", i )
+    i = i + 1
+    
+    while(not valid(Implies(F, W),0)):
+        temp = W
+        #Substitute current variables with post variables
+        W = substitute(W, *substList+[(c[j], c__[j]) for j in range(nQ)])
+
+        #Get AE/EA Formula with postcondition W
+        wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), W, Succ, c, c_, c__)
+
+        g = Goal()
+        g.add(wpAssertion)
+        wp = tactic_qe_fixpoint(g).as_expr()
+        print("Maximal states are: ")
+        m =  maximal(wp,s, s_, c, c_, nQ)
+        print_automaton_states(m,c,nQ)
+        # print_automaton_states(wp,c,nQ)
+        # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
+        assert is_downward_closed(wp, s, c, nQ, game_type)
+        W = And(wp, guarantee_(s, c))
+        F = temp
+        print("Iteration ", i )
+        i=i+1
+
+    #3. Output: Controller Extraction or Unrealizable
+    # Create constraint for the initial state of the automaton. 
+    # For example,
+    # init = And(c[0]==0, c[1]==-1) for 2 states 
+    # init = And(c[0]==0, c[1]==-1, c[2]==-1, c[3]==-1, c[4]==-1, c[5]==-1) for 6 states 
+    init = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
+    init = c[0]!=-1
+    if not satisfiable(And(F, init),0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+        # g = Goal()
+        # g.add(F)
+        # F = tactic_qe_fixpoint(g).as_expr()
+        # print("Invariant is: ")
+        # print(F)
+        # print("Maximal states are: ")
+        # m =  maximal(F,s, s_, c, c_, nQ)
+        # print_automaton_states(And(m, init),c,nQ)
+        print_automaton_states(And(F, init),c,nQ)
+        # g = Goal()
+        
+        # g.add(Exists(c, F))
+        # PF = tactic_qe_fixpoint(g).as_expr()
+        # print("Projected invariant is: ")
+        # print(PF)
+
+        # g.add(Exists(c, And(F, init)))
+        # PF = tactic_qe_fixpoint(g).as_expr()
+        # print("Projected invariant for initial state is: ")
+        # print(PF)
 
     print("")
     print("Number of iterations: ", i-1)
