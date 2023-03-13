@@ -1,0 +1,82 @@
+/*
+ Benchmark: win4.c
+ Property: G(keA => F keR)
+*/
+initP(A,R,K1,K2,K3,K4,K5,PC):=A=0,R=0,PC=1.
+nextP(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp):=
+    PC=1,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=2;
+    PC=2,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=3;
+    PC=3,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=4;
+    PC=4,Ap=0,Rp=R,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5; % K1p = _rho,
+    PC=5,K1>0,Ap=A,Rp=R,K1p=K1-1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5;
+    PC=5,K1=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=6;
+    PC=6,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=7;
+    PC=7,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=8;
+    PC=8,Ap=1,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=9;
+    PC=9,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=10;
+    PC=10,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=11;
+    PC=11,Ap=0,Rp=R,K1p=K1,K3p=K3,K4p=K4,K5p=K5,PCp=12; % K2p = _rho,
+    PC=12,K2>0,Ap=A,Rp=R,K1p=K1,K2p=K2-1,K3p=K3,K4p=K4,K5p=K5,PCp=12;
+    PC=12,K2=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=13;
+    PC=13,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=14;
+    PC=14,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=15;
+    PC=15,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=16;
+    PC=16,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=17;
+    PC=17,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=18;
+    PC=18,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=19;
+    PC=19,Ap=0,Rp=R,K1p=K1,K2p=K2,K4p=K4,K5p=K5,PCp=20; % K3p = _rho,
+    PC=20,K3>0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3-1,K4p=K4,K5p=K5,PCp=21;
+    PC=20,K3=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=24;
+    PC=21,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=22;
+    PC=22,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=23;
+    PC=23,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=16;
+    PC=24,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=25;
+    PC=25,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=26;
+    PC=26,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=27;
+    PC=27,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=28;
+    PC=28,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=29;
+    PC=29,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=30;
+    PC=30,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K5p=K5,PCp=31; % K4p = _rho,
+    PC=31,K4>0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4-1,K5p=K5,PCp=32;
+    PC=31,K4=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=35;
+    PC=32,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=33;
+    PC=33,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=34;
+    PC=34,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=27;
+    PC=35,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=36;
+    PC=36,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=37;
+    PC=37,Ap=1,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=38;
+    PC=38,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=39;
+    PC=39,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=40;
+    PC=40,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,PCp=41; % K5p = _rho,
+    PC=41,K5>0,Ap=A,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5-1,PCp=41;
+    PC=41,K5=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=42;
+    PC=42,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=43;
+    PC=43,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=44;
+    PC=44,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=45.
+
+initA(BC) := BC=1.
+nextA(BC,A,R,BCp) :=
+(   BC=1, BCp=1;
+    BC=1, A=1, R=<0, BCp=2;
+    BC=1, A=1, R>=2, BCp=2;
+    BC=2, R=<0, BCp=2;
+    BC=2, R>=2, BCp=2
+).
+buechi(BC) := BC=2.
+
+init(A,R,K1,K2,K3,K4,K5,PC,BCp) := initP(A,R,K1,K2,K3,K4,K5,PC), initA(BC), nextA(BC,A,R,BCp).
+next(A,R,K1,K2,K3,K4,K5,PC,BC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp) := nextP(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp), nextA(BC,Ap,Rp,BCp).
+
+inv(A,R,K1,K2,K3,K4,K5,PC,BC) :- init(A,R,K1,K2,K3,K4,K5,PC,BC).
+ti(A,R,K1,K2,K3,K4,K5,PC,BC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp), inv(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp) :-
+	inv(A,R,K1,K2,K3,K4,K5,PC,BC), next(A,R,K1,K2,K3,K4,K5,PC,BC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp).
+ti(A,R,K1,K2,K3,K4,K5,PC,BC,App,Rpp,K1pp,K2pp,K3pp,K4pp,K5pp,PCpp,BCpp) :-
+	ti(A,R,K1,K2,K3,K4,K5,PC,BC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp), next(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp,App,Rpp,K1pp,K2pp,K3pp,K4pp,K5pp,PCpp,BCpp).
+
+round(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp) :- ti(A,R,K1,K2,K3,K4,K5,PC,BC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,BCp), buechi(BC), buechi(BCp).
+
+dwf(round/16).
+
+query_naming(inv, [a,r,k1,k2,k3,k4,k5,pc,bc]).
+query_naming(round, [a,r,k1,k2,k3,k4,k5,pc,'a\'','r\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'']).
+query_naming(ti, [a,r,k1,k2,k3,k4,k5,pc,bc,'a\'','r\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'','bc\'']).

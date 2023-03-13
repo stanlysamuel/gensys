@@ -1,0 +1,18 @@
+% Property: AG (EF (p>0))
+% Queries: inv0, reach, inv1, rank, trank
+init(P,X,PC):=P=0,PC=1.
+next(P,X,PC,Pp,Xp,PCp):=
+ X>=0,Xp=X-1,Pp=P,PC=1,PCp=1;
+ X>=0,Xp=X,Pp=P,PC=1,PCp=1;
+ X<0,Pp=P,Xp=X,PC=1,PCp=3;
+ Pp=1,Xp=X,PC=3,PCp=4.
+% clauses in 1st column
+inv0(P,X,PC):-init(P,X,PC).
+inv0(Pp,Xp,PCp):-inv0(P,X,PC),next(P,X,PC,Pp,Xp,PCp).
+reach(P,X,PC):-inv0(P,X,PC).
+% clauses in 2nd column
+inv1(P,X,PC):-reach(P,X,PC).
+exists([Pp,Xp,PCp],(next(P,X,PC,Pp,Xp,PCp),rank(P,X,PC,Pp,Xp,PCp),inv1(Pp,Xp,PCp))):-inv1(P,X,PC),\+P>0.
+trank(P,X,PC,Pp,Xp,PCp):-rank(P,X,PC,Pp,Xp,PCp).
+trank(P,X,PC,G,H,I):-trank(P,X,PC,Pp,Xp,PCp),rank(Pp,Xp,PCp,G,H,I).
+dwf(trank(P,X,PC,Pp,Xp,PCp)).

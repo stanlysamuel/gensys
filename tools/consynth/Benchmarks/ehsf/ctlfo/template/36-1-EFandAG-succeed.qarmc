@@ -1,0 +1,50 @@
+% exists([y], EF(s=y /\ AG u!=1))
+init(I,P,X,S,U,PC):=S=0,U=0,PC=0.
+next(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp):=
+    PC=0,Ip=I,Pp=P,Sp=S,Up=U,PCp=1; % Xp=_ 
+    PC=1,X>=1,Ip=I,Pp=P,Xp=X,Sp=1,Up=U,PCp=2;
+    PC=1,X=<0,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+    PC=2,Ip=I,Pp=P,Xp=X,Sp=0,Up=U,PCp=3;
+    PC=3,I<P,Ip=I+1,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+    PC=3,I<P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+    PC=3,I>=P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+    PC=4,X=<0,Ip=I,Pp=P,Xp=X,Sp=S,Up=1,PCp=5;
+    PC=4,X>=1,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=6;
+    PC=5,Ip=I,Pp=P,Xp=X,Sp=S,Up=0,PCp=6.
+nondet_next(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp,B1,T1):=
+    PC=0,Ip=I,Pp=P,Xp=T1,Sp=S,Up=U,PCp=1;
+    X>=1,PC=1,Ip=I,Pp=P,Xp=X,Sp=1,Up=U,PCp=2;
+    X=<0,PC=1,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+    PC=2,Ip=I,Pp=P,Xp=X,Sp=0,Up=U,PCp=3;
+    B1=<0,PC=3,I<P,Ip=I+1,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+    B1>=1,PC=3,I<P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+    PC=3,I>=P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+    PC=4,X=<0,Ip=I,Pp=P,Xp=X,Sp=S,Up=1,PCp=5;
+    PC=4,X>=1,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=6;
+    PC=5,Ip=I,Pp=P,Xp=X,Sp=S,Up=0,PCp=6.
+dst(I,P,X,S,U,PC):=(U=<0;U>=2).
+p1(I,P,X,S,U,PC,Y):=S=1,(U=<0;U>=2),X=1,PC=2,Y=1.
+
+% init(v) => exists([y], aux(v,y))
+aux(I,P,X,S,U,PC,Y):-init(I,P,X,S,U,PC),witness0(Y).
+template(witness0, [X], X=Tx, (Tx=0;Tx=1)).
+% aux => EF p1
+phi0(I,P,X,S,U,PC,Y):-aux(I,P,X,S,U,PC,Y).
+(PC>=0,PC=<5):-phi0(I,P,X,S,U,PC,Y),\+p1(I,P,X,S,U,PC,Y).
+rank(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp),phi0(Ip,Pp,Xp,Sp,Up,PCp,Y):-phi0(I,P,X,S,U,PC,Y),\+p1(I,P,X,S,U,PC,Y),nondet_next(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp,B1,T1),witness(B1,T1).
+wf(rank/12).
+template(witness, [B1v,T1v], (B1v=B1,T1v=T1),((B1=0;B1=1),(T1=0;T1=1))).
+% p1 => s=y /\ AG u!=1
+S=Y:-p1(I,P,X,S,U,PC,Y).
+phi1(I,P,X,S,U,PC):-p1(I,P,X,S,U,PC,Y).
+phi1(Ip,Pp,Xp,Sp,Up,PCp):-phi1(I,P,X,S,U,PC),next(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp). 
+dst(I,P,X,S,U,PC):-phi1(I,P,X,S,U,PC).
+
+query_naming(phi0(i,p,rho1,s,u,pc,y)).
+query_naming(phi1(i,p,rho1,s,u,pc)).
+query_naming(witness(b1,t1)).
+
+query_finite_sorts(phi0/7,[6]).
+query_finite_sorts(phi1/6,[6]).
+query_finite_sorts(rank/12,[6,12]).
+query_finite_sorts(rank_p/12,[6,12]).

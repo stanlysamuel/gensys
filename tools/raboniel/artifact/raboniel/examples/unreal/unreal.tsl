@@ -1,0 +1,10 @@
+//-- State: x
+
+assume {
+  eq x i0();
+}
+
+always guarantee {
+  lt x i3(); /* INV */
+  [ x <- add x i1()];
+}

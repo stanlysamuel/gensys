@@ -1,0 +1,61 @@
+init(I,P,S,U,PC):=S=0,U=0,PC=1.
+next(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp):=
+    PC=1,Ip=I,Pp=P,Sp=1,Up=U,PCp=2;
+    PC=2,Ip=I,Pp=P,Sp=0,Up=U,PCp=3;
+    PC=3,I<P,Ip=I,Pp=P,Sp=S,Up=U,PCp=4;
+    PC=3,I>=P,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+    PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=5;
+    PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+    PC=5,Ip=I+1,Pp=P,Sp=S,Up=U,PCp=3;
+    PC=5,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+    PC=6,Ip=I,Pp=P,Sp=S,Up=1,PCp=7;
+    PC=6,Ip=I,Pp=P,Sp=S,Up=U,PCp=8;
+    PC=7,Ip=I,Pp=P,Sp=S,Up=0,PCp=8.
+dst(I,P,S,U,PC):=U=1.
+
+% AG p1
+phi0(I,P,S,U,PC):-init(I,P,S,U,PC).
+phi0(Ip,Pp,Sp,Up,PCp):-phi0(I,P,S,U,PC),next(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp).
+p1(I,P,S,U,PC):-phi0(I,P,S,U,PC).
+
+% p1 /\ s=1 => EF u=1
+phi1(I,P,S,U,PC):-p1(I,P,S,U,PC),S=1.
+% FIXME (existential quantifier not working yet): for now, projection is done explicitly.
+%%% PC>=1,PC=<7 :- phi1(I,P,S,U,PC),\+dst(I,P,S,U,PC).
+exists([Ip,Pp,Sp,Up,PCp],(next(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp))) :- phi1(I,P,S,U,PC),\+dst(I,P,S,U,PC).
+next_with_coef(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp,B1,B2,B3):=
+  PC=1,Ip=I,Pp=P,Sp=1,Up=U,PCp=2;
+  PC=2,Ip=I,Pp=P,Sp=0,Up=U,PCp=3;
+  PC=3,I<P,Ip=I,Pp=P,Sp=S,Up=U,PCp=4;
+  PC=3,I>=P,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+  B1=0,PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=5;
+  B1=1,PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+  B2=0,PC=5,Ip=I+1,Pp=P,Sp=S,Up=U,PCp=3;
+  B2=1,PC=5,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+  B3=0,PC=6,Ip=I,Pp=P,Sp=S,Up=1,PCp=7;
+  B3=1,PC=6,Ip=I,Pp=P,Sp=S,Up=U,PCp=8;
+  PC=7,Ip=I,Pp=P,Sp=S,Up=0,PCp=8.
+rank(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp), phi1(Ip,Pp,Sp,Up,PCp) :-
+	phi1(I,P,S,U,PC), \+dst(I,P,S,U,PC), next_with_coef(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp,B1,B2,B3),
+	witness(B1,B2,B3).
+template([(witness, [D1,D2,D3], (D1=B1,D2=B2,D3=B3))], 
+	 ((B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))
+	).
+wf(rank/10).
+
+query_naming(phi0(i,p,s,u,pc)).
+query_naming(p1(i,p,s,u,pc)).
+query_naming(phi1(i,p,s,u,pc)).
+query_naming(witness(b1,b2,b3)).
+query_naming(rank(i,p,s,u,pc,'i\'','p\'','s\'','u\'','pc\'')).
+query_naming(rank_p(i,p,s,u,pc,'i\'','p\'','s\'','u\'','pc\'')).
+
+query_finite_sorts(phi0/5,[5]).
+query_finite_sorts(p1/5,[5]).
+query_finite_sorts(phi1/5,[5]).
+query_finite_sorts(rank/10,[5,10]).
+query_finite_sorts(rank_p/10,[5,10]).
+
+% qarmc -exp-eval -refine-t tests/ctlstar-cav13-template/7-AGimpEF-succeed.qarmc
+% 'program correct' after 0.7s
+% Solution for witness: b1=0,b2=0,b3=0

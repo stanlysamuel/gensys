@@ -1,0 +1,40 @@
+% Round-robin strategy for cindy to win the game with EG ~overflow objective (for capacity = 30).
+init(B1, B2, B3, B4, B5, R) := B1=0, B2=0, B3=0, B4=0, B5=0, R=1.
+stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp) :=
+        B1p>=B1, B2p>=B2, B3p>=B3, B4p>=B4, B5p>=B5, B1p+B2p+B3p+B4p+B5p-B1-B2-B3-B4-B5=10, Rp=R.
+overflow(B1, B2, B3, B4, B5, R) := B1>=31 ; B2>=31 ; B3>=31 ; B4>=31 ; B5>=31.
+
+% cindy wins := EG ~overflow
+inv(B1, B2, B3, B4, B5, R) :- init(B1, B2, B3, B4, B5, R).
+exists([B1pp, B2pp, B3pp, B4pp, B5pp, Rpp],
+       inv(B1pp, B2pp, B3pp, B4pp, B5pp, Rpp)
+      ) :-
+	inv(B1, B2, B3, B4, B5, R),
+	stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp).
+false :-
+	inv(B1, B2, B3, B4, B5, R),
+	stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp),
+	overflow(B1p, B2p, B3p, B4p, B5p, Rp).
+
+skolem_template(s3, [_B1, _B2, _B3, _B4, _B5, _R,
+ 		     B1, B2, B3, B4, B5, R,
+ 		     B1p, B2p, B3p, B4p, B5p, Rp],
+  		true,
+		(R=1;R=3;R=4),
+  		(
+		  R=1, Rp=3, B1p=0,  B2p=0,  B3p=B3, B4p=B4, B5p=B5;
+		  R=2, Rp=3, B1p=B1, B2p=0,  B3p=0,  B4p=B4, B5p=B5;
+		  R=3, Rp=4, B1p=B1, B2p=B2, B3p=0,  B4p=0,  B5p=B5;
+		  R=4, Rp=1, B1p=B1, B2p=B2, B3p=B3, B4p=0,  B5p=0;
+		  R=5, Rp=0, B1p=0,  B2p=B2, B3p=B3, B4p=B4, B5p=0
+		),
+ 		( true )
+  	       ).
+
+query_naming(inv(b1, b2, b3, b4, b5, r)).
+query_naming(s('_b1', '_b2', '_b3', '_b4', '_b5', '_r',
+		b1, b2, b3, b4, b5, r, 'b1\'', 'b2\'', 'b3\'', 'b4\'', 'b5\'', 'r\'')).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred cindy_30_10_AG_safe.qarmc
+% 'program is correct' after 0.7s
+% 

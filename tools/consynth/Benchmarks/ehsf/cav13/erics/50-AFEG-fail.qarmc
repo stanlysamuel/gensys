@@ -1,0 +1,70 @@
+% No. 50 from Eric's paper
+% neg-egafp-fail/original.c in the benchmarks -- wrong program; else part left out!!
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0
+//
+// EXPECTED RANKING:    y' < y
+// ************************************************************
+
+int y, p;
+unsigned int pc;
+int __phi() { return CAF( CEG( CAP(p <= 0) ) ); }
+int __rho_1_;
+
+void init() { p = 0; y = 5; }
+
+int body() {
+  __rho_1_ = nondet();
+  if(__rho_1_ > 0) {
+    while(1) { if(y < 0) { break; } { y = y - 1; } }
+    p = 1;
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(Y,P,PC):=P=0,PC=1.
+next(Y,P,PC,Yp,Pp,PCp):=
+    PC=1,Yp=Y,Pp=1,PCp=2;
+    PC=1,Yp=Y,Pp=P,PCp=3;
+    Y<0,PC=3,Yp=Y,Pp=1,PCp=4;
+    Y>=0,PC=3,Yp=Y-1,Pp=P,PCp=3.
+dst(Y,P,PC):=P=<0.
+p1(X,P,PC):=P=<0.
+% AF p1
+phi0(X,P,PC):-init(X,P,PC).
+exists([Xp,Pp,PCp],next(X,P,PC,Xp,Pp,PCp)):-phi0(X,P,PC),\+p1(X,P,PC).
+rank(X,P,PC,Xp,Pp,PCp):-phi0(X,P,PC),\+p1(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+phi0(Xp,Pp,PCp):-phi0(X,P,PC),\+dst(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+wf(rank/6).
+% p1 => EG p=<0
+phi1(X,P,PC):-p1(X,P,PC).
+exists([Xp,Pp,PCp],phi1(Xp,Pp,PCp)):-phi1(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+dst(X,P,PC):-phi1(X,P,PC).
+
+skolem_template(s15, [Y,P,PC,Yp,Pp,PCp],
+ 		true,
+		(B=0,PC=1 ; B=1,PC=1 ; PC=3),
+ 		(
+		  B=0,PC=1,Yp=Y,Pp=1,PCp=2;
+		  B=1,PC=1,Yp=Y,Pp=P,PCp=3;
+		  Y<0,PC=3,Yp=Y,Pp=1,PCp=4;
+		  Y>=0,PC=3,Yp=Y-1,Pp=P,PCp=3
+		),
+ 		(B=0 ; B=1)
+ 	       ).
+query_naming(init(x,p,pc)).
+query_naming(phi0(x,p,pc)).
+query_naming(phi1(x,p,pc)).
+query_naming(p1(x,p,pc)).
+query_naming(next(x,p,pc,'x\'','p\'','pc\'')).
+query_naming(s15(x,p,pc,'x\'','p\'','pc\'')).
+query_naming(rank(x,p,pc,'x\'','p\'','pc\'')).
+query_naming(rank_p(x,p,pc,'x\'','p\'','pc\'')).
+
+% time ./ctlstar tests/ctlstar-Erics/50-AFEG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec, ** p1 given!!

@@ -1,0 +1,31 @@
+init(A,R,N,PC):=A=0,R=0,PC=1.
+next(A,R,N,PC,Ap,Rp,Np,PCp):=
+    PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+    PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+    PC=2,Ap=0,Rp=R,Np=N,PCp=3;
+    PC=3,N>0,Ap=A,Rp=R,Np=N-1,PCp=3;
+    PC=3,N=<0,Ap=A,Rp=1,Np=N,PCp=4;
+    PC=4,Ap=A,Rp=0,Np=N,PCp=1.
+dst(A,R,N,PC):=R=1.
+% AG p1
+phi0(A,R,N,PC):-init(A,R,N,PC).
+phi0(Ap,Rp,Np,PCp):-phi0(A,R,N,PC),next(A,R,N,PC,Ap,Rp,Np,PCp).
+p1(A,R,N,PC):-phi0(A,R,N,PC).
+% p1 /\ a=1 => AF R=1
+phi1(A,R,N,PC):-p1(A,R,N,PC),A=1.
+exists([Ap,Rp,Np,PCp],next(A,R,N,PC,Ap,Rp,Np,PCp)):-phi1(A,R,N,PC),\+dst(A,R,N,PC).
+phi1(Ap,Rp,Np,PCp):-phi1(A,R,N,PC),next(A,R,N,PC,Ap,Rp,Np,PCp),\+dst(A,R,N,PC).
+rank(A,R,N,PC,Ap,Rp,Np,PCp):-phi1(A,R,N,PC),next(A,R,N,PC,Ap,Rp,Np,PCp),\+dst(A,R,N,PC).
+wf(rank/8).
+
+query_naming(phi0(a,r,n,pc)).
+query_naming(p1(a,r,n,pc)).
+query_naming(phi1(a,r,n,pc)).
+query_naming(rank(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+query_naming(rank_p(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(p1/4,[4]).
+query_finite_sorts(phi1/4,[4]).
+query_finite_sorts(rank/8,[4,8]).
+query_finite_sorts(rank_p/8,[4,8]).

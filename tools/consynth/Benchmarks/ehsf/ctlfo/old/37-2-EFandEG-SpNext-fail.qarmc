@@ -1,0 +1,190 @@
+% No. 37 from Eric's paper (Industrial)
+/*
+int keA; keR;
+unsigned int pc;
+int __phi() { return CEF(CAND(CAP(keA==1),CEG(CAP(keR!=1)))); }
+
+void init() { keA = 0; keR = 0;}
+
+int body() {
+   keA = 1; keA = 0; keA = 1; keA = 0;
+   __rho_2_ = nondet();
+   k1 = __rho_2_;
+   while (1) { 
+     if (!(k1>0)) break;
+       k1--;
+   }
+   keR = 1; keR = 0; keR = 1; keR = 0;
+   keA = 1; keA = 0; keA = 1; keA = 0;
+   __rho_6_ = nondet();
+   k2 = __rho_6_;
+   while (1) {
+     if (!(k2>0)) break;
+       k2--;
+   }
+   keR = 1; keR = 0; keR = 1; keR = 0;
+   while (1) {
+       keA = 1; keA = 0; keA = 1; keA = 0;
+       __rho_10_ = nondet();
+       k3 = __rho_10_;
+       if (k3>0) {
+           k3--;
+           keR = 1; keR = 0; keR = 1; keR = 0;
+       }
+       else {
+           keR = 1; keR = 0; keR = 1; keR = 0;
+           break;
+       }
+   }
+   __rho_11_ = nondet();
+   k4 = __rho_11_;
+   while (1) {
+       keA = 1; keA = 0; keA = 1; keA = 0;
+       if (k4>0) {
+           k4--;
+           keR = 1; keR = 0; keR = 1; keR = 0;
+       }
+       else {
+           keR = 1; keR = 0; keR = 1; keR = 0;
+           break;
+       }
+   }
+   keA = 1; keA = 0; keA = 1; keA = 0;
+   __rho_13_ = nondet();
+   k5 = __rho_13_;
+   while (1) {
+     if (!(k5>0)) break;
+       k5--;
+   }
+   keR = 1; keR = 0; keR = 1; keR = 0;
+
+   while(1) { dummy=dummy; } L_return: return 0;
+}
+*/
+% EF(forall([x], a=x /\ EG r!=1))
+init(A,R,K1,K2,K3,K4,K5,PC):=A=0,R=0,PC=1.
+nextDet(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp):=
+    PC=1,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=2;
+    PC=2,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=3;
+    PC=3,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=4;
+    %PC=4,Ap=0,Rp=R,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5; % K1p = _rho,
+    PC=5,K1>0,Ap=A,Rp=R,K1p=K1-1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5;
+    PC=5,K1=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=6;
+    PC=6,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=7;
+    PC=7,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=8;
+    PC=8,Ap=1,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=9;
+    PC=9,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=10;
+    PC=10,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=11;
+    %PC=11,Ap=0,Rp=R,K1p=K1,K3p=K3,K4p=K4,K5p=K5,PCp=12; % K2p = _rho,
+    PC=12,K2>0,Ap=A,Rp=R,K1p=K1,K2p=K2-1,K3p=K3,K4p=K4,K5p=K5,PCp=12;
+    PC=12,K2=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=13;
+    PC=13,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=14;
+    PC=14,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=15;
+    PC=15,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=16;
+    PC=16,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=17;
+    PC=17,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=18;
+    PC=18,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=19;
+    %PC=19,Ap=0,Rp=R,K1p=K1,K2p=K2,K4p=K4,K5p=K5,PCp=20; % K3p = _rho,
+    PC=20,K3>0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3-1,K4p=K4,K5p=K5,PCp=21;
+    PC=20,K3=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=24;
+    PC=21,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=22;
+    PC=22,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=23;
+    PC=23,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=16;
+    PC=24,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=25;
+    PC=25,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=26;
+    PC=26,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=27;
+    PC=27,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=28;
+    PC=28,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=29;
+    PC=29,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=30;
+    %PC=30,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K5p=K5,PCp=31; % K4p = _rho,
+    PC=31,K4>0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4-1,K5p=K5,PCp=32;
+    PC=31,K4=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=35;
+    PC=32,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=33;
+    PC=33,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=34;
+    PC=34,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=27;
+    PC=35,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=36;
+    PC=36,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=37;
+    PC=37,Ap=1,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=38;
+    PC=38,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=39;
+    PC=39,Ap=1,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=40;
+    %PC=40,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,PCp=41; % K5p = _rho,
+    PC=41,K5>0,Ap=A,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5-1,PCp=41;
+    PC=41,K5=<0,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=42;
+    PC=42,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=43;
+    PC=43,Ap=A,Rp=1,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=44;
+    PC=44,Ap=A,Rp=0,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=45.
+nextNonDet(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp):=
+    PC=4,Ap=0,Rp=R,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5; % K1p = _rho,
+    PC=11,Ap=0,Rp=R,K1p=K1,K3p=K3,K4p=K4,K5p=K5,PCp=12; % K2p = _rho,
+    PC=19,Ap=0,Rp=R,K1p=K1,K2p=K2,K4p=K4,K5p=K5,PCp=20; % K3p = _rho,
+    PC=30,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K5p=K5,PCp=31; % K4p = _rho,
+    PC=40,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,PCp=41. % K5p = _rho,
+dst(A,R,K1,K2,K3,K4,K5,PC,X):=(R>=2;R=<0).
+p1(A,R,K1,K2,K3,K4,K5,PC):=A=1,R=0,PC=38.
+% init => EF p1 ===> split into ..... EF => p1 (for the nondet) and AF p1 (for the det)
+phi0(A,R,K1,K2,K3,K4,K5,PC):-init(A,R,K1,K2,K3,K4,K5,PC).
+PC>=1,PC=<44:-phi0(A,R,K1,K2,K3,K4,K5,PC),\+p1(A,R,K1,K2,K3,K4,K5,PC).
+exists([Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp],q1(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp)):-
+	id(1),phi0(A,R,K1,K2,K3,K4,K5,PC),\+p1(A,R,K1,K2,K3,K4,K5,PC),
+	nextNonDet(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp).
+(rank(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp),phi0(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp)):-
+ 	phi0(A,R,K1,K2,K3,K4,K5,PC),\+p1(A,R,K1,K2,K3,K4,K5,PC),
+	s1(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp).
+(rank(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp),phi0(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp)):-
+ 	phi0(A,R,K1,K2,K3,K4,K5,PC),\+p1(A,R,K1,K2,K3,K4,K5,PC),
+	nextDet(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp).
+wf(rank/16).
+skolem_template(s1, [A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp],
+   		true,
+  		(PC=4;PC=11;PC=19;PC=30;PC=40),
+  		(
+		  PC=4,Ap=0,Rp=R,K1p=T1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5; % K1p = _rho,
+		  PC=11,Ap=0,Rp=R,K1p=K1,K2p=T2,K3p=K3,K4p=K4,K5p=K5,PCp=12; % K2p = _rho,
+		  PC=19,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=T3,K4p=K4,K5p=K5,PCp=20; % K3p = _rho,
+		  PC=30,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=T4,K5p=K5,PCp=31; % K4p = _rho,
+		  PC=40,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=T5,PCp=41 % K5p = _rho,
+		),
+   		((T1=0;T1=1),(T2=0;T2=1),(T3=0;T3=1),(T4=0;T4=1),(T5=0;T5=1))
+   	       ).
+% p1(v) => forall([x], aux(v,x))
+aux(A,R,K1,K2,K3,K4,K5,PC,X):-p1(A,R,K1,K2,K3,K4,K5,PC).
+% aux => a=x /\ EG r!=1
+A=X:-aux(A,R,K1,K2,K3,K4,K5,PC,X).
+phi1(A,R,K1,K2,K3,K4,K5,PC,X):-aux(A,R,K1,K2,K3,K4,K5,PC,X).
+exists([Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp],q2(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp)):-
+	id(2),phi1(A,R,K1,K2,K3,K4,K5,PC,X),nextNonDet(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp).
+phi1(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,X):-phi1(A,R,K1,K2,K3,K4,K5,PC,X),s2(A,R,K1,K2,K3,K4,K5,PC,_,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp).
+phi1(Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp,X):-phi1(A,R,K1,K2,K3,K4,K5,PC,X),nextDet(A,R,K1,K2,K3,K4,K5,PC,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp).
+dst(A,R,K1,K2,K3,K4,K5,PC,X):-phi1(A,R,K1,K2,K3,K4,K5,PC,X).
+skolem_template(s2, [A,R,K1,K2,K3,K4,K5,PC,_,Ap,Rp,K1p,K2p,K3p,K4p,K5p,PCp],
+    		true,
+   		(PC=4;PC=11;PC=19;PC=30;PC=40),
+   		(
+ 		  PC=4,Ap=0,Rp=R,K1p=T1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5; % K1p = _rho,
+ 		  PC=11,Ap=0,Rp=R,K1p=K1,K2p=T2,K3p=K3,K4p=K4,K5p=K5,PCp=12; % K2p = _rho,
+ 		  PC=19,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=T3,K4p=K4,K5p=K5,PCp=20; % K3p = _rho,
+ 		  PC=30,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=T4,K5p=K5,PCp=31; % K4p = _rho,
+ 		  PC=40,Ap=0,Rp=R,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=T5,PCp=41 % K5p = _rho,
+   		),
+    		((T1=0;T1=1),(T2=0;T2=1),(T3=0;T3=1),(T4=0;T4=1),(T5=0;T5=1))
+    	       ).
+
+query_naming(phi0(a,r,k1,k2,k3,k4,k5,pc)).
+query_naming(aux(a,r,k1,k2,k3,k4,k5,pc,x)).
+query_naming(phi1(a,r,k1,k2,k3,k4,k5,pc,x)).
+query_naming(s1(a,r,k1,k2,k3,k4,k5,pc,'a\'','r\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+query_naming(s2(a,r,k1,k2,k3,k4,k5,pc,x,'a\'','r\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+query_naming(rank(a,r,k1,k2,k3,k4,k5,pc,'a\'','r\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+query_naming(rank_p(a,r,k1,k2,k3,k4,k5,pc,'a\'','r\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+
+query_finite_sorts(phi0/8,[8]).
+query_finite_sorts(aux/9,[8]).
+query_finite_sorts(phi1/9,[8]).
+query_finite_sorts(s1/16,[8,16]).
+query_finite_sorts(s2/17,[8,17]).
+query_finite_sorts(rank/16,[8,16]).
+query_finite_sorts(rank_p/16,[8,16]).
+
+% time ./ctlstar tests/ctlstar-Erics/Industrial/37-EFandEG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 1.5 sec with -exp-eval
+% CEX after 1.4 sec without -exp-eval

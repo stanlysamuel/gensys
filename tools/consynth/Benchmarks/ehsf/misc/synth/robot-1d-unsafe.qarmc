@@ -1,0 +1,44 @@
+% Game robot vs. human with objective EF (Yr=ydst), can the robot reach position with coordinates ydst?
+% Variables: position of human Yh, position of robot Yr, remaining energy (E).
+% V = (Yr,Yh,E), Venv = (Yh), Vsys = (Yr,E)
+
+% The human starts in the point yh=0, the robot starts at yr=10.
+init(Xr,Yr,Xh,Yh,E) := Yr=10, Yh=0, E=3.
+human(Xr,Yr,Xh,Yh,E,Xhp,Yhp) := Xhp=Xh,
+  Yhp=Yh. % now, human does not move
+  % (Yhp=Yh+1 ; Yhp=Yh-1).
+
+skolem_template(srobot,
+		[Xr,Yr,Xh,Yh,E,
+		 Xhp,Yhp,Xrp,Yrp,Ep, % the order is different!!
+		 Xrpp,Yrpp,Xhpp,Yhpp,Epp],
+		true,
+		( Ep>=1, (B=<0, Yrp+1>Yhp ; B>=1, Yrp-1>Yhp) ),
+		% For now, the robot only moves along the y axis:
+		( Xhpp=Xhp, Yhpp=Yhp, % The human's variables do not change
+		    (
+		      B=<0, Yrp+1>Yhp, Yrpp-Yrp=1, Epp=Ep-1
+		    ;
+		      B>=1, Yrp-1>Yhp, Yrp-Yrpp=1, Epp=Ep-1
+		    )
+		),
+		( B=0 ; B=1 )
+	       ).
+dst(Xr,Yr,Xh,Yh,E) := Yr=5.
+
+inv(Xr,Yr,Xh,Yh,E) :- init(Xr,Yr,Xh,Yh,E).
+exists([Xrpp,Yrpp,Xhpp,Yhpp,Epp],
+       (
+%	 robot(Xrp,Yrp,Xhp,Yhp,Ep,Xrpp,Yrpp,Epp),
+	 inv(Xrpp,Yrpp,Xhpp,Yhpp,Epp),
+	 round(Xr,Yr,Xh,Yh,E,Xrpp,Yrpp,Xhpp,Yhpp,Epp)
+       )
+      ) :-
+	id(robot),
+	inv(Xr,Yr,Xh,Yh,E),
+	\+ dst(Xr,Yr,Xh,Yh,E),
+	human(Xr,Yr,Xh,Yh,E,Xhp,Yhp),
+	Xrp=Xr, Yrp=Yr, Ep=E. % The robot's variables do not change during the human's turn.
+wf(round/10).
+
+% For ydst=5 and E=3, ctlstar-barcelogic returns 'program is not correct' after 7.2s (-z3 2m41s))

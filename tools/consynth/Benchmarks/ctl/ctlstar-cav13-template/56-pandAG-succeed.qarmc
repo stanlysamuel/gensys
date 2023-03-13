@@ -1,0 +1,21 @@
+init(C,R,CS,PC):=C>=1,R=0,CS=4,PC=1.
+next(C,R,CS,PC,Cp,Rp,CSp,PCp):=
+    PC=0,C>5,Cp=C,Rp=R,CSp=CS,PCp=2;
+    PC=0,C=<5,Cp=C,Rp=R,CSp=CS,PCp=1;
+    PC=1,CS=<0,Cp=C,Rp=R,CSp=CS,PCp=2;
+    PC=1,CS>0,Cp=C,Rp=R,CSp=CS,PCp=3;
+    PC=3,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    PC=3,C<CS,Cp=C,Rp=R,CSp=CS-1,PCp=1.
+dst(C,R,CS,PC):=R=<5.
+% init => (c>5 /\ AG r=<5)
+mid(Cp,R,CS,PC) :- init(C,R,CS,PC),Cp=Iv,init_witness(Iv).
+template(init_witness, [Tv], Tv=T, (T=4;T=8;T=5;T=3;T=1)).
+C>5:-mid(C,R,CS,PC).
+phi0(C,R,CS,PC):-mid(C,R,CS,PC).
+phi0(Cp,Rp,CSp,PCp):-phi0(C,R,CS,PC),next(C,R,CS,PC,Cp,Rp,CSp,PCp).
+dst(C,R,CS,PC):-phi0(C,R,CS,PC).
+
+query_naming(phi0(c,r,cs,pc)).
+query_naming(init_witness(iv)).
+
+query_finite_sorts(phi0/4,[4]).

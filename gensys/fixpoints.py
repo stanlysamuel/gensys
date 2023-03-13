@@ -910,9 +910,31 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
     print("")
 
 
+# Utility function to check number of determinized automaton states in a given formula F(s,c)
+def print_q_automaton_states(formula, q, nQ):
+    print("Printing determinized automaton states")
+    #Function to check models
+    s = Solver()
+    s.add(formula)
+    count = 0
+    while s.check() == sat:
+        count+=1
+        # Print readable model
+        m = s.model()
+        aut_state = (q, m[q])
+        model_formula = (q == m.evaluate(q))
+        g =Goal()
+        g.add(Exists(q, And(formula, model_formula)))
+        s_pred = tactic_qe_fixpoint(g).as_expr()
+
+        print(aut_state, s_pred)
+        s.add(q != m.evaluate(q))
+    # Print total number of states
+    print("Number of states:", count)
+
 def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
     print("Buchi Fixed Point Computation")
-    # exit()
+
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
@@ -934,36 +956,33 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
         s__.append(locals()[str(var)+"__"])
 
-    # Create determinized automaton state variables as IntVectors
-    c = IntVector('c', nQ)
-    c_ = IntVector('c_', nQ)
-    c__ = IntVector('c__', nQ)
+    # Create automaton state variables
+    q = Int("q")
+    q_ = Int("q_")
+    q__ = Int("q__")
 
     def project(formula):
         g =Goal()
         g.add(formula)
         return tactic_qe_fixpoint(g).as_expr()
 
-    # Retrive determinized predicate list
-    sigma = sigma(*s)
-
     # Define the guarantee that we will use
 
-    # Guarantee over the deterministic automaton states for a given k
-    def guarantee_automaton(c):
-        # Bounds on the range of the deterministic automaton states (functions)
-        l_bound = And([c[q] >= -1 for q in range(0, len(c))])
-        u_bound = And([c[q] < k+1 for q in range(0, len(c))])
-
-        return And(l_bound, u_bound)
+    # # Guarantee over the deterministic automaton states for a given k
+    # def guarantee_automaton(q):
+    #     #Hard coded for now
+    #     return q==0 
 
     # Combine above constraint with the optional safety guarantee, if any
-    def guarantee_(s, c):
-        return And(guarantee(*s), guarantee_automaton(c))
+    # def guarantee_(s, q):
+    #     return And(guarantee(*s), guarantee_automaton(q))
+    def guarantee_(s, q):
+        return And(True, guarantee(q))
     
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode
     if(mode == 1):
+        raise Exception("AE mode not supported for Buchi games")
         getFormulation = getFormulationAE_otfd
         contransitionVars = s_+s__
         envtransitionVars = s+s_
@@ -982,87 +1001,74 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     for move in controller_moves:
         controller = Or(move(*contransitionVars), controller)
 
-    #1. Game Formulation
-
-    # Get AE/EA Formula with postcondition guarantee(*s__)
-    wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), guarantee_(s__,c__), Succ, c, c_, c__)
-    
-    #2. Fixed Point Computation
-
     #Create list of tuples for substitution pre variables with post
     substList = []
     for (var, var__) in zip(s,s__):
         substList = substList+[(var,var__)]  
-    g =Goal()
-    g.add(wpAssertion)
-    wp = tactic_qe_fixpoint(g).as_expr()
-    print("Maximal states are: ")
-    m =  maximal(wp,s, s_, c, c_, nQ)
-    print_automaton_states(m,c,nQ)
-    # print_automaton_states(wp,c,nQ)
-    # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
-    assert is_downward_closed(wp, s, c, nQ, game_type)
-    W = And(wp, guarantee_(s, c))
-    F = guarantee_(s, c)
+    substList = substList+[(q, q__)]  
+
     i = 1
-    print("Iteration", i )
-    i = i + 1
-    
-    while(not valid(Implies(F, W),0)):
-        temp = W
+
+    W0 = And(True)
+    W1 = And(True)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
         #Substitute current variables with post variables
-        W = substitute(W, *substList+[(c[j], c__[j]) for j in range(nQ)])
+        W0_ = substitute(W0, *substList)
+        j = 1
 
-        #Get AE/EA Formula with postcondition W
-        wpAssertion = getFormulation(s, s_, s__, controller, environment(*envtransitionVars), guarantee_(s_,c_), W, Succ, c, c_, c__)
+        H0 = And(False)
+        H1 = And(False)
 
-        g = Goal()
-        g.add(wpAssertion)
-        wp = tactic_qe_fixpoint(g).as_expr()
-        print("Maximal states are: ")
-        m =  maximal(wp,s, s_, c, c_, nQ)
-        print_automaton_states(m,c,nQ)
-        # print_automaton_states(wp,c,nQ)
-        # Add an assertion to be sure that all sets are downward closed. Remove this check for efficiency.
-        assert is_downward_closed(wp, s, c, nQ, game_type)
-        W = And(wp, guarantee_(s, c))
-        F = temp
-        print("Iteration ", i )
-        i=i+1
+        while True:
+            print("Sub-Iteration", j )
+            H0 = H1
+            #Substitute current variables with post variables
+
+            # formula = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0))
+            # # formula = ForAll(s__+[q__], Implies(And(q_ == 3, q__ == 1, s_[0] ==1, s_[0] == s__[0] ), W0))
+            # print(formula)
+            # # exit()
+            # g =Goal()
+            # g.add(formula)
+            # H1 = tactic_qe_fixpoint(g).as_expr()
+            # print(H1)
+            # # exit()
+            # print_q_automaton_states(H1, q_, nQ)
+            # exit()
+            H0_ = substitute(H0, *substList)
+            WPW = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
+            WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0_))))
+            
+            H1 = Or(WPH, And(WPW, guarantee_(s, q)))
+            g =Goal()
+            g.add(H1)
+            H1 = tactic_qe_fixpoint(g).as_expr()
+            # print(H1)
+            # print_q_automaton_states(H1, q, nQ)
+            # exit()
+        
+            j = j + 1
+            # print_q_automaton_states(WPW, q, nQ)
+            if valid(Implies(H1, H0),0):
+            # if j == 6:
+                break
+        # exit()
+        W1 = H0
+        i = i + 1
+        if valid(Implies(W0, W1),0):
+            break
 
     #3. Output: Controller Extraction or Unrealizable
-    # Create constraint for the initial state of the automaton. 
-    # For example,
-    # init = And(c[0]==0, c[1]==-1) for 2 states 
-    # init = And(c[0]==0, c[1]==-1, c[2]==-1, c[3]==-1, c[4]==-1, c[5]==-1) for 6 states 
-    init = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
-    init = c[0]!=-1
-    if not satisfiable(And(F, init),0):
+
+    if not satisfiable(W0,0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
-        # g = Goal()
-        # g.add(F)
-        # F = tactic_qe_fixpoint(g).as_expr()
-        # print("Invariant is: ")
-        # print(F)
-        # print("Maximal states are: ")
-        # m =  maximal(F,s, s_, c, c_, nQ)
-        # print_automaton_states(And(m, init),c,nQ)
-        print_automaton_states(And(F, init),c,nQ)
-        # g = Goal()
-        
-        # g.add(Exists(c, F))
-        # PF = tactic_qe_fixpoint(g).as_expr()
-        # print("Projected invariant is: ")
-        # print(PF)
-
-        # g.add(Exists(c, And(F, init)))
-        # PF = tactic_qe_fixpoint(g).as_expr()
-        # print("Projected invariant for initial state is: ")
-        # print(PF)
 
     print("")
     print("Number of iterations: ", i-1)

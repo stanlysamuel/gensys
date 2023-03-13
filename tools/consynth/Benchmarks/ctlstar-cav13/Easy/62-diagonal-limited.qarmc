@@ -1,0 +1,61 @@
+% No. 25 from Eric's paper (Industrial)
+/*
+
+init(X,Y,R):=X=0,Y=0,R>=1,R=<2.
+adam(X,Y,R,Xp,Yp,Rp):=
+    X=Xp-1,Y=Yp,Rp=1;
+    X=Xp+1,Y=Yp,Rp=2.
+eve(X,Y,Xp,Yp):=
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1.
+safe(X,Y,R):=Y=<X+1,Y>=(X-1),R>=1,R=<2.
+% init => (c>5 /\ AG r=<5)
+phi0(X,Y,R):-init(X,Y,R).
+exists([Xpp,Ypp], (safe(Xpp,Ypp,Rpp),eve(Xp,Yp,Xpp,Ypp),phi0(Xpp,Ypp,Rpp))):-adam(X,Y,R,Xp,Yp,Rp),phi0(X,Y,R).
+safe(Xp,Yp,Rp):-adam(X,Y,R,Xp,Yp,Rp),phi0(X,Y,R).
+safe(X,Y,R):-phi0(X,Y,R).
+skolem_template(s3, [X,Y,R,Xp,Yp,Rp,Ypp],
+	true,
+	true,
+	(
+		Rp=1,Rpp=T1,Yp=Ypp-1;
+		Rp=2,Rpp=T2,Yp=Ypp+1
+	),
+	((T1=1;T1=2),(T2=1;T2=2))
+	).
+*/
+init(X,Y):=X=0,Y=0.
+adam(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp;
+    X=Xp+1,Y=Yp;
+    X=Xp,Y=Yp.
+eve(X,Y,Xp,Yp):=
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1;
+    X=Xp,Y=Yp.
+safe(X,Y):=Y=<X+1,Y>=(X-1).
+% init => (c>5 /\ AG r=<5)
+phi0(X,Y):-init(X,Y).
+exists([Xpp,Ypp], (phi0(Xpp,Ypp))):-adam(X,Y,Xp,Yp),phi0(X,Y).
+safe(Xp,Yp):-adam(X,Y,Xp,Yp),phi0(X,Y).
+safe(X,Y):-phi0(X,Y).
+skolem_template(s3, [X,Y,Xp,Yp,Xpp,Ypp],
+	true,
+	true,
+	(
+    		Yp-Xp>=1,Xp=Xpp,Ypp=Yp+T1;
+		Yp-Xp=1,Xp=Xpp,Ypp=Yp+T4;
+		Yp-Xp=(-1),Xp=Xpp,Ypp=Yp+T5;
+		Yp-Xp=<(-1),Xp=Xpp,Ypp=Yp+T2;
+		Yp-Xp=0,Xp=Xpp,Ypp=Yp+T3
+		
+	),
+	(T1>=(-1),T1=<1,T2>=(-1),T2=<1,T3>=(-1),T3=<1)
+	).
+
+
+query_naming(phi0(x,y)).
+
+% time ./ctlstar tests/ctlstar-Erics/Industrial/55-pandAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec
+% With '-case-split': CEX after 0.1 sec

@@ -1,0 +1,47 @@
+% No. 30 from Eric's paper
+% neg-agp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+int x, y;
+unsigned int pc;
+int __phi() { return CEF( CAP(x < y) ); }
+
+void init() { x = 1; y = 1; }
+
+int body() {
+  while(1) {
+    x = x + 1; 
+    y = y + 1;
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+p0(X,Y,PC):=X>=1,X=<1,Y>=1,Y=<1,PC=1.
+next(X,Y,PC,Xp,Yp,PCp):=
+        Xp=X+1,Yp=Y+1,PC=1,PCp=1.
+dst(X,Y,PC):=X<Y.
+
+phi0(X,Y,PC):-p0(X,Y,PC).
+exists([Xp,Yp,PCp],(rank(X,Y,PC,Xp,Yp,PCp),phi0(Xp,Yp,PCp))):-phi0(X,Y,PC),\+dst(X,Y,PC).
+wf(rank/6).
+
+skolem_template(s3, [X,Y,PC,Xp,Yp,PCp],
+ 		true,
+ 		true,
+ 		(
+		  Xp=X+1,Yp=Y+1,PC=1,PCp=1
+		),
+ 		true
+ 	       ).
+query_naming(p0(x,y,pc)).
+query_naming(phi0(x,y,pc)).
+query_naming(next(x,y,pc,'x\'','y\'','pc\'')).
+query_naming(rank(x,y,pc,'x\'','y\'','pc\'')).
+query_naming(rank_p(x,y,pc,'x\'','y\'','pc\'')).
+query_naming(s3(x,y,pc,'x\'','y\'','pc\'')).
+
+% time ./ctlstar tests/ctlstar-Erics/30-EF-fail.qarmc -use-next-skolem -no-extra-insert-pred
+% looping .......... ???!!!

@@ -1,0 +1,37 @@
+Required Setup:
+
+This artifact has been tested using Ubuntu 18.04 and 20.04. It should work with other Linux
+distributions as well, but this has not been tested.
+
+The shared library version of Z3 must be available on the library path under the name libz3.so
+Not libz3.so.4 as is the default in Ubuntu!
+If you are testing this tool in a virtual machine you can install Z3 by copying the opt folder
+directly into the home directory and then executing:
+cd ~/opt/Z3
+sudo ./install.sh
+
+Make sure the executable flag is set for all the binary and all the shell scripts in the raboniel and opt folder,
+zipping can sometime destroy this. 
+The files are: raboniel/raboniel, raboniel/experiments.sh, raboniel/synth.sh, raboniel/synth_mini.sh, raboniel/check.sh,
+opt/strix/strix, opt/strix/strix_tlsf.sh, /opt/syfco/syfco,
+opt/tsltools/tsl2tlsf, and opt/tsltools/tslcheck
+
+You can also execute the restore_exec.sh script, which sets the permissions for you.
+
+
+The configuration of our tool assumes that our opt folder is in the same folder as the raboniel folder.
+If you want to install these tool elsewhere you have to change the paths in the files:
+synth.sh, synth_mini.sh, and check.sh.
+
+When executing raboniel you must always be in the same folder as the binary.
+
+
+You can now go to the folder raboniel, it includes our tool prebuild and the source code.
+To execute all the experiments in the paper run:
+./experiments.sh
+
+This runs and times all the specifications from the paper and prints the result to stdout. The number of refinements and new predicates and also the runtime might vary slightly due to some non determinism in Strix and/or Z3.
+
+Note: some of the tests that take a very long time are commented out.
+
+A readme with more explanations for our tool is included in raboniel/README.md

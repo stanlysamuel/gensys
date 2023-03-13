@@ -1,0 +1,489 @@
+% globals: 
+% init: 
+
+%
+% function main
+% locals: s__state, s__hit, tmp, blastFlag, tmp___1, __retres6
+% formals: 
+fundec_src_file('main', 's3_srvr_1b_safe.cil.c').
+var2names('main', [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [(_s__state, 's__state'), (_s__hit, 's__hit'), (_tmp, 'tmp'), (_blastFlag, 'blastFlag'), (_tmp___1, 'tmp___1'), (___retres6, '__retres6')]).
+trans_preds('main', [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit_1, _tmp_1, _blastFlag_1, _tmp___1_1, ___retres6_1], []).
+program_node(s_main, enter('main')).
+proc_of(s_main, 'main').
+node_location(s_main, 7).
+program_edge(s_main, 'main_95').
+
+% print_stmt: main_95
+% undefined callee __VERIFIER_nondet_int
+program_node('main_95', skip).
+proc_of('main_95', 'main').
+node_location('main_95', 9).
+program_edge('main_95', 'main_95_ret').
+program_node('main_95_ret', skip).
+proc_of('main_95_ret', 'main').
+node_location('main_95_ret', 9).
+program_edge('main_95_ret', 'main_96').
+
+% print_stmt: main_96
+program_node('main_96', trans(t_main_96)).
+proc_of('main_96', 'main').
+node_location('main_96', 9).
+trans(t_main_96, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit_1, _tmp, _blastFlag_1, _tmp___1, ___retres6], (_blastFlag_1 = 0, _s__state_1 = 8466, _s__hit_1 = _tmp)). % s__hit = tmp; s__state = 8466; blastFlag = 0
+program_edge('main_96', 'main_97').
+
+% print_stmt: main_97
+program_node('main_97', skip).
+proc_of('main_97', 'main').
+program_edge('main_97', 'main_98').
+
+% print_stmt: main_98
+program_node('main_98', skip).
+proc_of('main_98', 'main').
+node_location('main_98', 16).
+program_edge('main_98', 'main_99').
+
+% print_stmt: main_99
+program_node('main_99', skip).
+proc_of('main_99', 'main').
+node_location('main_99', 17).
+program_node('main_144', trans(a_main_144)).
+proc_of('main_144', 'main').
+node_location('main_144', 17).
+trans(a_main_144, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state =< 8512)). % s__state <= 8512
+program_edge('main_99', 'main_144').
+program_edge('main_144', 'main_100').
+program_node('main_145', trans(a_main_145)).
+proc_of('main_145', 'main').
+node_location('main_145', 17).
+trans(a_main_145, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state >= 1+ 8512)). % s__state > 8512
+program_edge('main_99', 'main_145').
+program_edge('main_145', 'main_102').
+
+% print_stmt: main_100
+program_node('main_100', skip).
+proc_of('main_100', 'main').
+node_location('main_100', 17).
+program_node('main_146', trans(a_main_146)).
+proc_of('main_146', 'main').
+node_location('main_146', 17).
+trans(a_main_146, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag >= 1+ 2)). % blastFlag > 2
+program_edge('main_100', 'main_146').
+program_edge('main_146', 'main_101').
+program_node('main_147', trans(a_main_147)).
+proc_of('main_147', 'main').
+node_location('main_147', 17).
+trans(a_main_147, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag =< 2)). % blastFlag <= 2
+program_edge('main_100', 'main_147').
+program_edge('main_147', 'main_102').
+
+% print_stmt: main_101
+program_node('main_101', error).
+proc_of('main_101', 'main').
+node_location('main_101', 17).
+
+% print_stmt: main_102
+program_node('main_102', skip).
+proc_of('main_102', 'main').
+node_location('main_102', 23).
+program_node('main_148', trans(a_main_148)).
+proc_of('main_148', 'main').
+node_location('main_148', 23).
+trans(a_main_148, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state = 8466)). % s__state == 8466
+program_edge('main_102', 'main_148').
+program_edge('main_148', 'main_103').
+program_node('main_149', trans(a_main_149)).
+proc_of('main_149', 'main').
+node_location('main_149', 23).
+trans(a_main_149, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state =\= 8466)). % s__state != 8466
+program_edge('main_102', 'main_149').
+program_edge('main_149', 'main_104').
+
+% print_stmt: main_103
+program_node('main_103', skip).
+proc_of('main_103', 'main').
+node_location('main_103', 24).
+program_edge('main_103', 'main_111').
+
+% print_stmt: main_104
+program_node('main_104', skip).
+proc_of('main_104', 'main').
+node_location('main_104', 28).
+program_node('main_150', trans(a_main_150)).
+proc_of('main_150', 'main').
+node_location('main_150', 28).
+trans(a_main_150, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state = 8512)). % s__state == 8512
+program_edge('main_104', 'main_150').
+program_edge('main_150', 'main_105').
+program_node('main_151', trans(a_main_151)).
+proc_of('main_151', 'main').
+node_location('main_151', 28).
+trans(a_main_151, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state =\= 8512)). % s__state != 8512
+program_edge('main_104', 'main_151').
+program_edge('main_151', 'main_106').
+
+% print_stmt: main_105
+program_node('main_105', skip).
+proc_of('main_105', 'main').
+node_location('main_105', 29).
+program_edge('main_105', 'main_117').
+
+% print_stmt: main_106
+program_node('main_106', skip).
+proc_of('main_106', 'main').
+node_location('main_106', 44).
+program_node('main_152', trans(a_main_152)).
+proc_of('main_152', 'main').
+node_location('main_152', 44).
+trans(a_main_152, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state = 8640)). % s__state == 8640
+program_edge('main_106', 'main_152').
+program_edge('main_152', 'main_107').
+program_node('main_153', trans(a_main_153)).
+proc_of('main_153', 'main').
+node_location('main_153', 44).
+trans(a_main_153, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state =\= 8640)). % s__state != 8640
+program_edge('main_106', 'main_153').
+program_edge('main_153', 'main_108').
+
+% print_stmt: main_107
+program_node('main_107', skip).
+proc_of('main_107', 'main').
+node_location('main_107', 45).
+program_edge('main_107', 'main_122').
+
+% print_stmt: main_108
+program_node('main_108', skip).
+proc_of('main_108', 'main').
+node_location('main_108', 48).
+program_node('main_154', trans(a_main_154)).
+proc_of('main_154', 'main').
+node_location('main_154', 48).
+trans(a_main_154, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state = 8656)). % s__state == 8656
+program_edge('main_108', 'main_154').
+program_edge('main_154', 'main_109').
+program_node('main_155', trans(a_main_155)).
+proc_of('main_155', 'main').
+node_location('main_155', 48).
+trans(a_main_155, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state =\= 8656)). % s__state != 8656
+program_edge('main_108', 'main_155').
+program_edge('main_155', 'main_110').
+
+% print_stmt: main_109
+program_node('main_109', skip).
+proc_of('main_109', 'main').
+node_location('main_109', 49).
+program_edge('main_109', 'main_128').
+
+% print_stmt: main_110
+program_node('main_110', skip).
+proc_of('main_110', 'main').
+node_location('main_110', 53).
+program_edge('main_110', 'main_139').
+
+% print_stmt: main_111
+program_node('main_111', skip).
+proc_of('main_111', 'main').
+node_location('main_111', 56).
+program_node('main_156', trans(a_main_156)).
+proc_of('main_156', 'main').
+node_location('main_156', 56).
+trans(a_main_156, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag = 0)). % blastFlag == 0
+program_edge('main_111', 'main_156').
+program_edge('main_156', 'main_112').
+program_node('main_157', trans(a_main_157)).
+proc_of('main_157', 'main').
+node_location('main_157', 56).
+trans(a_main_157, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag =\= 0)). % blastFlag != 0
+program_edge('main_111', 'main_157').
+program_edge('main_157', 'main_113').
+
+% print_stmt: main_112
+program_node('main_112', trans(t_main_112)).
+proc_of('main_112', 'main').
+node_location('main_112', 57).
+trans(t_main_112, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag_1, _tmp___1, ___retres6], (_blastFlag_1 = 2)). % blastFlag = 2
+program_edge('main_112', 'main_113').
+
+% print_stmt: main_113
+program_node('main_113', skip).
+proc_of('main_113', 'main').
+node_location('main_113', 59).
+program_node('main_158', trans(a_main_158)).
+proc_of('main_158', 'main').
+node_location('main_158', 59).
+trans(a_main_158, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__hit =\= 0)). % s__hit != 0
+program_edge('main_113', 'main_158').
+program_edge('main_158', 'main_114').
+program_node('main_159', trans(a_main_159)).
+proc_of('main_159', 'main').
+node_location('main_159', 59).
+trans(a_main_159, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__hit = 0)). % s__hit == 0
+program_edge('main_113', 'main_159').
+program_edge('main_159', 'main_115').
+
+% print_stmt: main_114
+program_node('main_114', trans(t_main_114)).
+proc_of('main_114', 'main').
+node_location('main_114', 60).
+trans(t_main_114, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state_1 = 8656)). % s__state = 8656
+program_edge('main_114', 'main_116').
+
+% print_stmt: main_115
+program_node('main_115', trans(t_main_115)).
+proc_of('main_115', 'main').
+node_location('main_115', 62).
+trans(t_main_115, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state_1 = 8512)). % s__state = 8512
+program_edge('main_115', 'main_116').
+
+% print_stmt: main_116
+program_node('main_116', skip).
+proc_of('main_116', 'main').
+node_location('main_116', 64).
+program_edge('main_116', 'main_138').
+
+% print_stmt: main_117
+% undefined callee __VERIFIER_nondet_int
+program_node('main_117', skip).
+proc_of('main_117', 'main').
+node_location('main_117', 67).
+program_edge('main_117', 'main_117_ret').
+program_node('main_117_ret', skip).
+proc_of('main_117_ret', 'main').
+node_location('main_117_ret', 67).
+program_edge('main_117_ret', 'main_118').
+
+% print_stmt: main_118
+program_node('main_118', skip).
+proc_of('main_118', 'main').
+node_location('main_118', 68).
+program_node('main_160', trans(a_main_160)).
+proc_of('main_160', 'main').
+node_location('main_160', 68).
+trans(a_main_160, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_tmp___1 =\= 0)). % tmp___1 != 0
+program_edge('main_118', 'main_160').
+program_edge('main_160', 'main_119').
+program_node('main_161', trans(a_main_161)).
+proc_of('main_161', 'main').
+node_location('main_161', 68).
+trans(a_main_161, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_tmp___1 = 0)). % tmp___1 == 0
+program_edge('main_118', 'main_161').
+program_edge('main_161', 'main_120').
+
+% print_stmt: main_119
+program_node('main_119', trans(t_main_119)).
+proc_of('main_119', 'main').
+node_location('main_119', 69).
+trans(t_main_119, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state_1 = 8466)). % s__state = 8466
+program_edge('main_119', 'main_121').
+
+% print_stmt: main_120
+program_node('main_120', trans(t_main_120)).
+proc_of('main_120', 'main').
+node_location('main_120', 71).
+trans(t_main_120, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state_1 = 8640)). % s__state = 8640
+program_edge('main_120', 'main_121').
+
+% print_stmt: main_121
+program_node('main_121', skip).
+proc_of('main_121', 'main').
+node_location('main_121', 73).
+program_edge('main_121', 'main_138').
+
+% print_stmt: main_122
+program_node('main_122', skip).
+proc_of('main_122', 'main').
+node_location('main_122', 76).
+program_node('main_162', trans(a_main_162)).
+proc_of('main_162', 'main').
+node_location('main_162', 76).
+trans(a_main_162, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag = 3)). % blastFlag == 3
+program_edge('main_122', 'main_162').
+program_edge('main_162', 'main_123').
+program_node('main_163', trans(a_main_163)).
+proc_of('main_163', 'main').
+node_location('main_163', 76).
+trans(a_main_163, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag =\= 3)). % blastFlag != 3
+program_edge('main_122', 'main_163').
+program_edge('main_163', 'main_124').
+
+% print_stmt: main_123
+program_node('main_123', trans(t_main_123)).
+proc_of('main_123', 'main').
+node_location('main_123', 77).
+trans(t_main_123, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag_1, _tmp___1, ___retres6], (_blastFlag_1 = 4)). % blastFlag = 4
+program_edge('main_123', 'main_124').
+
+% print_stmt: main_124
+program_node('main_124', skip).
+proc_of('main_124', 'main').
+node_location('main_124', 79).
+program_node('main_164', trans(a_main_164)).
+proc_of('main_164', 'main').
+node_location('main_164', 79).
+trans(a_main_164, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__hit =\= 0)). % s__hit != 0
+program_edge('main_124', 'main_164').
+program_edge('main_164', 'main_125').
+program_node('main_165', trans(a_main_165)).
+proc_of('main_165', 'main').
+node_location('main_165', 79).
+trans(a_main_165, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__hit = 0)). % s__hit == 0
+program_edge('main_124', 'main_165').
+program_edge('main_165', 'main_126').
+
+% print_stmt: main_125
+program_node('main_125', skip).
+proc_of('main_125', 'main').
+node_location('main_125', 80).
+program_edge('main_125', 'main_139').
+
+% print_stmt: main_126
+program_node('main_126', trans(t_main_126)).
+proc_of('main_126', 'main').
+node_location('main_126', 82).
+trans(t_main_126, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state_1 = 8656)). % s__state = 8656
+program_edge('main_126', 'main_127').
+
+% print_stmt: main_127
+program_node('main_127', skip).
+proc_of('main_127', 'main').
+node_location('main_127', 84).
+program_edge('main_127', 'main_138').
+
+% print_stmt: main_128
+program_node('main_128', skip).
+proc_of('main_128', 'main').
+node_location('main_128', 87).
+program_node('main_166', trans(a_main_166)).
+proc_of('main_166', 'main').
+node_location('main_166', 87).
+trans(a_main_166, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag = 2)). % blastFlag == 2
+program_edge('main_128', 'main_166').
+program_edge('main_166', 'main_129').
+program_node('main_167', trans(a_main_167)).
+proc_of('main_167', 'main').
+node_location('main_167', 87).
+trans(a_main_167, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag =\= 2)). % blastFlag != 2
+program_edge('main_128', 'main_167').
+program_edge('main_167', 'main_130').
+
+% print_stmt: main_129
+program_node('main_129', trans(t_main_129)).
+proc_of('main_129', 'main').
+node_location('main_129', 88).
+trans(t_main_129, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag_1, _tmp___1, ___retres6], (_blastFlag_1 = 3)). % blastFlag = 3
+program_edge('main_129', 'main_130').
+
+% print_stmt: main_130
+program_node('main_130', skip).
+proc_of('main_130', 'main').
+node_location('main_130', 91).
+program_node('main_168', trans(a_main_168)).
+proc_of('main_168', 'main').
+node_location('main_168', 91).
+trans(a_main_168, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag = 4)). % blastFlag == 4
+program_edge('main_130', 'main_168').
+program_edge('main_168', 'main_131').
+program_node('main_169', trans(a_main_169)).
+proc_of('main_169', 'main').
+node_location('main_169', 91).
+trans(a_main_169, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag =\= 4)). % blastFlag != 4
+program_edge('main_130', 'main_169').
+program_edge('main_169', 'main_132').
+
+% print_stmt: main_131
+program_node('main_131', trans(t_main_131)).
+proc_of('main_131', 'main').
+node_location('main_131', 92).
+trans(t_main_131, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag_1, _tmp___1, ___retres6], (_blastFlag_1 = 5)). % blastFlag = 5
+program_edge('main_131', 'main_134').
+
+% print_stmt: main_132
+program_node('main_132', skip).
+proc_of('main_132', 'main').
+node_location('main_132', 94).
+program_node('main_170', trans(a_main_170)).
+proc_of('main_170', 'main').
+node_location('main_170', 94).
+trans(a_main_170, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag = 5)). % blastFlag == 5
+program_edge('main_132', 'main_170').
+program_edge('main_170', 'main_133').
+program_node('main_171', trans(a_main_171)).
+proc_of('main_171', 'main').
+node_location('main_171', 94).
+trans(a_main_171, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_blastFlag =\= 5)). % blastFlag != 5
+program_edge('main_132', 'main_171').
+program_edge('main_171', 'main_134').
+
+% print_stmt: main_133
+program_node('main_133', error).
+proc_of('main_133', 'main').
+node_location('main_133', 95).
+
+% print_stmt: main_134
+program_node('main_134', skip).
+proc_of('main_134', 'main').
+node_location('main_134', 98).
+program_node('main_172', trans(a_main_172)).
+proc_of('main_172', 'main').
+node_location('main_172', 98).
+trans(a_main_172, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__hit =\= 0)). % s__hit != 0
+program_edge('main_134', 'main_172').
+program_edge('main_172', 'main_135').
+program_node('main_173', trans(a_main_173)).
+proc_of('main_173', 'main').
+node_location('main_173', 98).
+trans(a_main_173, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__hit = 0)). % s__hit == 0
+program_edge('main_134', 'main_173').
+program_edge('main_173', 'main_136').
+
+% print_stmt: main_135
+program_node('main_135', trans(t_main_135)).
+proc_of('main_135', 'main').
+node_location('main_135', 99).
+trans(t_main_135, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state_1, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], (_s__state_1 = 8640)). % s__state = 8640
+program_edge('main_135', 'main_137').
+
+% print_stmt: main_136
+program_node('main_136', skip).
+proc_of('main_136', 'main').
+node_location('main_136', 101).
+program_edge('main_136', 'main_139').
+
+% print_stmt: main_137
+program_node('main_137', skip).
+proc_of('main_137', 'main').
+node_location('main_137', 103).
+program_edge('main_137', 'main_138').
+
+% print_stmt: main_138
+program_node('main_138', skip).
+proc_of('main_138', 'main').
+program_edge('main_138', 'main_99').
+
+% print_stmt: main_139
+program_node('main_139', trans(t_main_139)).
+proc_of('main_139', 'main').
+node_location('main_139', 136).
+trans(t_main_139, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6_1], (___retres6_1 = -1)). % __retres6 = -1
+program_edge('main_139', 'main_140').
+
+% print_stmt: main_140
+program_node('main_140', skip).
+proc_of('main_140', 'main').
+node_location('main_140', 136).
+program_edge('main_140', 'main_142').
+
+% print_stmt: main_141
+program_node('main_141', trans(t_main_141)).
+proc_of('main_141', 'main').
+node_location('main_141', 138).
+trans(t_main_141, [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6], [_s__state, _s__hit, _tmp, _blastFlag, _tmp___1, ___retres6_1], (___retres6_1 = -1)). % __retres6 = -1
+program_edge('main_141', 'main_142').
+
+% print_stmt: main_142
+program_node('main_142', return('main')).
+proc_of('main_142', 'main').
+node_location('main_142', 7).
+program_node(e_main, exit('main')).
+proc_of(e_main, 'main').
+node_location(e_main, 7).
+program_edge('main_142', e_main).

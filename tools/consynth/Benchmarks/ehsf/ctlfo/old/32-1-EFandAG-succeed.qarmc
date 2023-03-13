@@ -1,0 +1,92 @@
+% No. 32 from Eric's paper (Industrial)
+/*
+#include "../ctl.h"
+
+int n; int A; int R;
+unsigned int pc;
+int __phi() { return CEF(CAND(CAP(A==1),CAG(CAP(R!=1)))); }
+
+int init() { A=0; R=0; }
+int dobreak;
+int __rho_1_;
+
+int body() {
+  __rho_1_ = nondet();
+  dobreak = __rho_1_;
+  while(1) {
+    if (dobreak > 0) break;
+    A = 1;
+    A = 0;
+    n = nondet();
+    assume(n>0);
+    while(1) {
+      if (!(n>0)) break;
+      // should loop forever here
+      n = n + 0;
+    }
+    R = 1;
+    R = 0;
+    __rho_1_ = nondet();
+    dobreak = __rho_1_;
+  }
+  while(1) { dummy=dummy; } L_return: return 0;  
+}
+
+int main() { }
+*/
+% exists([x], EF(a=x /\ AG r!=1))
+init(A,R,N,PC):-A=0,R=0,PC=1.
+next(A,R,N,PC,Ap,Rp,Np,PCp):=
+    PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+    PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+    PC=2,Ap=0,Rp=R,Np>0,PCp=3;
+    PC=3,N>0,Ap=A,Rp=R,Np=N,PCp=3;
+    PC=3,N=<0,Ap=A,Rp=1,Np=N,PCp=4;
+    PC=4,Ap=A,Rp=0,Np=N,PCp=1.
+dst(A,R,N,PC,X):=(R>=2;R=<0).
+p1(A,R,N,PC,X):=PC=2,A=1,(R>=2;R=<0),X=1.
+% init(v) => exists([x], aux(v,x))
+exists([X],q1(X)):-id(1),init(A,R,N,PC).
+aux(A,R,N,PC,X):-s1(A,R,N,PC,X),init(A,R,N,PC).
+skolem_template(s1, [A,R,N,PC,X], true, true, X=Tx, (Tx=0;Tx=1)).
+% aux => EF p1
+phi0(A,R,N,PC,X):-aux(A,R,N,PC,X).
+exists([Ap,Rp,Np,PCp],(rank(A,R,N,PC,Ap,Rp,Np,PCp),phi0(Ap,Rp,Np,PCp,X))):-phi0(A,R,N,PC,X),\+p1(A,R,N,PC,X).
+wf(rank/8).
+skolem_template(s8, [A,R,N,PC,_,Ap,Rp,Np,PCp],
+ 		true,
+		( PC>=1, PC=<4 ),
+	       (
+		 B1=0,PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+		 B1=1,PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+		 PC=2,Ap=0,Rp=R,Np>0,PCp=3;
+		 PC=3,N>0,Ap=A,Rp=R,Np=N,PCp=3;
+		 PC=3,N=<0,Ap=A,Rp=1,Np=N,PCp=4;
+		 PC=4,Ap=A,Rp=0,Np=N,PCp=1
+ 		),
+		(B1=0;B1=1)
+ 	       ).
+% p1 => a=x /\ AG r!=1
+A=X:-p1(A,R,N,PC,X).
+phi1(A,R,N,PC,X):-p1(A,R,N,PC,X).
+phi1(Ap,Rp,Np,PCp,X):-phi1(A,R,N,PC,X),next(A,R,N,PC,Ap,Rp,Np,PCp).
+dst(A,R,N,PC,X):-phi1(A,R,N,PC,X).
+
+query_naming(aux(a,r,n,pc,x)).
+query_naming(phi0(a,r,n,pc,x)).
+query_naming(phi1(a,r,n,pc,x)).
+query_naming(s1(a,r,n,pc,x)).
+query_naming(s8(a,r,n,pc,x,'a\'','r\'','n\'','pc\'')).
+query_naming(rank(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+query_naming(rank_p(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+
+query_finite_sorts(aux/5,[4]).
+query_finite_sorts(phi0/5,[4]).
+query_finite_sorts(phi1/5,[4]).
+query_finite_sorts(s1/5,[4]).
+query_finite_sorts(s8/9,[4,9]).
+query_finite_sorts(rank/8,[4,8]).
+query_finite_sorts(rank_p/8,[4,8]).
+
+% time ./ctlstar tests/ctlstar-ctlfo/32-1-EFandAG-succeed.qarmc -no-extra-insert-pred -use-next-skolem
+% 'program correct' after 1.8 sec

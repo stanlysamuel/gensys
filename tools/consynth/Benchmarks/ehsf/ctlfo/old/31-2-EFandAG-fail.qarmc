@@ -1,0 +1,89 @@
+% No. 31 from Eric's paper (Industrial)
+/*
+#include "../ctl.h"
+
+int n; int A; int R;
+unsigned int pc;
+int __phi() { return CEF(CAND(CAP(A==1),CAG(CAP(R!=1)))); }
+
+int init() { A=0; R=0; }
+int dobreak;
+int __rho_1_;
+int __rho_2_;
+
+int body() {
+  __rho_1_ = nondet();
+  dobreak = __rho_1_;
+  while(1) {
+    if (dobreak > 0) break;
+    A = 1;
+    A = 0;
+    __rho_2_ = nondet();
+    n = __rho_2_;
+    //assume(n>0);
+    while(1) {
+      if (!(n>0)) break;
+      // should loop forever here
+      n = n + 0;
+    }
+    R = 1;
+    R = 0;
+    __rho_1_ = nondet();
+    dobreak = __rho_1_;
+  }
+  while(1) { dummy=dummy; } L_return: return 0;  
+}
+
+int main() { }
+*/
+% EF(forall([x], a=1 /\ AG r!=1))
+init(A,R,N,PC):=A=0,R=0,PC=1.
+next(A,R,N,PC,Ap,Rp,Np,PCp):=
+    PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+    PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+    PC=2,Ap=0,Rp=R,Np=N,PCp=3;
+    PC=3,N>0,Ap=A,Rp=R,Np=N-1,PCp=3;
+    PC=3,N=<0,Ap=A,Rp=1,Np=N,PCp=4;
+    PC=4,Ap=A,Rp=0,Np=N,PCp=1.
+dst(A,R,N,PC,X):=(R>=2;R=<0).
+p1(A,R,N,PC):=A=1,(R>=2;R=<0).
+% init => EF p1
+phi0(A,R,N,PC):-init(A,R,N,PC).
+exists([Ap,Rp,Np,PCp],(rank(A,R,N,PC,Ap,Rp,Np,PCp),phi0(Ap,Rp,Np,PCp))):-phi0(A,R,N,PC),\+p1(A,R,N,PC).
+wf(rank/8).
+skolem_template(s3, [A,R,N,PC,Ap,Rp,Np,PCp],
+ 		true,
+		( PC>=1, PC=<4 ),
+		(
+		  B1=0,PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+		  B1=1,PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+		  PC=2,Ap=0,Rp=R,Np=N,PCp=3;
+		  PC=3,N>0,Ap=A,Rp=R,Np=N,PCp=3;
+		  PC=3,N=<0,Ap=A,Rp=1,Np=N,PCp=4;
+		  PC=4,Ap=A,Rp=0,Np=N,PCp=1
+ 		),
+		(B1=0;B1=1)
+ 	       ).
+% p1(v) => forall([x], aux(v,x)) 
+aux(A,R,N,PC,X):-p1(A,R,N,PC).
+% aux => a=1 /\ AG r!=1
+A=X:-aux(A,R,N,PC,X).
+phi1(A,R,N,PC,X):-aux(A,R,N,PC,X).
+phi1(Ap,Rp,Np,PCp,X):-phi1(A,R,N,PC,X),next(A,R,N,PC,Ap,Rp,Np,PCp).
+dst(A,R,N,PC,X):-phi1(A,R,N,PC,X).
+
+query_naming(phi0(a,r,n,pc)).
+query_naming(aux(a,r,n,pc,x)).
+query_naming(phi1(a,r,n,pc,x)).
+query_naming(s3(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+query_naming(rank(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+query_naming(rank_p(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(aux/5,[4]).
+query_finite_sorts(phi1/5,[4]).
+query_finite_sorts(s3/8,[4,8]).
+query_finite_sorts(rank/8,[4,8]).
+query_finite_sorts(rank_p/8,[4,8]).
+% time ./ctlstar tests/ctlstar-ctlfo/31-2-EFandAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec

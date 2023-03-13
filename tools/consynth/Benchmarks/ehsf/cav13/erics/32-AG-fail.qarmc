@@ -1,0 +1,45 @@
+% No. 32 from Eric's paper
+% neg-efp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0
+//
+// EXPECTED RANKING:    x' > x  /\  x < 5
+// ************************************************************
+
+int x;
+unsigned int pc;
+int __phi() { return CAG( CAP(x <= 5) ); }
+int __rho_1_;
+
+void init() { x = 0; }
+
+int body() {
+  while(1) {
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x + 1; 
+    } else {
+      x = x - 1; 
+    }
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,PC):=X=0,PC=1.
+next(X,PC,Xp,PCp):=
+        Xp=X+1,PCp=1;
+	Xp=X-1,PCp=1.
+dst(X,PC):=X=<5.
+
+% Queries: inv0
+inv0(X,PC):-init(X,PC).
+inv0(Xp,PCp):-inv0(X,PC), next(X,PC,Xp,PCp).
+dst(X,PC):-inv0(X,PC).
+
+% ./ctlstar tests/ctlstar-Erics/32-AG-fail.qarmc -use-next-skolem -no-extra-insert-pred
+% CEX after 0.1 sec

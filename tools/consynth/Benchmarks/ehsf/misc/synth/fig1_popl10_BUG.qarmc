@@ -1,0 +1,28 @@
+% Figure 1 from Vechev-et-al POPL10. Only verification (should fail)
+% V = (X,Y1,Y2,Z,PC1,PC2,PC3)
+
+init(X,Y1,Y2,Z,PC1,PC2,PC3) := X=0, Z=0, PC1=1, PC2=1, PC3=1.
+next1(X,Z,PC1,Xp,Zp,PC1p) :=
+  PC1=1, PC1p=2, Xp=X+Z, Zp=Z
+  ; PC1=2, PC1p=3, Xp=X+Z, Zp=Z.
+next2(X,Z,PC2,Xp,Zp,PC2p) :=
+  PC2=1, PC2p=2, Zp=Z+1, Xp=X
+  ; PC2=2, PC2p=3, Zp=Z+1, Xp=X.
+next3(X,Y1,Y2,Z,PC3,Xp,Y1p,Y2p,Zp,PC3p) :=
+  PC3=1, PC3p=2, X=1, Y1p=3, Xp=X, Y2p=Y2, Zp=Z
+  ; PC3=1, PC3p=2, X=2, Y1p=6, Xp=X, Y2p=Y2, Zp=Z
+  ; PC3=1, PC3p=2, (X=<0 ; X>=3), Y1p=5, Xp=X, Y2p=Y2, Zp=Z
+  ; PC3=2, PC3p=3, Y2p=X, Xp=X, Y1p=Y1, Zp=Z
+  ; PC3=3, PC3p=4, (Y1 >= Y2 + 1 ; Y2 >= Y1+1), Xp=X, Y1p=Y1, Y2p=Y2, Zp=Z.
+error(X,Y1,Y2,Z,PC1,PC2,PC3) := PC3=3, Y1=Y2.
+
+inv(X,Y1,Y2,Z,PC1,PC2,PC3) :- init(X,Y1,Y2,Z,PC1,PC2,PC3).
+inv(Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p) :- inv(X,Y1,Y2,Z,PC1,PC2,PC3), next1(X,Z,PC1,Xp,Zp,PC1p), Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3.
+inv(Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p) :- inv(X,Y1,Y2,Z,PC1,PC2,PC3), next2(X,Z,PC2,Xp,Zp,PC2p), Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3.
+inv(Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p) :- inv(X,Y1,Y2,Z,PC1,PC2,PC3), next3(X,Y1,Y2,Z,PC3,Xp,Y1p,Y2p,Zp,PC3p), PC1p=PC1, PC2p=PC2.
+false :- inv(X,Y1,Y2,Z,PC1,PC2,PC3), error(X,Y1,Y2,Z,PC1,PC2,PC3).
+
+query_finite_sorts(inv,[5,6,7]).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred -case-split -nopreprocess fig1_popl10_BUG.qarmc
+% SVN revision 17985: 'program is not correct' after 0.7s

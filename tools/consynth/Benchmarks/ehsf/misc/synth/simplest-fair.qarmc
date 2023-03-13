@@ -1,0 +1,26 @@
+init(K1,K2,PC1,PC2):=PC1=1,PC2=1. %, K1=2,K2=2.
+next(K1,K2,PC1,PC2,K1p,K2p,PC1p,PC2p):=
+  % next1
+    PC1=1, PC1p=2, K1p=K1, K2p=K2, PC2p=PC2
+  ; PC1=2, PC1p=2, K1=<K2, K1p=K1, K2p=K2-1, PC2p=PC2
+  ; PC1=2, PC1p=1, K1=<K2, K1p=K1, K2p=K2-1, PC2p=PC2
+  % next2 
+  ; PC2=1, PC2p=2, K1p=K1, K2p=K2, PC1p=PC1
+  ; PC2=2, PC2p=2, K2=<K1, K1p=K1-1, K2p=K2, PC1p=PC1
+  ; PC2=2, PC2p=1, K2=<K1, K1p=K1-1, K2p=K2, PC1p=PC1.
+
+% init => AG p1
+phi1(K1,K2,PC1,PC2) :- init(K1,K2,PC1,PC2).
+phi1(K1p,K2p,PC1p,PC2p) :- next(K1,K2,PC1,PC2,K1p,K2p,PC1p,PC2p), phi1(K1,K2,PC1,PC2).
+p1(K1,K2,PC1,PC2) :- phi1(K1,K2,PC1,PC2).
+
+% p1 /\ pc1=2 => AF pc1=1
+phi2(K1,K2,PC1,PC2) :- p1(K1,K2,PC1,PC2), PC1=2.
+% phi2(v), not(dst(v)) -> exists v': next(v,v')
+exists([K1p,K2p,PC1p,PC2p], next(K1,K2,PC1,PC2,K1p,K2p,PC1p,PC2p)) :- phi2(K1,K2,PC1,PC2), \+ (PC1=1).
+% phi2(v), not(dst(v)), next(v,v') -> phi2(v') /\ rank(v,v')
+phi2(K1p,K2p,PC1p,PC2p), rank(K1,K2,PC1,PC2,K1p,K2p,PC1p,PC2p) :- phi2(K1,K2,PC1,PC2), \+ (PC1=1), next(K1,K2,PC1,PC2,K1p,K2p,PC1p,PC2p).
+wf(rank/8).
+
+% still not working!!
+% 'program is not correct'

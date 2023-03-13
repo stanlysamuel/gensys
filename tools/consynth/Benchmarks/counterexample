@@ -1,0 +1,5 @@
+4: from([3]) by trans(5-1)
+3: from([2,1]) by trans(3)
+2: from([]) by trans(2)
+1: from([]) by trans(scindy-1)
+cex_tids([scindy-1,2,3,5-1]).

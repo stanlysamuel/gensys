@@ -1,0 +1,40 @@
+% No. 25 from Eric's paper (Industrial)
+/*
+
+*/
+init(L,GL,PC):=GL=0,L=0,PC=0.
+eve(L,GL,PC,Lp,GLp,PCp):=
+    PC=0,PCp=2,L=Lp,GL=GLp;
+    PC=0,PCp=4,L=Lp,GL=GLp;
+    PC=2,PCp=4,L=<0,Lp=1;
+    PC=4,PCp=5,GL\=0,Lp=L,GLp=GL;
+    PC=4,PCp=6,GL=0,Lp=L,GLp=GL;
+    PC=5,PCp=6,L>=1,Lp=0,GLp=GL;
+    PC=6,PCp=0,Lp=L.
+adam(L,GL,PC,Lp,GLp,PCp):=
+    PC=PCp,L=Lp,GL=GLp.
+safe(L,GL,PC):= \+ (
+	PC=2,L=1;
+	PC=5,L=0).
+%error(L,GL,PC):= \+ (PC=2,L=1), \+ (PC=5,L=0).
+% init => (c>5 /\ AG r=<5)
+phi0(L,GL,PC):-init(L,GL,PC).
+%exists([Lpp,GLpp,PCpp],eve(Lp,GLp,PCp,Lpp,GLpp,PCpp),phi0(Lpp,GLpp,PCpp)),safe(Lp,GLp,PCp):-adam(L,GL,PC,Lp,GLp,PCp),phi0(L,GL,PC).
+exists([Lpp,GLpp,PCpp],(eve(Lp,GLp,PCp,Lpp,GLpp,PCpp),phi0(Lpp,GLpp,PCpp))):-adam(L,GL,PC,Lp,GLp,PCp),phi0(L,GL,PC).
+safe(Lp,GLp,PCp):-adam(L,GL,PC,Lp,GLp,PCp),phi0(L,GL,PC).
+safe(L,GL,PC):-phi0(L,GL,PC).
+skolem_template(s3, [L,GL,PC,Lp,GLp,PCp,Lpp,GLpp,PCpp],
+		 true,
+		 (PC>=0,PC=<6),
+		 (
+		   PCp=2,PCpp=4,GLpp=T1;
+		   PCp=6,PCpp=0,GLpp=T2
+		 ),
+		 ((T1=1;T1=1),(T2=0;T2=0))
+	        ).
+
+query_naming(phi0(l,gl,pc)).
+query_naming(safe(l,gl,pc)).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/55-pandAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec
+% With '-case-split': CEX after 0.1 sec

@@ -1,0 +1,41 @@
+rybal@Andreys-MacBook-Pro:~/research/code/qarmc5$ ./run-log-tests.sh -refine-t -exp-eval tests/ctlstar-pldi2014sub-template/  -nomcc -t 600
+Running tests..
+qarmc -refine-t -exp-eval -nomcc
+timeout: 600
+directories: tests/ctlstar-pldi2014sub-template/
+
+tests/ctlstar-pldi2014sub-template//cdaudio_safe.CdAudioHPCdrDeviceControl.qarmc.. PASSED (in 11 sec)
+tests/ctlstar-pldi2014sub-template//cdaudio_safe.IofCallDriver.qarmc.. PASSED (in 11 sec)
+tests/ctlstar-pldi2014sub-template//cdaudio_safe.KeSetEvent.qarmc.. PASSED (in 12 sec)
+tests/ctlstar-pldi2014sub-template//cdaudio_simpl1_safe.CdAudioHPCdrDeviceControl.qarmc.. PASSED (in 11 sec)
+tests/ctlstar-pldi2014sub-template//cdaudio_simpl1_safe.IofCallDriver.qarmc.. PASSED (in 12 sec)
+tests/ctlstar-pldi2014sub-template//cdaudio_simpl1_safe.KeSetEvent.qarmc.. PASSED (in 13 sec)
+tests/ctlstar-pldi2014sub-template//diskperf_safe.DiskPerfForwardIrpSynchronous.qarmc.. PASSED (in 5 sec)
+tests/ctlstar-pldi2014sub-template//diskperf_safe.IofCallDriver.qarmc.. PASSED (in 3 sec)
+tests/ctlstar-pldi2014sub-template//diskperf_safe.KeSetEvent.qarmc.. PASSED (in 5 sec)
+tests/ctlstar-pldi2014sub-template//diskperf_simpl1_safe.DiskPerfForwardIrpSynchronous.qarmc.. PASSED (in 4 sec)
+tests/ctlstar-pldi2014sub-template//diskperf_simpl1_safe.IofCallDriver.qarmc.. PASSED (in 3 sec)
+tests/ctlstar-pldi2014sub-template//diskperf_simpl1_safe.KeSetEvent.qarmc.. PASSED (in 4 sec)
+tests/ctlstar-pldi2014sub-template//floppy_safe.FloppyPnp.qarmc.. PASSED (in 8 sec)
+tests/ctlstar-pldi2014sub-template//floppy_safe.IofCallDriver.qarmc.. FAILED (in 599 sec)
+tests/ctlstar-pldi2014sub-template//floppy_safe.IofCallDriver_Bounded.qarmc.. PASSED (in 315 sec)
+tests/ctlstar-pldi2014sub-template//floppy_safe.KeSetEvent.qarmc.. PASSED (in 551 sec)
+tests/ctlstar-pldi2014sub-template//floppy_simpl3_safe.FloppyPnp.qarmc.. PASSED (in 3 sec)
+tests/ctlstar-pldi2014sub-template//floppy_simpl3_safe.IofCallDriver.qarmc.. PASSED (in 24 sec)
+tests/ctlstar-pldi2014sub-template//floppy_simpl3_safe.KeSetEvent.qarmc.. PASSED (in 5 sec)
+tests/ctlstar-pldi2014sub-template//floppy_simpl4_safe.FloppyPnp.qarmc.. PASSED (in 9 sec)
+tests/ctlstar-pldi2014sub-template//floppy_simpl4_safe.IofCallDriver.qarmc.. PASSED (in 28 sec)
+tests/ctlstar-pldi2014sub-template//floppy_simpl4_safe.KeSetEvent.qarmc.. PASSED (in 9 sec)
+tests/ctlstar-pldi2014sub-template//kbfiltr_simpl1_safe.IofCallDriver.qarmc.. PASSED (in 8 sec)
+tests/ctlstar-pldi2014sub-template//kbfiltr_simpl1_safe.KbFilterPnP.qarmc.. PASSED (in 1 sec)
+tests/ctlstar-pldi2014sub-template//kbfiltr_simpl1_safe.StubDriverInit.qarmc.. PASSED (in 2 sec)
+tests/ctlstar-pldi2014sub-template//kbfiltr_simpl2_safe.IofCallDriver.qarmc.. PASSED (in 10 sec)
+tests/ctlstar-pldi2014sub-template//kbfiltr_simpl2_safe.KbFilterPnP.qarmc.. PASSED (in 2 sec)
+tests/ctlstar-pldi2014sub-template//kbfiltr_simpl2_safe.StubDriverInit.qarmc.. PASSED (in 2 sec)
+tests/ctlstar-pldi2014sub-template//parport_safe.IofCallDriver.qarmc.. PASSED (in 19 sec)
+tests/ctlstar-pldi2014sub-template//parport_safe.KeSetEvent.qarmc.. PASSED (in 24 sec)
+tests/ctlstar-pldi2014sub-template//parport_safe.PptDispatchInternalDeviceControl.qarmc.. PASSED (in 19 sec)
+
+passed 30 out of 31 tests (96%)
+timeout: 0   out of memory: 0
+Total time: 1732 seconds

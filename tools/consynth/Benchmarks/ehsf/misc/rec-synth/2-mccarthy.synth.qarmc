@@ -1,0 +1,61 @@
+/*
+int mccarthy(int n) {      
+  int r1, r2;
+1:  if (n > ?) { 
+2:    return n-?;
+  } else {
+3:    r1 = mccarthy(n+?);
+4:    r2 = mccarthy(r1);
+5:    return r2;
+  }
+6:}
+*/
+init(N,R1,R2,R,PC):=PC=1.
+%%% next(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp):=
+%%%     PC=1,N>=101,Np=N,R1p=R1,R2p=R2,Rp=R,PCp=2;
+%%%     PC=2,Np=N,R1p=R1,R2p=R2,Rp=N-10,PCp=8;
+%%%     PC=1,N=<100,Np=N,R1p=R1,R2p=R2,Rp=R,PCp=3;
+%%%     PC=4,Np=N,R1p=R,R2p=R2,Rp=R,PCp=5;
+%%%     PC=6,Np=N,R1p=R1,R2p=R,Rp=R,PCp=7;
+%%%     PC=7,Np=N,R1p=R1,R2p=R2,Rp=R2,PCp=8.
+call(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp):=
+    PC=3,Np=N+11,PCp=1;
+    PC=5,Np=R1,PCp=1.
+loc(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp):=
+    PC=3,Np=N,R1p=R1,R2p=R2,PCp=4;
+    PC=5,Np=N,R1p=R1,R2p=R2,PCp=6.
+ret(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp):=
+    PC=8,Rp=R,PCp=4;
+    PC=8,Rp=R,PCp=6.
+error(N,R1,R2,R,PC):=PC=8,(N=<101,(R>=92;R=<90)).
+
+summ(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp):- init(N,R1,R2,R,PC),Np=N,R1p=R1,R2p=R2,Rp=R,PCp=PC.
+
+exists([Npp,R1pp,R2pp,Rpp,PCpp],summ(N,R1,R2,R,PC,Npp,R1pp,R2pp,Rpp,PCpp)) :-
+   	summ(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp),(PCp=1;PCp=2;PCp=4;PCp=6;PCp=7).
+skolem_template(s3,[_,_,_,_,_,N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp],true,
+    		(PC=1;PC=2;PC=4;PC=6;PC=7),
+    		(
+		  PC=1,N>=Cons+1,Np=N,R1p=R1,R2p=R2,Rp=R,PCp=2;
+		  PC=2,Np=N,R1p=R1,R2p=R2,Rp=N-10,PCp=8;
+		  PC=1,N=<Cons,Np=N,R1p=R1,R2p=R2,Rp=R,PCp=3;
+		  PC=4,Np=N,R1p=R,R2p=R2,Rp=R,PCp=5;
+		  PC=6,Np=N,R1p=R1,R2p=R,Rp=R,PCp=7;
+		  PC=7,Np=N,R1p=R1,R2p=R2,Rp=R2,PCp=8
+    		),
+    		(Cons>=101,Cons=<101)
+    	       ).
+summ(Npp,R1pp,R2pp,Rpp,PCpp,Nppp,R1ppp,R2ppp,Rppp,PCppp):-
+   	summ(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp),call(Np,R1p,R2p,Rp,PCp,Npp,R1pp,R2pp,Rpp,PCpp),
+   	Nppp=Npp,R1ppp=R1pp,R2ppp=R2pp,Rppp=Rpp,PCppp=PCpp.
+summ(N,R1,R2,R,PC,Npppp,R1pppp,R2pppp,Rpppp,PCpppp):-
+	summ(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp),
+	call(Np,R1p,R2p,Rp,PCp,Npp,R1pp,R2pp,Rpp,PCpp),
+	summ(Npp,R1pp,R2pp,Rpp,PCpp,Nppp,R1ppp,R2ppp,Rppp,PCppp),
+	ret(Nppp,R1ppp,R2ppp,Rppp,PCppp,Npppp,R1pppp,R2pppp,Rpppp,PCpppp),
+	loc(Np,R1p,R2p,Rp,PCp,Npppp,R1pppp,R2pppp,Rpppp,PCpppp).
+rank(N,R1,R2,R,PC,Npp,R1pp,R2pp,Rpp,PCpp):-
+	summ(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp),
+	call(Np,R1p,R2p,Rp,PCp,Npp,R1pp,R2pp,Rpp,PCpp).
+false:-summ(N,R1,R2,R,PC,Np,R1p,R2p,Rp,PCp),error(Np,R1p,R2p,Rp,PCp).
+wf(rank/10).

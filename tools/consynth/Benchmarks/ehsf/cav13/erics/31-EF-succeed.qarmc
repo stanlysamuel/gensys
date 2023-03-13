@@ -1,0 +1,56 @@
+% No. 31 from Eric's paper
+% neg-agp-succeed/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+int x;
+unsigned int pc;
+int __phi() { return CEF( CAP(x <= 1) ); }
+int __rho_1_;
+
+void init() { x = 2; }
+
+int body() {
+  while(1) {
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x + 1; 
+    } else {
+      x = x - 1; 
+    }
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+p0(X,PC):=X=2,PC=1.
+next(X,PC,Xp,PCp):=
+        Xp=X+1,PC=1,PCp=1;
+	Xp=X-1,PC=1,PCp=1.
+dst(X,PC):=X=<1.
+
+phi0(X,PC):-p0(X,PC).
+exists([Xp,PCp],(rank(X,PC,Xp,PCp),phi0(Xp,PCp))):-phi0(X,PC),\+dst(X,PC).
+wf(rank/4).
+
+skolem_template(s3, [X,PC,Xp,PCp],
+ 		true,
+		true,
+ 		(
+		  B=1,PC=1,PCp=1,Xp=X-1;
+		  B=0,PC=1,PCp=1,Xp=X+1
+		),
+ 		(B=0 ; B=1)
+ 	       ).
+
+query_naming(p0(x,pc)).
+query_naming(phi0(x,pc)).
+query_naming(next(x,pc,'x\'','pc\'')).
+query_naming(rank(x,pc,'x\'','pc\'')).
+query_naming(rank_p(x,pc,'x\'','pc\'')).
+query_naming(s3(x,pc,'x\'','pc\'')).
+
+% /ctlstar tests/ctlstar-Erics/31-EF-succeed.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program correct' after 0.4 sec, s3 = (x'=x-1,pc=1,pc'=1)
+% with a lot of issues **** ??

@@ -1,0 +1,47 @@
+/* EG (check==1 => EF (p>0)); program is correct
+int x, p, t, check;
+void init() { p = 0; check = 0; }
+
+int body() {
+  while(1) {
+    DOCHECK();
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      while(1) {
+	if (! (x > 0)) break; 
+	__rho_2_ = nondet();
+	if(__rho_2_ <= 0) {
+	  x = x - 1;
+	} else {
+	  t = nondet();
+	  assume(t > 0);
+	  x = x + t;
+	}
+      }
+      p = 1;
+    }
+    p = 0;
+  }
+}
+*/
+
+init(A,B,C,D,E):=B=0,D=0,E=1.
+step(A,B,C,D,E,F,G,H,I,J):=
+  F=A,G=B,H=C,E=1,J=2
+ ;D>=1,F=A,G=B,H=C,E=2,J=3
+ ;A>0,F=A,G=B,H=C,I=D,E=3,J=4
+ ;F=A,G=B,I=D,E=4,J=5
+ ;C>0,F=A+C,G=B,H=C,I=D,E=5,J=3
+ ;F=A-1,G=B,H=C,I=D,E=4,J=3
+ ;A=<0,F=A,G=1,H=C,I=D,E=3,J=6
+ ;D<1,F=A,G=B,H=C,I=D,E=2,J=6
+ ;G=0,F=A,H=C,I=D,E=6,J=1.
+phi0(A,B,C,D,E):-init(A,B,C,D,E).
+exists([F,G,H,I,J],(step(A,B,C,D,E,F,G,H,I,J),phi0(F,G,H,I,J))):-phi0(A,B,C,D,E).
+% instead of C1 and C2, we should get C3 ??
+phi1(A,B,C,D,E):-p1(A,B,C,D,E),D>=1. % clause C3
+exists([F,G,H,I,J],(step(A,B,C,D,E,F,G,H,I,J),phi1(F,G,H,I,J))):-phi1(A,B,C,D,E),\+B>0.
+rel0(A,B,C,D,E,F,G,H,I,J):-phi1(A,B,C,D,E),\+B>0,step(A,B,C,D,E,F,G,H,I,J),phi1(F,G,H,I,J),\+G>0.
+trel0(A,B,C,D,E,F,G,H,I,J):-rel0(A,B,C,D,E,F,G,H,I,J).
+trel0(A,B,C,D,E,K,L,M,N,O):-trel0(A,B,C,D,E,F,G,H,I,J),rel0(F,G,H,I,J,K,L,M,N,O).
+dwf(trel0(A,B,C,D,E,F,G,H,I,J)).

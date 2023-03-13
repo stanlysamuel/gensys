@@ -1,0 +1,33 @@
+% property : init => AG dst1 \/ AG dst2
+init(R,X,PC) := PC=1,X=0.
+next(R,X,PC,Rp,Xp,PCp) :=
+	PC=1,R>=1,Rp=R,Xp=X+1,PCp=2;
+	PC=1,R=<0,Rp=R,Xp=X-1,PCp=3;
+	PC=2,Rp=R,Xp=X+1,PCp=2;
+	PC=3,Rp=R,Xp=X-1,PCp=3.
+dst1(R,X,PC) := X>=0.
+dst2(R,X,PC) := X=<0.
+
+% init => p1 \/ p2
+% ... encoded as ... exists b : init /\ b => p1 and init /\ ~b => p2
+exists([R,X,PC], p1(R,X,PC)) :- id(1), Fl=1, init(R,X,PC).
+exists([R,X,PC], p2(R,X,PC)) :- id(1), Fl=0, init(R,X,PC).
+
+% p1 => AG dst1
+phi1(R,X,PC) :- p1(R,X,PC).
+phi1(Rp,Xp,PCp) :- phi1(R,X,PC),next(R,X,PC,Rp,Xp,PCp).
+dst1(R,X,PC) :- phi1(R,X,PC).
+
+% p2 => AG dst2
+phi2(R,X,PC) :- p2(R,X,PC).
+phi2(Rp,Xp,PCp) :- phi2(R,X,PC),next(R,X,PC,Rp,Xp,PCp).
+dst2(R,X,PC) :- phi2(R,X,PC).
+
+skolem_template(s1, [Fl,R,X,PC], true, true,
+		(
+		  Fl=0, X=0, PC=1, T1*R=<T2 ;
+		  Fl=1, X=0, PC=1, T1*R>=T2+1
+		),
+		true).
+
+

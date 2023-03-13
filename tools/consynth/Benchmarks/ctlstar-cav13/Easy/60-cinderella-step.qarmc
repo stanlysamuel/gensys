@@ -1,0 +1,46 @@
+% No. 25 from Eric's paper (Industrial)
+/*
+
+
+*/
+init(B1,B2,B3,B4,B5):=B1=0,B2=0,B3=0,B4=0,B5=0.
+stepmother(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp;
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1;
+    X=Xp+1,Y=Yp;
+    X=Xp+1,Y=Yp+1;
+    X=Xp+1,Y=Yp-1.
+cinderellac(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp;
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1;
+    X=Xp+1,Y=Yp;
+    X=Xp+1,Y=Yp+1;
+    X=Xp+1,Y=Yp-1.
+safe(X,Y):= X=<2,X>=0,Y=<2,Y>=0.
+% init => (c>5 /\ AG r=<5)
+phi0(X,Y):-init(X,Y).
+exists([Xpp,Ypp], (eve(Xp,Yp,Xpp,Ypp),phi0(Xpp,Ypp))):-adam(X,Y,Xp,Yp),phi0(X,Y).
+safe(Xp,Yp):-adam(X,Y,Xp,Yp),phi0(X,Y).
+safe(X,Y):-phi0(X,Y).
+skolem_template(s3, [X,Y,Xp,Yp,Xpp,Ypp],
+	true,
+	(X=<2,Y=<2),
+	(
+		Xpp=T1,Ypp=T2		
+	),
+	((T1=X),(T2=Y))
+	).
+
+
+query_naming(phi0(x,y)).
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(s3/8, [4,8]).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/55-pandAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec
+% With '-case-split': CEX after 0.1 sec

@@ -1,0 +1,41 @@
+/* EG (check==1 => AF (p>0)) ; program is correct
+
+int y, p, check;
+void init() { p = 0; y = 5; check = 0; }
+
+int body() {
+  check = 1;
+  __rho_1_ = nondet();
+  if(__rho_1_ > 0) {
+    while(1) {
+	      if(y < 0) { break; }
+	      { check = 1; y = y - 1; }
+	     }
+    p = 1;
+  }
+}
+*/
+
+init(P,Y,C,PC):=A=0,B=5,D=1.
+step(A,B,C,D,E,F,G,H):=
+  G=1,E=A,F=B,D=1,H=2
+ ;E=A,F=B,G=C,D=2,H=3
+ ;B>=0,E=A,F=B,G=C,D=3,H=4
+ ;F=B-1,G=1,E=A,D=4,H=3
+ ;B<0,E=1,F=B,G=C,D=3,H=5
+ ;E=A,F=B,G=C,D=2,H=5.
+phi0(A,B,C,D):-init(A,B,C,D).
+exists([E,F,G,H],phi0(E,F,G,H)):-phi0(A,B,C,D),step(A,B,C,D,E,F,G,H).
+% insteaad of C1 and C2, we should get C3 ??
+(\+C=1;p1(A,B,C,D)) :- phi0(A,B,C,D). % clause C1
+phi1(A,B,C,D):-p1(A,B,C,D). % clause C2
+%phi1(A,B,C,D):-p1(A,B,C,D), C=1. % clause C3
+exists([E,F,G,H],step(A,B,C,D,E,F,G,H)):-phi1(A,B,C,D),\+A>0.
+phi1(E,F,G,H):-phi1(A,B,C,D),step(A,B,C,D,E,F,G,H),\+A>0.
+rel0(A,B,C,D,E,F,G,H):-phi1(A,B,C,D),\+A>0,step(A,B,C,D,E,F,G,H),phi1(E,F,G,H),\+E>0.
+trel0(A,B,C,D,E,F,G,H):-rel0(A,B,C,D,E,F,G,H).
+trel0(A,B,C,D,I,J,K,L):-trel0(A,B,C,D,E,F,G,H),rel0(E,F,G,H,I,J,K,L).
+dwf(trel0(A,B,C,D,E,F,G,H)).
+
+skolem_template(s3, [P,Y,C,PC,Pp,Yp,Cp,PCp], [[1=1]], [], [[Xp=T*X+T0]], true).
+% With -use-next-skolem, ??

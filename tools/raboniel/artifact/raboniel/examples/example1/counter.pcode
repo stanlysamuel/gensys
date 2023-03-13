@@ -1,0 +1,30 @@
+State: counter
+Inputs: i
+
+Initialization:
+    [state <- s0()]
+
+LOOP:
+  case: eq state s0() &&
+        (
+          le (add counter i) i100() &&
+          le i i5() &&
+          le counter i100() &&
+          ge i i0() &&
+          ge counter i0()
+        )
+  then: [ state <- s0() ]
+        [ counter <- (add counter i) ]
+
+  case: eq state s0() &&
+        (
+          !(le (add counter i) i100()) &&
+          le i i5() &&
+          le counter i100() &&
+          ge (add counter (mul im1() i)) i0() &&
+          ge i i0() &&
+          ge counter i0()
+        )
+  then: [ state <- s0() ]
+        [ counter <- (sub counter i) ]
+

@@ -1,0 +1,28 @@
+/* EF (pc1 >=3 && pc2 >= 3) ; program is correct
+int x, y;
+// init = (x>=1 && y>=1)
+
+void t1() {
+  while (x>=1) {
+    x--; 
+  }
+}
+
+void t2() {
+  while (y>=1) { 
+    y--;
+  }
+}
+*/
+
+p0(X,Y,PC1,PC2):=X>=1,Y>=1,PC1=1,PC2=1.
+fds_transrel(A,B,C,D,E,F,G,H):=A>=1,E=A,F=B,C=1,G=2,H=D;E=A-1,F=B,C=2,G=1,H=D;E=A,F=B,C=2,G=1,H=D;A=<0,E=A,F=B,C=1,G=3,H=D;B>=1,E=A,F=B,D=1,H=2,G=C;E=A,F=B-1,D=2,H=1,G=C;B=<0,E=A,F=B,D=1,H=3,G=C.
+phi0(A,B,C,D):-p0(A,B,C,D).
+exists([E,F,G,H],phi0(E,F,G,H)):-phi0(A,B,C,D),\+ (C>=3,D>=3),fds_transrel(A,B,C,D,E,F,G,H).
+rel0(A,B,C,D,E,F,G,H):-phi0(A,B,C,D),\+ (C>=3,D>=3),fds_transrel(A,B,C,D,E,F,G,H),phi0(E,F,G,H),\+ (G>=3,H>=3).
+trel0(A,B,C,D,E,F,G,H):-rel0(A,B,C,D,E,F,G,H).
+trel0(A,B,C,D,I,J,K,L):-trel0(A,B,C,D,E,F,G,H),rel0(E,F,G,H,I,J,K,L).
+dwf(trel0(A,B,C,D,E,F,G,H)).
+
+skolem_template(s3, [X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p], [[1=1]], [], [[Xp=T*X+T0]], true).
+% With -use-next-skolem, program is proven correct, solution: sk(V,V') = (x'=5x+7)

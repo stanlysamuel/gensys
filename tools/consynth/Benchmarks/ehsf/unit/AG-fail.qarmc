@@ -1,0 +1,15 @@
+% Property: AG (p=<0) = not(EF (p>0)), program is not correct
+% Example adapted from agefp-succeed/original.c
+init(P,X):=P=0,X=5.
+next(P,X,Pp,Xp):=
+ X>=0,Xp=X-1,Pp=P;
+ X>=0,Xp=X,Pp=P;
+ X<0,Pp=1,Xp=X.
+dst(P,X):=P=<0.
+
+% Queries: inv0
+inv0(P,X):-init(P,X).
+inv0(Pp,Xp):-inv0(P,X), next(P,X,Pp,Xp).
+dst(P,X):-inv0(P,X).
+
+% ==> counterexample, 0.09s

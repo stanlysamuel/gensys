@@ -1,0 +1,51 @@
+% No. 28 from Eric's paper
+% neg-afp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+int y, p;
+unsigned int pc;
+int __phi() { return CEG( CAP(p <= 0) ); }
+
+void init() { p = 0;  }
+
+int body() {
+  while(1) {
+    if (!(y > 0))  break;
+    y = y - 1;
+  }
+  p = 1;
+ while(1) { if(dummy>0) break; } L_return: return 0;  
+}
+
+int main() {}
+*/
+init(Y,P,PC):=P=0,PC=1.
+next(Y,P,PC,Yp,Pp,PCp):=
+        Y>0,PC=1,Yp=Y-1,Pp=P,PCp=1;
+	Y=<0,PC=1,Yp=Y,Pp=1,PCp=2.
+dst(Y,P,PC):=P=<0.
+
+% Queries: inv0
+inv0(Y,P,PC):-init(Y,P,PC).
+exists([Yp,Pp,PCp],inv0(Yp,Pp,PCp)):-inv0(Y,P,PC),next(Y,P,PC,Yp,Pp,PCp).
+dst(Y,P,PC):-inv0(Y,P,PC).
+
+skolem_template(s3, [Y,P,PC,Yp,Pp,PCp],
+ 		true,
+ 		(Y>0,PC=1 ; Y=<0,PC=1),
+ 		(
+ 		  Y>0,PC=1,Yp=Y-1,Pp=P,PCp=1;
+		  Y=<0,PC=1,Yp=Y,Pp=1,PCp=2
+ 		),
+ 		true
+ 	       ).
+query_naming(init(y,p,pc)).
+query_naming(dst(y,p,pc)).
+query_naming(inv0(y,p,pc)).
+
+query_naming(next(y,p,pc,'y\'','p\'','pc\'')).
+query_naming(s3(y,p,pc,'y\'','p\'','pc\'')).
+
+% ./ctlstar tests/ctlstar-Erics/28-EG-fail.qarmc -use-next-skolem -no-extra-insert-pred
+% CEX after 0.1 sec

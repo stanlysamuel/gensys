@@ -1,0 +1,56 @@
+/*
+while(1)
+{
+   if(x=<0) break;
+   x--;
+}   
+*/
+init(X,PC):=PC=1.
+next(X,PC,Xp,PCp):=
+  	PC=1,Xp=X,PCp=2;
+  	PC=2,X>0,Xp=X,PCp=3;
+  	PC=3,Xp=X-1,PCp=2.
+dst(X,PC):=X=<0.
+phi(X,PC):-init(X,PC).
+exists([Xp,PCp],(next(X,PC,Xp,PCp),rank(X,PC,Xp,PCp),phi(Xp,PCp))):-phi(X,PC),\+dst(X,PC).
+wf(rank/4).
+
+skolem_template(s3, [X,PC,Xp,PCp],
+      		true,
+      		( PC=1 ; PC=2, X>0 ; PC=3 ),
+	%	true,
+      		(
+     		  PC=1,Xp=X,PCp=2;
+     		  PC=2,X>0,Xp=X,PCp=3;
+     		  PC=3,Xp=X+1,PCp=2
+     		),
+      		true
+      	       ).
+/*
+init(X,PC):=X=1,PC=1.
+next(X,PC,Xp,PCp):=
+ X>0,Xp=X+1,PC=1,PCp=1;
+ X=<0,Xp=X,PC=1,PCp=2.
+dst(X,PC):=X=0.
+
+% Queries: inv0, rank
+inv(X,PC):-init(X,PC).
+inv(Xp,PCp) :- next(X,PC,Xp,PCp), inv(X,PC).
+rank(X,PC,Xp,PCp):-inv(X,PC),next(X,PC,Xp,PCp).
+wf(rank/4).
+
+init(X,PC):= X=40,PC=1.
+next(X,PC,Xp,PCp):=
+   X>0,Xp=X-1,PC=1,PCp=1;
+   X=<0,Xp=X,PC=1,PCp=2.
+% dst(X,PC):=X=<0.
+
+% Queries: inv0, rank
+inv(X,PC):-init(X,PC).
+inv(Xp,PCp) :- next(X,PC,Xp,PCp), inv(X,PC).
+%dst(X,PC) :- inv(X,PC).
+rank(X,PC,Xp,PCp):-inv(X,PC),next(X,PC,Xp,PCp).
+wf(rank/4).
+
+*/
+

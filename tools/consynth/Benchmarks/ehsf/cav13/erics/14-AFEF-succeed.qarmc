@@ -1,0 +1,83 @@
+% No. 14 from Eric's paper
+% afefp-succeed/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0
+//
+// EXPECTED RANKING:    x' < x      y' < y
+// ************************************************************
+
+int x, p, y;
+unsigned int pc;
+int __phi() { return CAF( CEF( CAP(p > 0) ) ); }
+int __rho_1_;
+
+void init() { p = 0; x = 5; y = 5; }
+
+int body() {
+  while(1) {
+    if(y < 0) break;
+    y = y - 1; 
+  }
+
+  while(1) {
+    if(x < 0) break; 
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x - 1;
+    }
+  }
+  p = 1;
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,Y,P,PC):=X=5,Y=5,P=0,PC=1.
+next(X,Y,P,PC,Xp,Yp,Pp,PCp):=
+    Y<0,PC=1,Xp=X,Yp=Y,Pp=P,PCp=2;
+    Y>=0,PC=1,Xp=X,Yp=Y-1,Pp=P,PCp=1;
+    X<0,PC=2,Xp=X,Yp=Y,Pp=1,PCp=3;
+    X>=0,PC=2,Xp=X,Yp=Y,Pp=P,PCp=2;
+    X>=0,PC=2,Xp=X-1,Yp=Y,Pp=P,PCp=2.
+dst(X,Y,P,PC):=P>0.
+p1(X,Y,P,PC):=X=5,PC=2.
+% AF p1
+phi0(X,Y,P,PC):-init(X,Y,P,PC).
+exists([Xp,Yp,Pp,PCp],next(X,Y,P,PC,Xp,Yp,Pp,PCp)):-phi0(X,Y,P,PC),\+p1(X,Y,P,PC).
+rank1(X,Y,P,PC,Xp,Yp,Pp,PCp):-phi0(X,Y,P,PC),\+p1(X,Y,P,PC),next(X,Y,P,PC,Xp,Yp,Pp,PCp).
+phi0(Xp,Yp,Pp,PCp):-phi0(X,Y,P,PC),\+p1(X,Y,P,PC),next(X,Y,P,PC,Xp,Yp,Pp,PCp).
+wf(rank1/8).
+% p1 => EF p>0
+phi1(X,Y,P,PC):-p1(X,Y,P,PC).
+exists([Xp,Yp,Pp,PCp],(rank2(X,Y,P,PC,Xp,Yp,Pp,PCp),phi1(Xp,Yp,Pp,PCp))):-phi1(X,Y,P,PC),\+dst(X,Y,P,PC).
+exists([Xp,Yp,Pp,PCp],next(X,Y,P,PC,Xp,Yp,Pp,PCp)):-phi1(X,Y,P,PC),\+dst(X,Y,P,PC). % domain clause***
+wf(rank2/8).
+
+skolem_template(s15, [X,Y,P,PC,Xp,Yp,Pp,PCp],
+      		true,
+		true,
+      		(
+      		  Y<0,PC=1,Xp=X,Yp=Y,Pp=P,PCp=2;
+     		  Y>=0,PC=1,Xp=X,Yp=Y-1,Pp=P,PCp=1;
+     		  X<0,PC=2,Xp=X,Yp=Y,Pp=1,PCp=3;
+     		  B>=1,X>=0,PC=2,Xp=X,Yp=Y,Pp=P,PCp=2;
+     		  B=<0,X>=0,PC=2,Xp=X-1,Yp=Y,Pp=P,PCp=2
+      		),
+      		(B=0 ; B=1)
+      	       ).
+query_naming(init(x,y,p,pc)).
+query_naming(phi0(x,y,p,pc)).
+query_naming(phi1(x,y,p,pc)).
+query_naming(p1(x,y,p,pc)).
+query_naming(next(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(s15(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(rank1(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(rank_p1(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(rank2(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(rank_p2(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+
+% time ./ctlstar tests/ctlstar-Erics/14-AFEF-succeed.qarmc -no-extra-insert-pred
+% 'program correct' after 23.6 sec, p1 given *****!!

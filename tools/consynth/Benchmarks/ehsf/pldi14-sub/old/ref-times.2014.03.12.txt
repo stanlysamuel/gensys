@@ -1,0 +1,64 @@
+rybal@unknown-20:c9:d0:47:5c:4d-2:~/research/code/qarmc5$ m ctlstar && time ./run-tests-ctlstar.local.sh -exp-eval -nomcc -t 600 tests/ctlstar-pldi2014sub/
+make: `ctlstar' is up to date.
+Running tests..
+ctlstar -use-next-skolem  -exp-eval -nomcc
+timeout: 600
+directories: tests/ctlstar-pldi2014sub/
+
+tests/ctlstar-pldi2014sub//cdaudio_safe.CdAudioHPCdrDeviceControl.qarmc.. PASSED (in 20 sec)
+tests/ctlstar-pldi2014sub//cdaudio_safe.IofCallDriver.qarmc.. TIMEOUT (in 600 sec)
+tests/ctlstar-pldi2014sub//cdaudio_safe.IofCallDriver_Bound.qarmc.. PASSED (in 53 sec)
+tests/ctlstar-pldi2014sub//cdaudio_safe.IofCallDriver_Rest.qarmc.. PASSED (in 22 sec)
+tests/ctlstar-pldi2014sub//cdaudio_safe.KeSetEvent.qarmc.. PASSED (in 26 sec)
+tests/ctlstar-pldi2014sub//cdaudio_simpl1_safe.CdAudioHPCdrDeviceControl.qarmc.. PASSED (in 39 sec)
+tests/ctlstar-pldi2014sub//cdaudio_simpl1_safe.IofCallDriver.qarmc.. TIMEOUT (in 600 sec)
+tests/ctlstar-pldi2014sub//cdaudio_simpl1_safe.IofCallDriver_Bound.qarmc.. PASSED (in 115 sec)
+tests/ctlstar-pldi2014sub//cdaudio_simpl1_safe.IofCallDriver_Rest.qarmc.. PASSED (in 33 sec)
+tests/ctlstar-pldi2014sub//cdaudio_simpl1_safe.KeSetEvent.qarmc.. PASSED (in 33 sec)
+tests/ctlstar-pldi2014sub//diskperf_safe.DiskPerfForwardIrpSynchronous.qarmc.. PASSED (in 7 sec)
+tests/ctlstar-pldi2014sub//diskperf_safe.IofCallDriver.qarmc.. TIMEOUT (in 600 sec)
+tests/ctlstar-pldi2014sub//diskperf_safe.IofCallDriver_Bound.qarmc.. PASSED (in 6 sec)
+tests/ctlstar-pldi2014sub//diskperf_safe.IofCallDriver_Rest.qarmc.. PASSED (in 8 sec)
+tests/ctlstar-pldi2014sub//diskperf_safe.KeSetEvent.qarmc.. PASSED (in 7 sec)
+tests/ctlstar-pldi2014sub//diskperf_simpl1_safe.DiskPerfForwardIrpSynchronous.qarmc.. PASSED (in 6 sec)
+tests/ctlstar-pldi2014sub//diskperf_simpl1_safe.IofCallDriver.qarmc.. TIMEOUT (in 600 sec)
+tests/ctlstar-pldi2014sub//diskperf_simpl1_safe.IofCallDriver_Bound.qarmc.. PASSED (in 7 sec)
+tests/ctlstar-pldi2014sub//diskperf_simpl1_safe.IofCallDriver_Rest.qarmc.. PASSED (in 8 sec)
+tests/ctlstar-pldi2014sub//diskperf_simpl1_safe.KeSetEvent.qarmc.. PASSED (in 8 sec)
+tests/ctlstar-pldi2014sub//floppy_safe.FloppyPnp.qarmc.. PASSED (in 22 sec)
+tests/ctlstar-pldi2014sub//floppy_safe.IofCallDriver.qarmc.. PASSED (in 492 sec)
+tests/ctlstar-pldi2014sub//floppy_safe.IofCallDriver_Bound.qarmc.. PASSED (in 51 sec)
+tests/ctlstar-pldi2014sub//floppy_safe.IofCallDriver_Rest.qarmc.. PASSED (in 17 sec)
+tests/ctlstar-pldi2014sub//floppy_safe.KeSetEvent.qarmc.. PASSED (in 382 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl3_safe.FloppyPnp.qarmc.. PASSED (in 13 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl3_safe.IofCallDriver.qarmc.. PASSED (in 6 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl3_safe.IofCallDriver_Bound.qarmc.. PASSED (in 12 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl3_safe.IofCallDriver_Rest.qarmc.. PASSED (in 6 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl3_safe.KeSetEvent.qarmc.. PASSED (in 5 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl4_safe.FloppyPnp.qarmc.. PASSED (in 19 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl4_safe.IofCallDriver.qarmc.. PASSED (in 13 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl4_safe.IofCallDriver_Bound.qarmc.. PASSED (in 13 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl4_safe.IofCallDriver_Rest.qarmc.. PASSED (in 13 sec)
+tests/ctlstar-pldi2014sub//floppy_simpl4_safe.KeSetEvent.qarmc.. PASSED (in 19 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl1_safe.IofCallDriver.qarmc.. PASSED (in 8 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl1_safe.IofCallDriver_Bound.qarmc.. PASSED (in 3 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl1_safe.IofCallDriver_Rest.qarmc.. PASSED (in 5 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl1_safe.KbFilterPnP.qarmc.. PASSED (in 6 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl1_safe.StubDriverInit.qarmc.. PASSED (in 2 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl2_safe.IofCallDriver.qarmc.. PASSED (in 4 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl2_safe.IofCallDriver_Bound.qarmc.. PASSED (in 3 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl2_safe.IofCallDriver_Rest.qarmc.. PASSED (in 5 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl2_safe.KbFilterPnP.qarmc.. PASSED (in 4 sec)
+tests/ctlstar-pldi2014sub//kbfiltr_simpl2_safe.StubDriverInit.qarmc.. PASSED (in 4 sec)
+tests/ctlstar-pldi2014sub//parport_safe.IofCallDriver.qarmc.. PASSED (in 36 sec)
+tests/ctlstar-pldi2014sub//parport_safe.IofCallDriver_Bound.qarmc.. PASSED (in 36 sec)
+tests/ctlstar-pldi2014sub//parport_safe.IofCallDriver_Rest.qarmc.. PASSED (in 50 sec)
+tests/ctlstar-pldi2014sub//parport_safe.KeSetEvent.qarmc.. PASSED (in 191 sec)
+tests/ctlstar-pldi2014sub//parport_safe.PptDispatchInternalDeviceControl.qarmc.. PASSED (in 34 sec)
+
+passed 46 out of 50 tests (92%)
+timeout: 4   out of memory: 0
+Total time: 4273 seconds
+
+real	71m13.864s
+user	41m39.374s

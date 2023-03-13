@@ -46,7 +46,8 @@ def automaton(q, q_, x):
             And(q == 3, q_==3, And(x>=2, x<=3)),
             And(q == 3, q_==0, x==1),
             And(q == 3, q_==4, Not(And(x>=1, x<=3))),
-            And(q == 4, q_==4)
+            And(q == 4, q_==4),
+            # And(q>=0, q<=4, q_>=0, q_<=4)
             )
 
 # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run

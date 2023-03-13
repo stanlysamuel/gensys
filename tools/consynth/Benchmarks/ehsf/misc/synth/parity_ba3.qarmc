@@ -1,0 +1,79 @@
+/*
+the formula Q  = GF p0
+            ~Q = FG ~p0
+LTL = FG(!p1)
+*/
+     
+% componenets from the buchi automata
+initBA(PC) := PC=0.
+nextBA(PC,B1,B2,B3,B4,B5,PCp) :=
+    PC=0, PCp=0 ;
+    PC=0, PCp=1, (B1>=15; B2>=15; B3>=15; B4>=15; B5>=15) ;
+    PC=1, PCp=1, (B1>=15; B2>=15; B3>=15; B4>=15; B5>=15).
+accBA(PC) := (PC=1).
+
+init(B1,B2,B3,B4,B5) := B1=0, B2=0, B3=0, B4=0, B5=0.
+stepmother(B1,B2,B3,B4,B5,B1p,B2p,B3p,B4p,B5p) :=
+        B1p>=B1, B2p>=B2, B3p>=B3, B4p>=B4, B5p>=B5,
+	B1p+B2p+B3p+B4p+B5p-B1-B2-B3-B4-B5=10.
+
+skolem_template(s3, [PCp, B1, B2, B3, B4, B5, PC, 
+		     B1p, B2p, B3p, B4p, B5p,
+		     B1pp, B2pp, B3pp, B4pp, B5pp],
+   		true,
+ 		%%% ( B1p+B3p=<10 ; B2p+B4p=<10 ; B3p+B5p=<10 ; B4p+B1p=<10 ; B5p+B2p=<10),
+%		(B1=0,B2=0 ; B2=0,B3=0 ; B3=0,B4=0 ; B4=0,B5=0 ; B5=0,B1=0),
+		(   B3=0, B4=0, (B2p+B4p=<10 ; B3p+B5p=<10 )
+		;   B4=0, B5=0, (B3p+B5p=<10 ; B4p+B1p=<10 )
+		;   B5=0, B1=0, (B4p+B1p=<10 ; B5p+B2p=<10 )
+		;   B1=0, B2=0, (B5p+B2p=<10 ; B1p+B3p=<10 )
+		;   B2=0, B3=0, (B1p+B3p=<10 ; B2p+B4p=<10 )
+		), 
+		(
+		% nextBA(PC,B1,B2,B3,B4,B5,PCp),
+ 		% Transition relation of cindy
+ 		  (   B1pp=0,   B2pp=0,   B3pp=B3p, B4pp=B4p, B5pp=B5p
+ 		  ;   B1pp=B1p, B2pp=0,   B3pp=0,   B4pp=B4p, B5pp=B5p
+ 		  ;   B1pp=B1p, B2pp=B2p, B3pp=0,   B4pp=0,   B5pp=B5p
+ 		  ;   B1pp=B1p, B2pp=B2p, B3pp=B3p, B4pp=0,   B5pp=0
+ 		  ;   B1pp=0,   B2pp=B2p, B3pp=B3p, B4pp=B4p, B5pp=0
+ 		  ),
+ 		% Additional constraints: invariant + strategy.
+ 		% Example invariant: B3=0, B4=0, (B2p+B4p=<10 ; B3p+B5p=<10).
+ 		% Example strategy:  B5pp=0, B1pp=0 ; B1pp, B2pp=0.
+ 		  (   B3=0, B4=0, (B2p+B4p=<10, B5pp=0, B1pp=0 ; B3p+B5p=<10, B1pp=0, B2pp=0)
+ 		  ;   B4=0, B5=0, (B3p+B5p=<10, B1pp=0, B2pp=0 ; B4p+B1p=<10, B2pp=0, B3pp=0)
+ 		  ;   B5=0, B1=0, (B4p+B1p=<10, B2pp=0, B3pp=0 ; B5p+B2p=<10, B3pp=0, B4pp=0)
+ 		  ;   B1=0, B2=0, (B5p+B2p=<10, B3pp=0, B4pp=0 ; B1p+B3p=<10, B4pp=0, B5pp=0)
+ 		  ;   B2=0, B3=0, (B1p+B3p=<10, B4pp=0, B5pp=0 ; B2p+B4p=<10, B5pp=0, B1pp=0)
+ 		  ) ),
+ 		true).
+
+inv(B1,B2,B3,B4,B5,PCp) :- init(B1,B2,B3,B4,B5), initBA(PC), nextBA(PC,B1,B2,B3,B4,B5,PCp).
+exists([B1pp,B2pp,B3pp,B4pp,B5pp],
+       (
+%	 cindy(B1, B2, B3, B4, B5, B1p, B2p, B3p, B4p, B5p, B1pp, B2pp, B3pp, B4pp, B5pp),
+	 rest(B1,B2,B3,B4,B5,PC,B1p,B2p,B3p,B4p,B5p,PCp,B1pp,B2pp,B3pp,B4pp,B5pp)
+       )) :-
+	inv(B1,B2,B3,B4,B5,PC),
+	stepmother(B1,B2,B3,B4,B5,B1p,B2p,B3p,B4p,B5p),
+	nextBA(PC,B1p,B2p,B3p,B4p,B5p,PCp).
+
+(
+ inv(B1pp,B2pp,B3pp,B4pp,B5pp,PCpp),
+ round(B1,B2,B3,B4,B5,PC,B1p,B2p,B3p,B4p,B5p,PCp,B1pp,B2pp,B3pp,B4pp,B5pp,PCpp)
+) :-
+	rest(B1,B2,B3,B4,B5,PC,B1p,B2p,B3p,B4p,B5p,PCp,B1pp,B2pp,B3pp,B4pp,B5pp),
+	nextBA(PCp,B1pp,B2pp,B3pp,B4pp,B5pp,PCpp).
+
+fair(B1,B2,B3,B4,B5,PC,B1pp,B2pp,B3pp,B4pp,B5pp,PCpp) :-
+	round(B1,B2,B3,B4,B5,PC,B1p,B2p,B3p,B4p,B5p,PCp,B1pp,B2pp,B3pp,B4pp,B5pp,PCpp),
+	(accBA(PC); accBA(PCp)).
+fair(B1,B2,B3,B4,B5,PC,B1ppp,B2ppp,B3ppp,B4ppp,B5ppp,PCppp) :-
+        fair(B1,B2,B3,B4,B5,PC,B1p,B2p,B3p,B4p,B5p,PCp),
+	round(B1p,B2p,B3p,B4p,B5p,PCp,B1pp,B2pp,B3pp,B4pp,B5pp,PCpp,B1ppp,B2ppp,B3ppp,B4ppp,B5ppp,PCppp).
+wf(fair/12).
+
+% time ctlstar -use-next-skolem parity_ba3.qarmc
+% 'program correct' after 33.28s (without case-split)
+% 'program correct' after 0.18s (with case-split)

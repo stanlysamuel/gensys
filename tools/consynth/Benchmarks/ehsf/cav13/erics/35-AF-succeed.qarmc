@@ -1,0 +1,46 @@
+% No. 35 from Eric's paper
+% neg-egp-succeed/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+int x,p;
+unsigned int pc;
+int __phi() { return CAF( CAP(p <= 0) ); }
+int __rho_1_;
+
+void init() { x = 5; p = 0; }
+
+int body() {
+  p = 0;
+  while(1) {
+    if (!(x > 0)) break;
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x + 1; 
+    } else {
+      x = x + 2; 
+    }
+  }
+  p = 1;
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,P,PC):=X=5,P=0,PC=1.
+next(X,P,PC,Xp,Pp,PCp):=
+        Xp=X,Pp=0,PC=1,PCp=2;
+	X>0,Xp=X+1,Pp=P,PC=2,PCp=2;
+	X>0,Xp=X+2,Pp=P,PC=2,PCp=2;
+	X=<0,Xp=X,Pp=1,PC=2,PCp=3.
+dst(X,P,PC):=P=<0.
+
+% Queries: inv0, rank
+inv0(X,P,PC):-init(X,P,PC).
+exists([Xp,Pp,PCp],next(X,P,PC,Xp,Pp,PCp)):-inv0(X,P,PC),\+dst(X,P,PC).
+rank(X,P,PC,Xp,Pp,PCp):-inv0(X,P,PC),\+dst(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+inv0(Xp,Pp,PCp):-inv0(X,P,PC),\+dst(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+wf(rank/6).
+
+% ./ctlstar tests/ctlstar-Erics/35-AF-succeed.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program correct' after 0.1 sec

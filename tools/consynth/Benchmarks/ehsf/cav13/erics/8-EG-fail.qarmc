@@ -1,0 +1,59 @@
+% No. 8 from Eric's paper
+% egp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+int x,p;
+unsigned int pc;
+int __phi() { return CEG( CAP(p > 0) ); }
+int __rho_1_;
+
+void init() { x = 5; p = 0; }
+
+int body() {
+  while(1) {
+    if (!(x > 0)) break;
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x + 1; 
+    } else {
+      x = x + 2; 
+    }
+    p = p * 1;
+  }
+  p = 1;
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,P,PC):=X=5,P=0,PC=1.
+next(X,P,PC,Xp,Pp,PCp):=
+	X>0,Xp=X+1,Pp=P,PC=1,PCp=1;
+	X>0,Xp=X+2,Pp=P,PC=1,PCp=1;
+	X=<0,Xp=X,Pp=1,PC=1,PCp=2.
+dst(X,P,PC):=P>0.
+
+% Queries: inv0
+inv0(X,P,PC):-init(X,P,PC).
+exists([Xp,Pp,PCp],inv0(Xp,Pp,PCp)):-inv0(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+dst(X,P,PC):-inv0(X,P,PC).
+
+skolem_template(s3, [X,P,PC,Xp,Pp,PCp],
+ 		true,
+ 		(X>0,PC=1 ; X=<0,PC=1),
+ 		(
+ 		  X>0,PC=1,Xp=X-1,Pp=P,PCp=1;
+		  X=<0,PC=1,Xp=X,Pp=1,PCp=2
+ 		),
+ 		true
+ 	       ).
+query_naming(init(x,p,pc)).
+query_naming(dst(x,p,pc)).
+query_naming(inv0(x,p,pc)).
+
+query_naming(next(x,p,pc,'x\'','p\'','pc\'')).
+query_naming(s3(x,p,pc,'x\'','p\'','pc\'')).
+
+% ./ctlstar tests/ctlstar-Erics/8-EG-fail.qarmc -use-next-skolem -no-extra-insert-pred
+% CEX after 0.1 sec

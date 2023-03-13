@@ -1,0 +1,65 @@
+% No. 48 from Eric's paper
+% neg-egefp-succeed/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0     and     __rho_2_ <= 0
+//
+// EXPECTED RANKING:    x' < x  /\  x > 0
+// ************************************************************
+
+int x, p;
+unsigned int pc;
+int __phi() { return CAF( CAG( CAP(p <= 0) ) ); }
+int __rho_1_;
+int __rho_2_;
+
+void init() { p = 0; }
+
+int body() {
+  while(1) {
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      while(1) {
+	if (!(x > 0)) break; 
+	__rho_2_ = nondet();
+	if(__rho_2_ <= 0) {
+	  x = x - 1;
+	} else {
+	  x = x + 1;
+	}
+      }
+      p = -1;
+    }
+    p = 0;
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,P,PC):=P=0,PC=1.
+next(X,P,PC,Xp,Pp,PCp):=
+    PC=1,Xp=X,Pp=P,PCp=2;
+    PC=1,Xp=X,Pp=0,PCp=4;
+    X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+    X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+    X=<0,PC=2,Xp=X,Pp= -1,PCp=3;
+    PC=3,Xp=X,Pp=0,PCp=4;
+    PC=4,Xp=X,Pp=P,PCp=1.
+dst(X,P,PC):=P=<0.
+p1(X,P,PC):=P=<0.
+% AF p1
+inv0(X,P,PC):-init(X,P,PC).
+exists([Xp,Pp,PCp],next(X,P,PC,Xp,Pp,PCp)):-inv0(X,P,PC),\+p1(X,P,PC).
+rank(X,P,PC,Xp,Pp,PCp):-inv0(X,P,PC),\+p1(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+inv0(Xp,Pp,PCp):-inv0(X,P,PC),\+dst(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+wf(rank/6).
+% p1 => AG p>0
+phi1(X,P,PC):-p1(X,P,PC).
+phi1(Xp,Pp,PCp):-phi1(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+dst(X,P,PC):-phi1(X,P,PC).
+
+% time ./ctlstar tests/ctlstar-Erics/21-EGEF-fail.qarmc -no-extra-insert-pred
+% 'progrm correct' after 0.2 sec

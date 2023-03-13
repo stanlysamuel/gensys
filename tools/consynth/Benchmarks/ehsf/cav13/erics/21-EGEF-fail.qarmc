@@ -1,0 +1,92 @@
+% No. 121 from Eric's paper
+% egefp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0     and     __rho_2_ <= 0
+//
+// EXPECTED RANKING:    x' < x  /\  x > 0
+// ************************************************************
+
+int x, p;
+unsigned int pc;
+int __phi() { return CEG( CEF( CAP(p > 0) ) ); }
+int __rho_1_;
+int __rho_2_;
+
+void init() { p = 0; }
+
+int body() {
+  while(1) {
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      while(1) {
+	if (!(x > 0)) break; 
+	__rho_2_ = nondet();
+	if(__rho_2_ <= 0) {
+	  x = x - 1;
+	} else {
+	  x = x + 1;
+	}
+      }
+      p = -1;
+    }
+    p = 0;
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,P,PC):=P=0,PC=1.
+next(X,P,PC,Xp,Pp,PCp):=
+    PC=1,Xp=X,Pp=P,PCp=2;
+    PC=1,Xp=X,Pp=0,PCp=4;
+    X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+    X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+    X=<0,PC=2,Xp=X,Pp= -1,PCp=3;
+    PC=3,Xp=X,Pp=0,PCp=4;
+    PC=4,Xp=X,Pp=P,PCp=1.
+dst(X,P,PC):=P>=1.
+% EG p1
+phi0(X,P,PC):-init(X,P,PC).
+exists([Xp,Pp,PCp],phi0(Xp,Pp,PCp)):-phi0(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+dst(X,P,PC):-phi0(X,P,PC).
+skolem_template(s3, [X,P,PC,Xp,Pp,PCp],
+ 		true,
+		(B1=0,PC=1 ; B1=1,PC=1 ; B2=0,X>0,PC=2 ; B2=1,X>0,PC=2 ; X=<0,PC=2 ; PC=3 ; PC=4),
+ 		(
+		  B1=0,PC=1,Xp=X,Pp=P,PCp=2;
+		  B1=1,PC=1,Xp=X,Pp=0,PCp=4;
+		  B2=0,X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+		  B2=1,X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+		  X=<0,PC=2,Xp=X,Pp= -1,PCp=3;
+		  PC=3,Xp=X,Pp=0,PCp=4;
+		  PC=4,Xp=X,Pp=P,PCp=1
+		),
+ 		((B1=0;B1=1),(B2=0;B2=1))
+ 	       ).
+% p1 => EF p>0
+phi1(X,P,PC):-p1(X,P,PC).
+exists([Xp,Pp,PCp],(rank(X,P,PC,Xp,Pp,PCp),phi1(Xp,Pp,PCp))):-phi1(X,P,PC),\+dst(X,P,PC).
+%PC=1:-phi0(X,P,PC),\+dst(X,P,PC). % domain clause***
+wf(rank/6).
+
+skolem_template(s9, [X,P,PC,Xp,Pp,PCp],
+ 		true,
+		(B1=0,PC=1 ; B1=1,PC=1 ; B2=0,X>0,PC=2 ; B2=1,X>0,PC=2 ; X=<0,PC=2 ; PC=3 ; PC=4),
+ 		(
+		  B1=0,PC=1,Xp=X,Pp=P,PCp=2;
+		  B1=1,PC=1,Xp=X,Pp=0,PCp=4;
+		  B2=0,X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+		  B2=1,X>0,PC=2,Xp=X+1,Pp=P,PCp=2;
+		  X=<0,PC=2,Xp=X,Pp= -1,PCp=3;
+		  PC=3,Xp=X,Pp=0,PCp=4;
+		  PC=4,Xp=X,Pp=P,PCp=1
+		),
+ 		((B1=0;B1=1),(B2=0;B2=1))
+ 	       ).
+
+% time ./ctlstar tests/ctlstar-Erics/21-EGEF-fail.qarmc -no-extra-insert-pred
+% CEX after 0.1 sec

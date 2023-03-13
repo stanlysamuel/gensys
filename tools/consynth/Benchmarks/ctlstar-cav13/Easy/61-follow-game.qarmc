@@ -1,0 +1,91 @@
+% No. 25 from Eric's paper (Industrial)
+/*
+
+adam(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp;
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp,Y=Yp;
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1;
+    X=Xp+1,Y=Yp;
+    X=Xp+1,Y=Yp+1;
+    X=Xp+1,Y=Yp-1.
+eve(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp;
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp,Y=Yp;
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1;
+    X=Xp+1,Y=Yp;
+    X=Xp+1,Y=Yp+1;
+    X=Xp+1,Y=Yp-1.
+int main() {}
+init(X,Y):=X=1,Y=1.
+adam(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp+1,Y=Yp+1;
+    X=Xp+1,Y=Yp-1.
+eve(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp+1,Y=Yp+1;
+    X=Xp+1,Y=Yp-1.
+
+*/
+init(X,Y):=X=0,Y=0.
+adam(X,Y,Xp,Yp):=
+    X=Xp+1,Y=Yp+1,Y>=1,X>=1;
+    X=Xp-1,Y=Yp;
+    X=Xp-1,Y=Yp+1,Y>=1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp,Y=Yp+1,Y>=1;
+    X=Xp,Y=Yp-1;
+    X=Xp+1,Y=Yp,X>=1;
+    X=Xp,Y=Yp;
+    X=Xp+1,Y=Yp-1,X>=1.
+eve(X,Y,Xp,Yp):=
+    X=Xp-1,Y=Yp;
+    X=Xp-1,Y=Yp+1;
+    X=Xp-1,Y=Yp-1;
+    X=Xp,Y=Yp+1;
+    X=Xp,Y=Yp-1;
+    X=Xp+1,Y=Yp;
+    X=Xp+1,Y=Yp+1;
+    X=Xp,Y=Yp;
+    X=Xp+1,Y=Yp-1.
+safe(X,Y):=X+Y=<3,X>=0,Y>=0.
+% init => (c>5 /\ AG r=<5)
+phi0(X,Y):-init(X,Y).
+exists([Xpp,Ypp], (phi0(Xpp,Ypp))):-adam(X,Y,Xp,Yp),phi0(X,Y).
+safe(Xp,Yp):-adam(X,Y,Xp,Yp),phi0(X,Y).
+safe(X,Y):-phi0(X,Y).
+skolem_template(s3, [X,Y,Xp,Yp,Xpp,Ypp],
+	true,
+	true,
+	(
+    		Xp+T1=Xpp,Ypp=Yp+T2;
+		Xp+T3=Xpp,Ypp=Yp+T4;
+		Xp+T5=Xpp,Ypp=Yp+T6;
+		Xp+T7=Xpp,Ypp=Yp+T8;
+    		Xp+T9=Xpp,Ypp=Yp+T10;
+		Xp+T11=Xpp,Ypp=Yp+T12;
+		Xp+T13=Xpp,Ypp=Yp+T14;
+		Xp+T15=Xpp,Ypp=Yp+T16;
+		Xp+T17=Xpp,Ypp=Yp+T18
+
+		
+	),
+	(T1>=(-1),T1=<1,T2>=(-1),T2=<1,T3>=(-1),T3=<1,T4>=(-1),T4=<1,T5>=(-1),T5=<1,T6>=(-1),T6=<1,T7>=(-1),T7=<1,T8>=(-1),T8=<1,T9>=(-1),T9=<1,T10>=(-1),T10=<1,T11>=(-1),T11=<1,T12>=(-1),T12=<1,T13>=(-1),T13=<1,T14>=(-1),T14=<1,T15>=(-1),T15=<1,T16>=(-1),T16=<1,T17>=(-1),T17=<1,T18>=(-1),T18=<1)
+	).
+
+
+
+query_naming(phi0(x,y)).
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(s3/8, [4,8]).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/55-pandAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec
+% With '-case-split': CEX after 0.1 sec

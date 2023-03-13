@@ -1,0 +1,11 @@
+init(A,B,C,D)->inv0(A,B,C,D).
+inv0(A,B,C,D),next(A,B,C,D,F,G,H,I),true->inv0(F,G,H,I).
+inv0(A,B,C,D)->exists([E],aux0(A,B,C,D,E)).
+aux0(A,B,C,D,E),aux1(A,B,C,D,E)->aux2(A,B,C,D,E).
+aux1(A,B,C,D,E)->p1.
+aux2(A,B,C,D,E)->inv1(A,B,C,D,E).
+inv1(A,B,C,D,E),\+aux4(A,B,C,D,E)->aux3(A,B,C,D,E),exists([J,K,L,M,N],(next(A,B,C,D,J,K,L,M),N=E)).
+inv1(A,B,C,D,E),\+aux4(A,B,C,D,E),next(A,B,C,D,J,K,L,M),N=E->inv1(J,K,L,M,N),rank0(A,B,C,D,E,J,K,L,M,N).
+dwf(rank0).
+aux3(A,B,C,D,E)->true.
+aux4(A,B,C,D,E)->p2.

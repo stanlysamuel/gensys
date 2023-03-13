@@ -1,0 +1,43 @@
+init(B1, B2, B3, B4, B5) := B1=0, B2=0, B3=0, B4=0, B5=0.
+stepmother(B1, B2, B3, B4, B5, B1p, B2p, B3p, B4p, B5p) :=
+  B1p>=B1, B2p>=B2, B3p>=B3, B4p>=B4, B5p>=B5, B1p+B2p+B3p+B4p+B5p-B1-B2-B3-B4-B5=10.
+cinderella(B1, B2, B3, B4, B5, B1p, B2p, B3p, B4p, B5p) :=
+        B1p=0, B2p=0, B3p=B3, B4p=B4, B5p=B5;
+	B1p=B1, B2p=0, B3p=0, B4p=B4, B5p=B5;
+	B1p=B1, B2p=B2, B3p=0, B4p=0, B5p=B5;
+	B1p=B1, B2p=B2, B3p=B3, B4p=0, B5p=0;
+	B1p=0, B2p=B2, B3p=B3, B4p=B4, B5p=0.
+overflow(B1, B2, B3, B4, B5) := B1>14; B2>14; B3>14; B4>14; B5>14.
+
+% stepmother wins := EF overflow
+inv(B1, B2, B3, B4, B5) :- init(B1, B2, B3, B4, B5).
+
+exists([B1pp, B2pp, B3pp, B4pp, B5pp],
+       (
+	 % stepmother(Vp,Vpp),
+ 	 inv(B1pp, B2pp, B3pp, B4pp, B5pp),
+ 	 round(B1, B2, B3, B4, B5, B1pp, B2pp, B3pp, B4pp, B5pp)
+       )
+      ) :-
+	inv(B1, B2, B3, B4, B5), \+overflow(B1, B2, B3, B4, B5), 
+	cinderella(B1, B2, B3, B4, B5, B1p, B2p, B3p, B4p, B5p).
+
+wf(round/10).
+
+skolem_template(s3, [_B1, _B2, _B3, _B4, _B5,
+ 		     B1, B2, B3, B4, B5,
+ 		     B1p, B2p, B3p, B4p, B5p],
+  		true, true,
+  		( B1p=B1+D1, B2p=B2+D2, B3p=B3+D3, B4p=B4+D4, B5p=B5+D5 ),
+ 		( D1>=0, D2>=0, D3>=0, D4>=0, D5>=0, D1+D2+D3+D4+D5=10 )
+  	       ).
+
+query_naming(inv(b1, b2, b3, b4, b5)).
+query_naming(round(b1, b2, b3, b4, b5, 'b1\'', 'b2\'', 'b3\'', 'b4\'', 'b5\'')).
+query_naming(round_p(b1, b2, b3, b4, b5, 'b1\'', 'b2\'', 'b3\'', 'b4\'', 'b5\'')).
+query_naming(s('_b1', '_b2', '_b3', '_b4', '_b5',
+		b1, b2, b3, b4, b5, 'b1\'', 'b2\'', 'b3\'', 'b4\'', 'b5\'')).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred cindy_14_10_safe.qarmc
+% 'program is correct' after 15s, last iteration - 36
+% SVN revision 18029

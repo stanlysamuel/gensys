@@ -1,0 +1,126 @@
+% No. 23 from Eric's paper (Industrial)
+% e-pgarch-succeed/original.c in the benchmarks
+/*
+int wakend, got_SIGHUP;
+void init() { wakend = 1; __rho_1_ = nondet(); got_SIGHUP = __rho_1_; }
+int __phi() { return CAG(CEF(CAP(wakend = 1))); }
+
+void body() {
+  wakend = 1;
+  while(1) {
+    if (got_SIGHUP>0) {
+      got_SIGHUP = 0;
+      __rho_2_ = NONDET;
+      if (__rho_2_<=0) break; 
+    }
+    if (wakend>0) { wakend = 0; }
+    if (wakend<=0) {
+      if (NONDET) wakend = 1;
+    }
+    __rho_4_ = nondet();
+    if (__rho_4 <= 0) { break; }
+  }
+  while(1) {} 
+  return 0;
+}
+*/
+init(W,G,PC):=W=1,PC=0.
+next(W,G,PC,Wp,Gp,PCp):=
+    PC=0,PCp=1,Wp=W; % Gp=_
+    PC=1,PCp=2,G>=1,Wp=W,Gp=0;
+    PC=1,PCp=3,G=<0,Wp=W,Gp=G;
+    PC=2,PCp=3,Wp=W,Gp=G; % __rho_2_>=1
+    PC=2,PCp=6,Wp=W,Gp=G; % __rho_2_=<0
+    PC=3,PCp=4,W>=1,Wp=0,Gp=G;
+    PC=3,PCp=4,W=<0,Wp=W,Gp=G;
+    PC=4,PCp=5,W=<0,Wp=1,Gp=G;
+    PC=4,PCp=5,W=<0,Wp=W,Gp=G;
+    PC=4,PCp=5,W>=1,Wp=W,Gp=G;
+    PC=5,PCp=1,Wp=W,Gp=G; % __rho_4_>=1
+    PC=5,PCp=6,Wp=W,Gp=G; % __rho_4_=<0
+    PC=6,PCp=6,Wp=1,Gp=G. % Pretend the loop at the end sets w=1;
+dst(W,G,PC):=W=1.
+% AG p1
+phi0(W,G,PC):-init(W,G,PC).
+phi0(Wp,Gp,PCp):-phi0(W,G,PC),next(W,G,PC,Wp,Gp,PCp).
+p1(W,G,PC):-phi0(W,G,PC).
+% p1 => EF w=1
+phi1(W,G,PC):-p1(W,G,PC).
+exists([Wp,Gp,PCp],(rank(W,G,PC,Wp,Gp,PCp),phi1(Wp,Gp,PCp))):-phi1(W,G,PC),\+dst(W,G,PC).
+wf(rank/6).
+
+skolem_template(s9, [W,G,PC,Wp,Gp,PCp],
+ 		true,
+		(PC>=0, PC=<6),
+ 		(
+		  PC=0,PCp=1,Wp=W,Gp=T1; % Gp=_
+		  PC=1,PCp=2,G>=1,Wp=W,Gp=0;
+		  PC=1,PCp=3,G=<0,Wp=W,Gp=G;
+		  B1>=1,PC=2,PCp=3,Wp=W,Gp=G; % __rho_2_>=1
+		  B1=<0,PC=2,PCp=6,Wp=W,Gp=G; % __rho_2_=<0
+		  PC=3,PCp=4,W>=1,Wp=0,Gp=G;
+		  PC=3,PCp=4,W=<0,Wp=W,Gp=G;
+		  PC=4,PCp=5,W=<0,Wp=1,Gp=G;
+		  PC=4,PCp=5,W=<0,Wp=W,Gp=G;
+		  PC=4,PCp=5,W>=1,Wp=W,Gp=G;
+		  B2>=1,PC=5,PCp=1,Wp=W,Gp=G; % __rho_4_>=1
+		  B2=<0,PC=5,PCp=6,Wp=W,Gp=G; % __rho_4_=<0
+		  PC=6,PCp=6,Wp=1,Gp=G
+		),
+ 		((B1=0),(B2=0;B2=1),(T1=1))
+ 	       ).
+
+query_naming(phi0(w,g,pc)).
+query_naming(phi1(w,g,pc)).
+query_naming(p1(w,g,pc)).
+query_naming(s9(w,g,pc,'w\'','g\'','pc\'')).
+query_naming(rank(w,g,pc,'w\'','g\'','pc\'')).
+query_naming(rank_p(w,g,pc,'w\'','g\'','pc\'')).
+
+query_finite_sorts(phi0/3,[3]).
+query_finite_sorts(p1/3,[3]).
+query_finite_sorts(phi1/3,[3]).
+query_finite_sorts(s9/6,[3,6]).
+query_finite_sorts(rank/6,[3,6]).
+query_finite_sorts(rank_p/6,[3,6]).
+
+prog_rep([W,G,PC,Wp,Gp,PCp],
+	 (W=1,PC=0),
+	 (
+	   PC=0,PCp=1,Wp=W;	% Gp=_
+	   PC=1,PCp=2,G>=1,Wp=W,Gp=0;
+	   PC=1,PCp=3,G=<0,Wp=W,Gp=G;
+	   PC=2,PCp=3,Wp=W,Gp=G; % __rho_2_>=1
+	   PC=2,PCp=6,Wp=W,Gp=G; % __rho_2_=<0
+	   PC=3,PCp=4,W>=1,Wp=0,Gp=G;
+	   PC=3,PCp=4,W=<0,Wp=W,Gp=G;
+	   PC=4,PCp=5,W=<0,Wp=1,Gp=G;
+	   PC=4,PCp=5,W=<0,Wp=W,Gp=G;
+	   PC=4,PCp=5,W>=1,Wp=W,Gp=G;
+	   PC=5,PCp=1,Wp=W,Gp=G; % __rho_4_>=1
+	   PC=5,PCp=6,Wp=W,Gp=G; % __rho_4_=<0
+	   PC=6,PCp=6,Wp=1,Gp=G
+	 )
+	).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/23-AGEF-succeed.qarmc -no-extra-insert-pred -use-next-skolem
+% 'program is correct' after 3.3 sec
+% With '-case-split': 'program is correct' after 1.2 sec
+
+% (There is one difference between this model and
+% Eric's original benchmark. Eric's benchmark fails on this AGEF property, see below.)
+
+% CEX after 8.8 sec; with s9=(T1=1,B1=0)
+% Counterexample that seems feasible to me.
+%%% % First part of the counterexample shows how to reach (pc=6, w=0)
+%%% tc(2, [], [], phi0-[1,A,0]).
+%%% tc(4-13, [A=1,B=0,C=D], [phi0-[D,E,B]], phi0-[C,F,A]).
+%%% tc(4-11, [A=3,B=1,C=D,D=<0,E=F], [phi0-[F,C,B]], phi0-[E,D,A]).
+%%% tc(4-8, [A=0,B=4,C=3,D=E,F>=1], [phi0-[F,E,C]], phi0-[A,D,B]).
+%%% tc(4-5, [A=5,B=4,C=D,E=F,F=<0], [phi0-[E,D,B]], phi0-[F,C,A]).
+%%% tc(4-2, [A=6,B=5,C=D,E=F], [phi0-[F,D,B]], phi0-[E,C,A]).
+%%% tc(6-8, [], [phi0-[A,B,C]], phi1-[A,B,C]).
+%%% % Second part of the counterexample shows how to loop at location pc=6
+%%% tc(s9-1, [A=B,C=D,E=6,F=6], [], s9-[D,B,F,C,A,E]).
+%%% tc(10-2, [A=<0], [phi1-[A,B,C],s9-[A,B,C,D,E,F]], phi1-[D,E,F]).
+%%% tc(11-2, [A=<0], [phi1-[A,B,C],s9-[A,B,C,D,E,F]], rank-[A,B,C,D,E,F]).
+%%% tc(13, [], [rank-[A,B,C,D,E,F]], rank_p-[A,B,C,D,E,F]).

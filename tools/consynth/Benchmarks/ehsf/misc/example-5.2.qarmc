@@ -1,0 +1,82 @@
+
+next(X,Y,PC,Xp,Yp,PCp) :=
+    X>=1, Xp=X-1, Yp=Y, PC=1, PCp=1
+  ; X>=1,  Xp=X, Yp=Y, PC=1, PCp=1
+  ; X=<0, Yp=1, PC=1, PCp=2.
+
+
+inv0(X,Y,PC) :- Y=0, PC=1, X>=0.
+inv0(Xp,Yp,PCp) :- inv0(X,Y,PC), next(X,Y,PC,Xp,Yp,PCp).
+reach0(X,Y,PC) :- inv0(X,Y,PC).
+inv1(X,Y,PC) :- reach0(X,Y,PC).
+
+exists([Xp,Yp,PCp], (next(X,Y,PC,Xp,Yp,PCp), inv1(Xp,Yp,PCp), rank0(X,Y,PC,Xp,Yp,PCp))) :- inv1(X,Y,PC), Y=<0.
+ti0(X,Y,PC,Xp,Yp,PCp) :- rank0(X,Y,PC,Xp,Yp,PCp).
+ti0(X,Y,PC,Xpp,Ypp,PCpp) :- ti0(X,Y,PC,Xp,Yp,PCp), rank0(Xp,Yp,PCp,Xpp,Ypp,PCpp).
+dwf(ti0(X,Y,PC,Xp,Yp,PCp)).
+% works!
+/*
+skolem_template(s9, [X,Y,PC,Xp,Yp,PCp], [[1=1]], [],
+		[[X>=1, Xp=X-1, Yp=Y, PC=1, PCp=1],
+		 [X=<0, Yp=1,         PC=1, PCp=2]], true).
+*/
+% works!
+/*
+skolem_template(s9, [X,Y,PC,Xp,Yp,PCp], [[1=1]], [],
+		[[X>=1, Xp=X-1, Yp=Y, PCp=1],
+		 [X=<0, Yp=1,         PCp=2]], true).
+*/
+% works!
+/*
+skolem_template(s9, [X,Y,PC,Xp,Yp,PCp], [[1=1]], [],
+		[[X>=G, Xp=X-1, Yp=Y, PCp=1],
+		 [X+1=<G, Yp=1,       PCp=2]], true).
+skolem_template(s9, [X,Y,PC,Xp,Yp,PCp], [[1=1]], [],
+		[[GX*X+GY*Y>=G, Xp=X-1, Yp=Y, PCp=1],
+		 [GX*X+GY*Y+1=<G, Yp=1,       PCp=2]], true).
+*/
+skolem_template(s9, [X,Y,PC,Xp,Yp,PCp], [[1=1]], [],
+		[[GX*X+GY*Y>=G,   Xp=X+UX1, Yp=Y, PCp=1],
+		 [GX*X+GY*Y+1=<G, Yp=1,       PCp=2]], (UX1= -1; UX1=1)
+	       ).
+
+
+/*
+
+check52dnf :-
+	Init = (Y=0, PC=1, X>=0),
+	Next = (
+		 X>=1, X1=X-1, Y1=Y, PC=1, PC1=1
+	       ;
+		 X>=1, X1=X,   Y1=Y, PC=1, PC1=1
+	       ;
+		 X=<0, Y1=1,         PC=1, PC1=2
+	       ),
+	Inv0 = (X>=0, Y=0, PC=1; PC=2, Y=1),
+	Inv1 = (X>=0, Y=0, PC=1; PC=2, Y=1),
+	Sk0 = (
+		X>=1, X1=X-1, Y1=Y, PC=1, PC1=1
+	       ;
+		X=<0, Y1=1,         PC=1, PC1=2
+	       ),
+	Rank0 = (X>=0, X1=X-1; PC=1, PC1=2),
+	copy_term(Inv0-Inv1-[X,Y,PC], Inv0p-Inv1p-[X1,Y1,PC1]),
+	Imps = [
+		(Inv0 :- Init),
+		(Inv0p :- Inv0, Next), 
+		(Inv1 :- Inv0),
+		(Next :- Inv1, Y=<0, Sk0),
+		(Inv1p :- Inv1, Y=<0, Sk0),
+		(Rank0 :- Inv1, Y=<0, Sk0)
+	       ],
+	(   foreach((Head :- Body), Imps),
+	    count(I, 1, _),
+	    param(X,Y,PC, X1,Y1,PC1)
+	do  dformat_nn(
+		       (X,Y,PC, X1,Y1,PC1) = (x, y, pc, 'x\'', 'y\'', 'pc\''),
+		       '~p:  ~p :- ~p\n',
+		       [I, Head, Body]
+		      ),
+	    dnf_entails_once((Body, \+Head), false, clp_utils:entails_once)
+	).
+*/

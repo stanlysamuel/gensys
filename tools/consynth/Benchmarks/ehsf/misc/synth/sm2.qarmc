@@ -1,0 +1,66 @@
+% The "SIMPLE" strategy for cindy to win the game with EG not(overflow) objective (for capacity > 20).
+init(B1,B2,B3,B4,B5) :=
+        B1=0, B2=0, B3=0, B4=0, B5=0.
+stepmother(B1,B2,B3,B4,B5,B1p,B2p,B3p,B4p,B5p) :=
+        B1p>=B1, B2p>=B2, B3p>=B3, B4p>=B4, B5p>=B5,
+	B1p+B2p+B3p+B4p+B5p-B1-B2-B3-B4-B5=10.
+skolem_template(scindy, [B1, B2, B3, B4, B5,
+			 B1p, B2p, B3p, B4p, B5p,
+			 B1pp, B2pp, B3pp, B4pp, B5pp],
+  		true,
+%		(B1p+B3p=<10 ; B2p+B4p=<10 ; B3p+B5p=<10 ; B4p+B1p=<10 ; B5p+B2p=<10),
+%		(B1=0,B2=0 ; B2=0,B3=0 ; B3=0,B4=0 ; B4=0,B5=0 ; B5=0,B1=0),
+		(   B3=0, B4=0, (B2p+B4p=<10 ; B3p+B5p=<10 )
+		;   B4=0, B5=0, (B3p+B5p=<10 ; B4p+B1p=<10 )
+		;   B5=0, B1=0, (B4p+B1p=<10 ; B5p+B2p=<10 )
+		;   B1=0, B2=0, (B5p+B2p=<10 ; B1p+B3p=<10 )
+		;   B2=0, B3=0, (B1p+B3p=<10 ; B2p+B4p=<10 )
+		), 
+		% Transition relation of cindy
+		(   B3=0, B4=0,
+		    (
+		      B2p+B4p=<10, B1pp=0,   B2pp=B2p, B3pp=B3p, B4pp=B4p, B5pp=0;
+		      B3p+B5p=<10, B1pp=0,   B2pp=0,   B3pp=B3p, B4pp=B4p, B5pp=B5p
+		    )
+		;   B4=0, B5=0,
+		    (
+		      B3p+B5p=<10, B1pp=0,   B2pp=0,   B3pp=B3p, B4pp=B4p, B5pp=B5p; 
+		      B4p+B1p=<10, B1pp=B1p, B2pp=0,   B3pp=0,   B4pp=B4p, B5pp=B5p
+		    )
+		;   B5=0, B1=0,
+		    (
+		      B4p+B1p=<10, B1pp=B1p, B2pp=0,   B3pp=0,   B4pp=B4p, B5pp=B5p;
+		      B5p+B2p=<10, B1pp=B1p, B2pp=B2p, B3pp=0,   B4pp=0,   B5pp=B5p
+		    )
+		;   B1=0, B2=0,
+		    (
+		      B5p+B2p=<10, B1pp=B1p, B2pp=B2p, B3pp=0,   B4pp=0,   B5pp=B5p;
+		      B1p+B3p=<10, B1pp=B1p, B2pp=B2p, B3pp=B3p, B4pp=0,   B5pp=0
+		    )
+		;   B2=0, B3=0,
+		    (
+		      B1p+B3p=<10, B1pp=B1p, B2pp=B2p, B3pp=B3p, B4pp=0,   B5pp=0;
+		      B2p+B4p=<10, B1pp=0,   B2pp=B2p, B3pp=B3p, B4pp=B4p, B5pp=0
+		    )
+		),
+		true
+	       ).
+overflow(B1,B2,B3,B4,B5) :=
+        B1>=21 ; B2>=21 ; B3>=21 ; B4>=21 ; B5>=21.
+
+% Cindy wins EG not(overflow)
+inv(B1,B2,B3,B4,B5) :- init(B1,B2,B3,B4,B5).
+exists([B1pp,B2pp,B3pp,B4pp,B5pp],
+       (
+	 inv(B1pp,B2pp,B3pp,B4pp,B5pp)
+       )) :-
+	id(cindy),
+	inv(B1,B2,B3,B4,B5),
+	stepmother(B1,B2,B3,B4,B5,B1p,B2p,B3p,B4p,B5p).
+
+% Property clauses
+false :- inv(B1,B2,B3,B4,B5), overflow(B1,B2,B3,B4,B5).
+false :- inv(B1,B2,B3,B4,B5), stepmother(B1,B2,B3,B4,B5,B1p,B2p,B3p,B4p,B5p), overflow(B1p,B2p,B3p,B4p,B5p).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred sm2.qarmc (faster version of cindy_20_10_safe.qarmc)
+% 'program correct' after 3.12s

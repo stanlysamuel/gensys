@@ -1,0 +1,85 @@
+/*
+**Critical Sections Program** (repair version, with next split into nextDT and nextNDT)
+  Propery to check: EG ((pc1=4 -> pc2!=4) /\ (pc1=8 -> pc2!=7))
+Process A
+1  flag1A = true;
+2  turn1B = false;
+3  while(flag1B && turn1B);
+4  x=x&&y; **********
+   flag1A = false;
+5  if(turn1B){
+       flag2A = true;
+6      turn2B = true;
+7      while(flag2B && turn2B);
+8      y = false; *************
+       flag2A = false;}
+9  goto 1;
+Process B
+1  flag1B = true;
+2  turn1B = false;
+3  while(flag1A && !turn1B);
+4  x=x&&y; **********
+   flag2B = true;
+5  turn2B = false;
+6  while(flag2A && !turn2B);
+7  y=!y; ******************
+   x=x||y;
+   flag2B = false;
+8  flag1B = false;
+9  goto 1;
+*/
+init(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):=F1A=0,F1B=0,T1B=0,F2A=0,F2B=0,T2B=0,PC1=1,PC2=1.
+nextDT(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p):=   
+     % thread A
+     PC1=1,F1Ap=1,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=2,PC2p=PC2;
+%     PC1=2,F1Ap=F1A,F1Bp=F1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2; % T1Bp = _rho
+     PC1=3,F1B=1,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2;
+     PC1=3,(F1B=0;T1B=0),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=4,PC2p=PC2;
+     PC1=4,F1Ap=0,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=5,PC2p=PC2;
+     PC1=5,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=1,  F2Bp=F2B,T2Bp=T2B,PC1p=6,PC2p=PC2;
+     PC1=5,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=9,PC2p=PC2;
+     PC1=6,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,  F2Bp=F2B,T2Bp=1,  PC1p=7,PC2p=PC2;
+     PC1=7,F2B=1,T2B=1,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=8,PC2p=PC2;
+     PC1=8,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=0,  F2Bp=F2B,T2Bp=T2B,PC1p=9,PC2p=PC2;
+     PC1=9,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=1,PC2p=PC2;
+     % thread B
+     PC2=1,F1Ap=F1A,F1Bp=1,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=2;
+     PC2=2,F1Ap=F1A,F1Bp=F1B,T1Bp=0,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=3;
+     PC2=3,F1A=1,T1B=0,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=3;
+     PC2=3,(F1A=0;T1B=1),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=4;
+     PC2=4,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=1,T2Bp=T2B,PC1p=PC1,PC2p=5;
+     PC2=5,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=0,PC1p=PC1,PC2p=6;
+     PC2=6,F2A=1,T2B=0,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=6;
+     PC2=6,(F2A=0;T2B=1),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=7;
+     PC2=7,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=0,T2Bp=T2B,PC1p=PC1,PC2p=8;
+     PC2=8,F1Ap=F1A,F1Bp=0,T1Bp=T1B,F2Ap=F2A,F2Bp=F1B,T2Bp=T2B,PC1p=PC1,PC2p=9;
+     PC2=9,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=1.
+nextNDT(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p):=   
+     % thread A
+     PC1=2,F1Ap=F1A,F1Bp=F1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2. % T1Bp = _rho
+dst(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):= ((PC1=<3;PC1>=5;PC2=<3;PC2>=5),(PC1=<7;PC1>=9;PC2=<6;PC2>=8)).
+% init => EG dst
+phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):-init(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2).
+phi(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p):-
+	phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2),nextDT(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p).
+exists([F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p],phi(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p)):-phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2).
+dst(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):-phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2).
+skolem_template(s5, [F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p],
+  		true,
+  		true,
+  		(
+		  PC1=2,F1Ap=F1A,F1Bp=F1B,T1Bp=T1,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2 % T1Bp = _rho
+		),
+  		((T1=0;T1=1))
+  	       ).
+
+query_naming(phi(f1A,f1B,t1B,f2A,f2B,t2B,pc1,pc2)).
+query_naming(s5(f1A,f1B,t1B,f2A,f2B,t2B,pc1,pc2,'f1A\'','f1B\'','t1B\'','f2A\'','f2B\'','t2B\'','pc1\'','pc2\'')).
+
+query_finite_sorts(phi/8,[7,8]).
+query_finite_sorts(s5/16,[7,8,15,16]).
+
+% ./ctlstar tests/ctlstar-synth/g7-repair-critsec.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program is correct' after 20.1s without any option
+% 'program is NOT correct' after 6.8s -exp-eval *********
+% T/O -case-split (doesn't like splitting!!)

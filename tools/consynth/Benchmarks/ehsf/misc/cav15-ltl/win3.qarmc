@@ -1,0 +1,40 @@
+/*
+  Benchmark: win3.c
+  Property: F G Stored==0
+*/
+
+initP(S,PC):=S=0,PC=1.
+nextP(S,PC,Sp,PCp):=
+(  PC=1,Sp=S,PCp=1;
+   PC=1,Sp=1,PCp=2;
+   PC=2,S=1,Sp=0,PCp=3;
+   PC=2,S=0,Sp=S,PCp=4;
+   PC=3,Sp=S,PCp=3;
+   PC=4,Sp=S,PCp=4
+).
+
+initA(BC) := BC=1.
+nextA(BC,S,BCp) :=
+(   BC=1,BCp=1;
+    BC=1,S<0,BCp=2;
+    BC=1,S>0,BCp=2;
+    BC=2,BCp=1;
+    BC=2,S<0,BCp=2;
+    BC=2,S>0,BCp=2
+).
+buechi(BC) := BC=2.
+
+init(S,PC,BCp) := initP(S,PC), initA(BC), nextA(BC,S,BCp).
+next(S,PC,BC,Sp,PCp,BCp) := nextP(S,PC,Sp,PCp), nextA(BC,Sp,BCp).
+
+inv(S,PC,BC) :- init(S,PC,BC).
+ti(S,PC,BC,Sp,PCp,BCp), inv(Sp,PCp,BCp) :- inv(S,PC,BC), next(S,PC,BC,Sp,PCp,BCp).
+ti(S,PC,BC,Spp,PCpp,BCpp) :- ti(S,PC,BC,Sp,PCp,BCp), next(Sp,PCp,BCp,Spp,PCpp,BCpp).
+
+round(S,PC,Sp,PCp) :- ti(S,PC,BC,Sp,PCp,BCp), buechi(BC), buechi(BCp).
+
+dwf(round/4).
+
+query_naming(inv, [s,pc,bc]).
+query_naming(round, [s,pc,'s\'','pc\'']).
+query_naming(ti, [s,pc,bc,'s\'','pc\'','bc\'']).

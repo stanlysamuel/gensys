@@ -1,0 +1,16 @@
+/*
+while(1)
+{
+   if(x=<0) break;
+   x--;
+}   
+*/
+init(X,PC):=PC=1.
+next(X,PC,Xp,PCp):=
+  	PC=1,Xp=X,PCp=2;
+  	PC=2,X>0,Xp=X,PCp=3;
+  	PC=3,Xp=X-1,PCp=2.
+dst(X,PC):=X>=0.
+phi(X,PC):-init(X,PC).
+phi(Xp, PCp):-phi(X,PC), next(X,PC,Xp,PCp).
+dst(X,PC):-phi(X,PC).

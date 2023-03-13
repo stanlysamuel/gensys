@@ -1,0 +1,40 @@
+% No. 34 from Eric's paper
+% neg-egp-fail/original.c in the benchmarks
+/*#include "../ctl.h"
+
+int x;
+unsigned int pc;
+int __phi() { return CAF( CAP(x <= 1) ); }
+int __rho_1_;
+
+void init() { x = 2; }
+
+int body() {
+  while(1) {
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x + 1; 
+    } else {
+      x = x - 1; 
+    }
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,PC):=X=2,PC=1.
+next(X,PC,Xp,PCp):=
+	Xp=X+1,PC=1,PCp=1;
+	Xp=X-1,PC=1,PCp=1.
+dst(X,PC):=X=<1.
+
+% Queries: inv0, rank
+inv0(X,PC):-init(X,PC).
+exists([Xp,PCp],next(X,PC,Xp,PCp)):-inv0(X,PC),\+dst(X,PC).
+rank(X,PC,Xp,PCp):-inv0(X,PC),\+dst(X,PC),next(X,PC,Xp,PCp).
+inv0(Xp,PCp):-inv0(X,PC),\+dst(X,PC),next(X,PC,Xp,PCp).
+wf(rank/4).
+
+% ./ctlstar tests/ctlstar-Erics/34-AF-fail.qarmc -use-next-skolem -no-extra-insert-pred
+% CEX after 0.4 sec

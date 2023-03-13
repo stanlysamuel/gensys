@@ -1,0 +1,28 @@
+% Property: AG (EF (p>0)), program is correct
+init(P,X,PC):=P=0,X=5,PC=1.
+next(P,X,PC,Pp,Xp,PCp):=
+ X>=0,Xp=X-1,Pp=P,PC=1,PCp=1;
+ X>=0,Xp=X,Pp=P,PC=1,PCp=1;
+ X<0,Pp=1,Xp=X,PC=1,PCp=2.
+
+% Queries: inv0, reach, inv1, rank, trank
+inv0(P,X,PC):-init(P,X,PC).
+inv0(Pp,Xp,PCp):-inv0(P,X,PC),next(P,X,PC,Pp,Xp,PCp).
+reach(P,X,PC):-inv0(P,X,PC).
+inv1(P,X,PC):-reach(P,X,PC).
+% ==== Move next(V,V') to the body or not ? ====
+% exists([Pp,Xp,PCp],(next(P,X,PC,Pp,Xp,PCp),rank(P,X,PC,Pp,Xp,PCp),inv1(Pp,Xp,PCp))):-inv1(P,X,PC),\+P>0.
+trank(P,X,PC,Pp,Xp,PCp):-rank(P,X,PC,Pp,Xp,PCp).
+trank(P,X,PC,G,H,I):-trank(P,X,PC,Pp,Xp,PCp),rank(Pp,Xp,PCp,G,H,I).
+dwf(trank(P,X,PC,Pp,Xp,PCp)).
+
+% ==== 1. next(V,V') moved from the head to the body ====
+% exists([Pp,Xp,PCp],(rank(P,X,PC,Pp,Xp,PCp),inv1(Pp,Xp,PCp))):-inv1(P,X,PC),\+P>0,next(P,X,PC,Pp,Xp,PCp).
+% skolem_template(s13, [P,X,PC,Pp,Xp,PCp], [[1=1]], [], [[Xp=T*X+T0]], true).
+% With -use-next-skolem, program is proven correct, solution: sk(V,V') = (x'=7x+4)
+
+% ==== 2. next(V,V') stays in the head ====
+exists([Pp,Xp,PCp],(next(P,X,PC,Pp,Xp,PCp),rank(P,X,PC,Pp,Xp,PCp),inv1(Pp,Xp,PCp))):-inv1(P,X,PC),\+P>0.
+%skolem_template(s13, [P,X,PC,Pp,Xp,PCp], [[1=1]], [], [[Xp=T*X+T0]], true).
+%skolem_template(s13, [P,X,PC,Pp,Xp,PCp], [[PC=1, X>=0, Xp=X-1, PCp=1], [PC=1, X<0, Xp=X, PCp=2]], [], [[Xp=T*X+T0]], true).
+skolem_template(s13, [P,X,PC,Pp,Xp,PCp], [[1=1]], [], [[X>=G, Xp=T1X*X+T1], [X+1=<G, Xp=T2X*X+T2]], true).

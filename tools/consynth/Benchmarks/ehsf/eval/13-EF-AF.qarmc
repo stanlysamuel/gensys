@@ -1,0 +1,33 @@
+/* EF (AF (p<=0)); program is not correct
+int x, p;
+void init() { p = 1; }
+
+int body() {
+  while(1) {
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      p = 1;
+    } else {
+      p = 2;
+    }
+  }
+}
+*/
+
+init(A,B,C):=B=1,C=1.
+step(A,B,C,D,E,F):=
+  E=1,C=1,F=1
+ ;E=2,C=1,F=1.
+phi0(A,B,C):-init(A,B,C).
+exists([D,E,F],(step(A,B,C,D,E,F),phi0(D,E,F))):-phi0(A,B,C),\+p1(A,B,C).
+rel0(A,B,C,D,E,F):-phi0(A,B,C),\+p1(A,B,C),step(A,B,C,D,E,F),phi0(D,E,F),\+p1(D,E,F).
+trel0(A,B,C,D,E,F):-rel0(A,B,C,D,E,F).
+trel0(A,B,C,G,H,I):-trel0(A,B,C,D,E,F),rel0(D,E,F,G,H,I).
+dwf(trel0(A,B,C,D,E,F)).
+phi1(A,B,C):-p1(A,B,C).
+exists([D,E,F],step(A,B,C,D,E,F)):-phi1(A,B,C),\+B=<0.
+phi1(D,E,F):-phi1(A,B,C),step(A,B,C,D,E,F),\+B=<0.
+rel1(A,B,C,D,E,F):-phi1(A,B,C),\+B=<0,step(A,B,C,D,E,F),phi1(D,E,F),\+E=<0.
+trel1(A,B,C,D,E,F):-rel1(A,B,C,D,E,F).
+trel1(A,B,C,G,H,I):-trel1(A,B,C,D,E,F),rel1(D,E,F,G,H,I).
+dwf(trel1(A,B,C,D,E,F)).

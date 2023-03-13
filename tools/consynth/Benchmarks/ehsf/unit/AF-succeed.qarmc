@@ -1,0 +1,19 @@
+% Property: AF(p=<0) = not(EG (p>0)), program is correct
+% Example adapted from egp-fail/original.c
+init(X,P,PC):=X=5,P=0,PC=1.
+next(X,P,PC,Xp,Pp,PCp):=
+ X>0,Xp=X+1,Pp=P,PC=1,PCp=1;
+ X>0,Xp=X+2,Pp=P,PC=1,PCp=1;
+ X=<0,Xp=X,Pp=1,PC=1,PCp=2.
+dst(X,P,PC):=P=<0.
+
+% Queries: inv0, rank
+inv0(X,P,PC):-init(X,P,PC).
+%exists([Xp,Pp,PCp],next(X,P,PC,Xp,Pp,PCp)):-inv0(X,P,PC),\+dst(X,P,PC).
+(X>0,PC=1 ; X=<0,PC=1):-inv0(X,P,PC),\+dst(X,P,PC). % domain clause
+rank(X,P,PC,Xp,Pp,PCp):-inv0(X,P,PC),\+dst(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+inv0(Xp,Pp,PCp):-inv0(X,P,PC),\+dst(X,P,PC),next(X,P,PC,Xp,Pp,PCp).
+wf(rank/6).
+
+% ./ctlstar tests/ctlstar-unit/AF-succeed.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program correct' after 0.1 sec

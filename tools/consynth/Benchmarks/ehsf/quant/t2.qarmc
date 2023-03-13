@@ -1,0 +1,7 @@
+init(I,X) := I=0,X=0.
+next(I,Ip) := Ip=I+1.
+inv(I,X) :- init(I,X).
+inv(Ip,X) :- inv(I,X),next(I,Ip).
+exists([N],q1(N)):-id(1),I>=0.
+X=1 :- s1(I,N),inv(N,X).
+skolem_template(s1,[I,N],true,true, N=I*B1+B2, true).

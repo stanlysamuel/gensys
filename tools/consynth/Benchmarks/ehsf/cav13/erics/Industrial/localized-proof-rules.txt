@@ -1,0 +1,46 @@
+1. EF proof rule 
+    ==> Current version (without localizing 'next')
+
+            init(v) -> phi0(v)
+            phi0(v) /\ !dst(v) -> exists v': phi0(v') /\ rank(v,v')
+            wf(rank) 
+ ________________________________________________________________
+
+                    (init(v),next(v,v')) |= EF dst(v)
+
+
+    ==> Localized version
+
+            init(v) -> phi0(v)
+            phi0(v) /\ !dst(v) -> exists v': next(v,v')
+            phi0(v) /\ !dst(v) /\ nextD(v,v') -> phi0(v') /\ rank(v,v')
+            phi0(v) /\ !dst(v) /\ nextN(v,v') -> exists v': phi0(v') /\ rank(v,v')
+            wf(rank) 
+ ________________________________________________________________
+
+                    (init(v),next(v,v')) |= EF dst(v)
+
+where nextD and nextN represent the deterministic and non-deterministic partition of next,i.e. next(v,v'):= nextD(v,v');nextN(v,v').
+
+2. EG proof rule 
+    ==> Current version (without localizing 'next')
+
+            init(v) -> phi0(v)
+            phi0(v) /\ next(v,v') -> exists v': phi0(v')
+            phi0(v) -> safe(v)
+ ________________________________________________________________
+
+                    (init(v),next(v,v')) |= EG safe(v)
+
+
+    ==> Localized version
+
+            init(v) -> phi0(v)
+            phi0(v) /\ nextD(v,v') -> phi0(v')
+            phi0(v) /\ nextN(v,v') -> exists v': phi0(v')
+            phi0(v) -> safe(v)
+ ________________________________________________________________
+
+                    (init(v),next(v,v')) |= EG safe(v)
+
+where nextD and nextN represent the deterministic and non-deterministic partition of next,i.e. next(v,v'):= nextD(v,v');nextN(v,v').

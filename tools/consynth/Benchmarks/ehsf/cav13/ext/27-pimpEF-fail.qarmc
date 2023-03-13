@@ -1,0 +1,106 @@
+% No. 27 from Eric's paper (Industrial)
+/*
+#include "../ctl.h"
+// Property: c > 5 => F(resp > 5)
+
+int c;
+int servers ;
+int resp;
+int curr_serv;
+
+int __rho_1_;
+unsigned int pc;
+int __phi() { return COR(CAP(c<=5),CEF(CAP(resp>5))); }
+
+void init() {
+  c = nondet(); assume(c>0);
+  servers = 4;
+  resp = 0;
+  curr_serv = servers;
+}
+
+int body() {
+  while(1) {
+    if (!(curr_serv > 0)) break;
+    __rho_1_ = nondet();
+    if(__rho_1_>0) {
+      c--; curr_serv--;
+      resp++;
+    } else {
+      assume(c < curr_serv);
+      curr_serv--;
+    }
+  }
+  while(1) { dummy=dummy; } L_return: return 0;
+}
+
+int main() {}
+
+// c=6, servers=4, curr = 4, resp=0
+// c=5, servers=4, curr = 3, resp=1
+// c=4, servers=4, curr = 2, resp=2
+// c=3, servers=4, curr = 1, resp=2
+// c=2, servers=4, curr = 0, resp=3
+*/
+
+init(C,R,CS,PC):=C>=1,R=0,CS=4,PC=1.
+next(C,R,CS,PC,Cp,Rp,CSp,PCp):=
+    PC=1,CS=<0,Cp=C,Rp=R,CSp=CS,PCp=2;
+    PC=1,CS>0,Cp=C,Rp=R,CSp=CS,PCp=3;
+    %%% PC=3,C>=CS,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    %%% PC=3,C<CS,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    %%% PC=3,C<CS,Cp=C,Rp=R,CSp=CS-1,PCp=1.
+    PC=3,C>=CS,Cp=C,Rp=R,CSp=CS,PCp=4;
+    PC=3,C<CS,Cp=C,Rp=R,CSp=CS,PCp=5;
+    PC=4,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    PC=5,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    PC=5,Cp=C,Rp=R,CSp=CS-1,PCp=1.
+dst(C,R,CS,PC):=R>5.
+% init => (c<=5 \/ EF r>5)
+phi0(C,R,CS,PC):-init(C,R,CS,PC),C>5.
+exists([Cp,Rp,CSp,PCp],(rank(C,R,CS,PC,Cp,Rp,CSp,PCp),phi0(Cp,Rp,CSp,PCp))):-phi0(C,R,CS,PC),\+dst(C,R,CS,PC).
+(PC=1 ; PC=3):-phi0(C,R,CS,PC),\+dst(C,R,CS,PC).
+wf(rank/8).
+skolem_template(s3, [C,R,CS,PC,Cp,Rp,CSp,PCp],
+  		true,
+		(PC=1 ; PC>=3,PC=<5),
+		(
+		  PC=1,CS=<0,Cp=C,Rp=R,CSp=CS,PCp=2;
+		  PC=1,CS>0,Cp=C,Rp=R,CSp=CS,PCp=3;
+		  %%% PC=3,C>=CS,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+		  %%% B>=1,PC=3,C<CS,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+		  %%% B=<0,PC=3,C<CS,Cp=C,Rp=R,CSp=CS-1,PCp=1
+		  PC=3,C>=CS,Cp=C,Rp=R,CSp=CS,PCp=4;
+		  PC=3,C<CS,Cp=C,Rp=R,CSp=CS,PCp=5;
+		  PC=4,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+		  B=<0,PC=5,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+		  B>=1,PC=5,Cp=C,Rp=R,CSp=CS-1,PCp=1
+		),
+		(B=0 ; B=1)
+  	       ).
+
+query_naming(phi0(c,r,cs,pc)).
+query_naming(s3(c,r,cs,pc,'c\'','r\'','cs\'','pc\'')).
+query_naming(rank(c,r,cs,pc,'c\'','r\'','cs\'','pc\'')).
+query_naming(rank_p(c,r,cs,pc,'c\'','r\'','cs\'','pc\'')).
+
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(s3/8,[4,8]).
+query_finite_sorts(rank/8,[4,8]).
+query_finite_sorts(rank_p/8,[4,8]).
+
+prog_rep([C,R,CS,PC,Cp,Rp,CSp,PCp],
+	 (C>=1,R=0,CS=4,PC=1),
+	 (
+	   PC=1,CS=<0,Cp=C,Rp=R,CSp=CS,PCp=2;
+	   PC=1,CS>0,Cp=C,Rp=R,CSp=CS,PCp=3;
+	   PC=3,C>=CS,Cp=C,Rp=R,CSp=CS,PCp=4;
+	   PC=3,C<CS,Cp=C,Rp=R,CSp=CS,PCp=5;
+	   PC=4,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+	   PC=5,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+	   PC=5,Cp=C,Rp=R,CSp=CS-1,PCp=1
+	 )
+	).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/27-pimpEF-succeed.qarmc -no-extra-insert-pred -use-next-skolem
+% T/O
+% With '-case-split': CEX after 2.5 sec

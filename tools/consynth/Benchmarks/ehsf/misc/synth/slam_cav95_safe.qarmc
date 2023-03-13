@@ -1,0 +1,47 @@
+% SLAM example from Jobstmann-et-al CAV'95 paper
+% V = (L,GL,PC) for variables L, got_lock and pc
+
+init(L,GL,PC) := GL=0, L=0, PC=0.
+next(L,GL,PC,Lp,GLp,PCp) :=
+    PC=0, PCp=2, Lp=L, GLp=GL
+  ; PC=2, PCp=4, L=<0, Lp=1
+  ; PC=0, PCp=4, Lp=L, GLp=GL
+  ; PC=4, PCp=5, GL>=1, Lp=L, GLp=GL
+  ; PC=4, PCp=5, GL=< -1, Lp=L, GLp=GL
+  ; PC=5, PCp=6, L>=1, Lp=0, GLp=GL
+  ; PC=4, PCp=6, GL=0, Lp=L, GLp=GL
+  ; PC=6, PCp=0, Lp=L.
+error(L,GL,PC) := PC=2, L>=1 ; PC=5, L=<0.
+
+% Queries: inv
+inv(L,GL,PC) :- init(L,GL,PC).
+exists([Lp,GLp,PCp],inv(Lp,GLp,PCp)) :- inv(L,GL,PC). %, next(L,GL,PC,Lp,GLp,PCp).
+false :- inv(L,GL,PC), error(L,GL,PC).
+
+skolem_template(s3, [L,GL,PC,Lp,GLp,PCp],
+ 		true,
+ 		( PC=0 ; PC=2, L=<0 ; PC=4 ; PC=5, L>=1 ; PC=6 ),
+ 		(
+		  PC=0, PCp=2, Lp=L, GLp=GL
+		; PC=2, PCp=4, L=<0, Lp=1, GLp=T1
+		; PC=0, PCp=4, Lp=L, GLp=GL
+		; PC=4, PCp=5, GL>=1, Lp=L, GLp=GL
+		; PC=4, PCp=5, GL=< -1, Lp=L, GLp=GL
+		; PC=5, PCp=6, L>=1, Lp=0, GLp=GL
+		; PC=4, PCp=6, GL=0, Lp=L, GLp=GL
+		; PC=6, PCp=0, GLp=T2, Lp=L
+ 		),
+ 		((T1=0;T1=1), (T2=0;T2=1))
+ 	       ).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred -case-split slam_cav95_safe.qarmc
+% 'program is correct' after 0.3s. Solution: T1=1 and T2=0.
+% SVN revision: 17985
+
+%%% s324: l=<0, gl'=1, l'=1
+%%% s360: gl'=0, l'=l
+%%% inv0: gl=0,l=<0
+%%% inv2: gl=0,l=<0
+%%% inv4: 1=<l,gl=1 ; l=<0,gl=0
+%%% inv5:  gl=<1,1=<l
+%%% inv6:  gl=<1,l=<0

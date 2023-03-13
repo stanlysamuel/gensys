@@ -1,0 +1,44 @@
+init(A,R,N,PC):=A=0,R=0,PC=1.
+next(A,R,N,PC,Ap,Rp,Np,PCp):=
+    PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+    PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+    PC=2,Ap=0,Rp=R,Np=N,PCp=3;
+    PC=3,Ap=A,Rp=R,Np=N,PCp=3;
+    PC=3,Ap=A,Rp=1,Np=N,PCp=4;
+    PC=4,Ap=A,Rp=0,Np=N,PCp=1.
+next_with_coef(A,R,N,PC,Ap,Rp,Np,PCp,B1,B2):=
+  B1=0,PC=1,Ap=A,Rp=R,Np=N,PCp=5;
+  B1=1,PC=1,Ap=1,Rp=R,Np=N,PCp=2;
+  PC=2,Ap=0,Rp=R,Np=N,PCp=3;
+  B2=0,PC=3,Ap=A,Rp=R,Np=N,PCp=3;
+  B2=1,PC=3,Ap=A,Rp=1,Np=N,PCp=4;
+  PC=4,Ap=A,Rp=0,Np=N,PCp=1.
+dst(A,R,N,PC):=R=1.
+
+% init(v) => exists([x], aux(v,x))
+aux(A,R,N,PC,X):-init(A,R,N,PC),witness1(X).
+template(witness1, [X], X=Vx, (Vx=0;Vx=1)). 
+% aux => AG p1
+phi0(A,R,N,PC,X):-init(A,R,N,PC,X).
+phi0(Ap,Rp,Np,PCp):-phi0(A,R,N,PC,X),next(A,R,N,PC,Ap,Rp,Np,PCp).
+p1(A,R,N,PC,X):-phi0(A,R,N,PC,X).
+
+% p1 /\ a=x => EF r=1
+phi1(A,R,N,PC):-p1(A,R,N,PC,X),A=X.
+PC>=1, PC=<4 :- phi1(A,R,N,PC), \+ dst(A,R,N,PC).
+rank(A,R,N,PC,Ap,Rp,Np,PCp), phi1(Ap,Rp,Np,PCp) :-phi1(A,R,N,PC), \+dst(A,R,N,PC), next_with_coef(A,R,N,PC,Ap,Rp,Np,PCp,B1,B2), witness(B1,B2).
+template(witness, [D1,D2], (D1=B1, D2=B2), ((B1=0;B1=1),(B2=0;B2=1))).
+wf(rank/8).
+
+query_naming(phi0(a,r,n,pc,x)).
+query_naming(p1(a,r,n,pc,x)).
+query_naming(phi1(a,r,n,pc)).
+query_naming(witness(b1,b2)).
+query_naming(rank(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+query_naming(rank_p(a,r,n,pc,'a\'','r\'','n\'','pc\'')).
+
+query_finite_sorts(phi0/5,[4]).
+query_finite_sorts(p1/5,[4]).
+query_finite_sorts(phi1/4,[4]).
+query_finite_sorts(rank/8,[4,8]).
+query_finite_sorts(rank_p/8,[4,8]).

@@ -1,0 +1,101 @@
+% No. 20 from Eric's paper (Industrial)
+/*
+#include "../ctl.h"
+
+// Property: G F WItemsNum >= 1
+
+int WItemsNum;
+unsigned int pc;
+int __rho_1_;
+int __rho_2_;
+int __phi() { return CAG(CEF(CAP(WItemsNum>=1))); }
+
+void init() { WItemsNum = nondet(); }
+
+void callback1() {}
+void callback2() {}
+#define MoreWItems() nondet()
+
+void body() {
+  __rho_1_ = nondet();
+    WItemsNum = __rho_1_;
+    if(WItemsNum<0) {
+      while (1) { WItemsNum = WItemsNum; }
+    }
+    while(1) {
+      while(1) { 
+	__rho_2_ = MoreWItems();
+	if (WItemsNum<=5) { if (__rho_2_>0) break; }
+               if (WItemsNum<=5) {
+                   callback1();
+                   WItemsNum++;
+    
+               } else {
+                   WItemsNum++;
+               }
+        }
+    
+      while(1) { 
+	if (!(WItemsNum>2)) break;
+             callback2();
+             WItemsNum--;
+        }
+    }
+  while(1) { dummy=dummy; } L_return: return 0;
+}
+    
+int main () {}
+*/
+init(W,PC):=PC=0.
+next(W,PC,Wp,PCp):=
+    PC=0,W<0,Wp=W,PCp=0;
+    PC=0,W>=0,Wp=W,PCp=1;
+    PC=1,W=<5,Wp=W,PCp=3;
+    PC=2,Wp=W+1,PCp=1;
+    PC=3,Wp=W,PCp=2;
+    PC=3,Wp=W,PCp=4;
+    PC=4,W=<2,Wp=W,PCp=1;
+    PC=4,W>2,Wp=W-1,PCp=4.
+dst(W,PC):=W>=1.
+% AG p1
+phi0(W,PC):-init(W,PC).
+phi0(Wp,PCp):-phi0(W,PC),next(W,PC,Wp,PCp).
+p1(W,PC):-phi0(W,PC).
+% p1 => EF w>=1
+phi1(W,PC):-p1(W,PC).
+exists([Wp,PCp],(rank(W,PC,Wp,PCp),phi1(Wp,PCp))):-phi1(W,PC),\+dst(W,PC).
+wf(rank/4).
+skolem_template(s9, [W,PC,Wp,PCp],
+ 		true,
+		(PC>=0, PC=<4),
+	       (
+		 PC=0,W<0,Wp=W,PCp=0;
+		 PC=0,W>=0,Wp=W,PCp=1;
+		 PC=1,W>5,Wp=W,PCp=2;
+		 PC=1,W=<5,Wp=W,PCp=3;
+		 PC=2,Wp=W+1,PCp=1;
+		 B=0,PC=3,Wp=W,PCp=2;
+		 B=1,PC=3,Wp=W,PCp=4;
+		 PC=4,W=<2,Wp=W,PCp=1;
+		 PC=4,W>2,Wp=W-1,PCp=4
+	       ),
+ 		(B=0;B=1)
+ 	       ).
+
+query_naming(phi0(w,pc)).
+query_naming(p1(w,pc)).
+query_naming(phi1(w,pc)).
+query_naming(s9(w,pc,'w\'','pc\'')).
+query_naming(rank(w,pc,'w\'','pc\'')).
+query_naming(rank_p(w,pc,'w\'','pc\'')).
+
+query_finite_sorts(phi0/2,[2]).
+query_finite_sorts(p1/2,[2]).
+query_finite_sorts(phi1/2,[2]).
+query_finite_sorts(s9/4,[2,4]).
+query_finite_sorts(rank/4,[2,4]).
+query_finite_sorts(rank_p/4,[2,4]).
+
+% time ./ctlstar tests/ctlstar-Erics/20-AGEF-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec
+% With '-case-split': CEX after 0.2 sec

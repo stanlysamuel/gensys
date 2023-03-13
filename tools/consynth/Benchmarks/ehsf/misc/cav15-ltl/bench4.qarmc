@@ -1,0 +1,91 @@
+/*
+Heidy's cav2015: example9.t2
+property: AG(EFG y=1 & EF x>=t)
+*/
+initP(X,Y,T,PC):=PC=0.
+nextP(X,Y,T,PC,Xp,Yp,Tp,PCp):=
+(   PC=0,Xp=0,Yp=0,PCp=1; % Tp=?
+    PC=1,Xp=X+1,Yp=Y,Tp=T,PCp=1; 
+    PC=1,Xp=X,Yp=Y,Tp=T,PCp=2; 
+    PC=2,X>=T,Xp=X,Yp=Y,Tp=T,PCp=3; 
+    PC=2,X<T,Xp=X,Yp=Y,Tp=T,PCp=3; 
+    PC=2,X<T,Xp=X,Yp=1,Tp=T,PCp=3; 
+    PC=3,Xp=X,Yp=Y,Tp=T,PCp=3
+).
+nextDetP(X,Y,T,PC,Xp,Yp,Tp,PCp,Tv,B1,B2):=
+(   PC=0,Xp=0,Yp=0,Tp=Tv,PCp=1; % Tp=?
+    B1>=1,PC=1,Xp=X+1,Yp=Y,Tp=T,PCp=1; 
+    B1=<0,PC=1,Xp=X,Yp=Y,Tp=T,PCp=2; 
+    PC=2,X>=T,Xp=X,Yp=Y,Tp=T,PCp=3; 
+    B2>=1,PC=2,X<T,Xp=X,Yp=Y,Tp=T,PCp=3; 
+    B2=<0,PC=2,X<T,Xp=X,Yp=1,Tp=T,PCp=3; 
+    PC=3,Xp=X,Yp=Y,Tp=T,PCp=3
+).
+
+% AG p1 & p2
+phi0(X,Y,T,PC):-initP(X,Y,T,PC).
+phi0(Xp,Yp,Tp,PCp):-phi0(X,Y,T,PC),nextP(X,Y,T,PC,Xp,Yp,Tp,PCp).
+p1(X,Y,T,PC),p2(X,Y,T,PC):-phi0(X,Y,T,PC).
+
+% computing p3 and ~p3
+p3(X,Y,T,PC):-Y=1,witp3(X,T,PC).
+neg_p3(X,Y,T,PC):-Y=<0;Y>=2;witneg1_p3(X,T,PC);witneg2_p3(X,T,PC);witneg3_p3(X,T,PC);witneg4_p3(X,T,PC).
+template([(witp3, [X,T,PC], (A1*X>=B1,A2*T>=B2,PC=T1)),
+	  (witneg1_p3, [X,T,PC], PC>=T1+1),
+	  (witneg2_p3, [X,T,PC], PC+1=<T1),
+	  (witneg3_p3, [X,T,PC], A1*X<B1),
+	  (witneg4_p3, [X,T,PC], A2*T<B2)	  
+	 ], (T1=0;T1=1;T1=2;T1=3)).
+
+% p1 => EF p3
+phi1(X,Y,T,PC):-p1(X,Y,T,PC).
+(PC>=0,PC=<3):-phi1(X,Y,T,PC),neg_p3(X,Y,T,PC).
+rank1(X,Y,T,PC,Xp,Yp,Tp,PCp),phi1(Xp,Yp,Tp,PCp):-phi1(X,Y,T,PC),neg_p3(X,Y,T,PC),nextDetP(X,Y,T,PC,Xp,Yp,Tp,PCp,Tv,B1,B2),witness1(Tv,B1,B2).
+wf(rank1/8).
+template(witness1, [Tv,Bv1,Bv2], (Tv=B1,Bv1=B2,Bv2=B3), ((B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))).
+
+% LTL:p3 => G y=1
+initA(BC) := BC=1.
+nextA(BC,Y,BCp) :-
+(   BC=1,BCp=1;
+    BC=1,Y=<0,BCp=2;
+    BC=1,Y>=2,BCp=2;
+    BC=2,BCp=2
+).
+buechi(BC) := BC=2.
+
+init(X,Y,T,PC,BCp) := p1(X,Y,T,PC), initA(BC), nextA(BC,Y,BCp).
+next(X,Y,T,PC,BC,Xp,Yp,Tp,PCp,BCp) := nextP(X,Y,T,PC,Xp,Yp,Tp,PCp), nextA(BC,Yp,BCp).
+
+inv(X,Y,T,PC,BC) :- init(X,Y,T,PC,BC).
+ti(X,Y,T,PC,BC,Xp,Yp,Tp,PCp,BCp), inv(Xp,Yp,Tp,PCp,BCp) :- inv(X,Y,T,PC,BC), next(X,Y,T,PC,BC,Xp,Yp,Tp,PCp,BCp).
+ti(X,Y,T,PC,BC,Xpp,Ypp,Tpp,PCpp,BCpp) :- ti(X,Y,T,PC,BC,Xp,Yp,Tp,PCp,BCp), next(Xp,Yp,Tp,PCp,BCp,Xpp,Ypp,Tpp,PCpp,BCpp).
+round(X,Y,T,PC,Xp,Yp,Tp,PCp) :- ti(X,Y,T,PC,BC,Xp,Yp,Tp,PCp,BCp), buechi(BC), buechi(BCp).
+dwf(round/8).
+
+% p2 => EF x>=t
+phi2(X,Y,T,PC):-p2(X,Y,T,PC).
+(PC>=0,PC=<3):-phi2(X,Y,T,PC),X<T.
+rank2(X,Y,T,PC,Xp,Yp,Tp,PCp),phi2(Xp,Yp,Tp,PCp):-phi2(X,Y,T,PC),X<T,nextDetP(X,Y,T,PC,Xp,Yp,Tp,PCp,Tv,B1,B2),witness2(Tv,B1,B2).
+wf(rank2/8).
+template(witness2, [Tv,Bv1,Bv2], (Tv=B1,Bv1=B2,Bv2=B3), ((B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))).
+
+query_naming(witness1, [tv,b1,b2]).
+query_naming(witness2, [tv,b1,b2]).
+query_naming(witp3, [x,t,pc]).
+query_naming(witneg1_p3, [x,t,pc]).
+query_naming(witneg2_p3, [x,t,pc]).
+query_naming(witneg3_p3, [x,t,pc]).
+query_naming(witneg4_p3, [x,t,pc]).
+
+query_naming(inv, [x,y,t,pc,bc]).
+query_naming(phi0, [x,y,t,pc]).
+query_naming(phi1, [x,y,t,pc]).
+query_naming(phi2, [x,y,t,pc]).
+
+query_naming(round, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(rank1, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(rank1_p, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(rank2, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(rank2_p, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(ti, [x,y,t,pc,bc,'x\'','y\'','t\'','pc\'','bc\'']).

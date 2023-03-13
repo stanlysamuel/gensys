@@ -1,0 +1,65 @@
+% No. 49 from Eric's paper
+% neg-egagp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0
+// ************************************************************
+
+int y, p;
+unsigned int pc;
+int __phi() { return CAF( CEF( CAP(p <= 0) ) ); }
+int __rho_1_;
+
+void init() { p = 1; y = 5; }
+
+int body() {
+  __rho_1_ = nondet();
+  if(__rho_1_ > 0) {
+    p = 1;
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(Y,P,PC):=Y=5,P=1,PC=1.
+next(Y,P,PC,Yp,Pp,PCp):=
+    PC=1,Yp=Y,Pp=1,PCp=2;
+    PC=1,Yp=Y,Pp=P,PCp=2.
+dst(X,P,PC):=P=<0.
+p1(Y,P,PC):=Y=5,P=1,PC=1.
+% AF p1
+phi0(Y,P,PC):-init(Y,P,PC).
+exists([Yp,Pp,PCp],next(Y,P,PC,Yp,Pp,PCp)):-phi0(Y,P,PC),\+p1(Y,P,PC).
+rank(Y,P,PC,Yp,Pp,PCp):-phi0(Y,P,PC),\+p1(Y,P,PC),next(Y,P,PC,Yp,Pp,PCp).
+phi0(Yp,Pp,PCp):-phi0(Y,P,PC),\+p1(Y,P,PC),next(Y,P,PC,Yp,Pp,PCp).
+wf(rank/6).
+% p1 => EF p=<0
+phi1(Y,P,PC):-p1(Y,P,PC).
+exists([Yp,Pp,PCp],(rank(Y,P,PC,Yp,Pp,PCp),phi1(Yp,Pp,PCp))):-phi1(Y,P,PC),\+dst(Y,P,PC).
+exists([Yp,Pp,PCp],next(Y,P,PC,Yp,Pp,PCp)):-phi1(Y,P,PC),\+dst(Y,P,PC). % domain clause***
+wf(rank/6).
+
+skolem_template(s15, [Y,P,PC,Yp,Pp,PCp],
+      		true,
+		true,
+%      		(B=0,PC=1 ; B=1,PC=1), 
+      		(
+		  B=0,PC=1,Yp=Y,Pp=1,PCp=2;
+		  B=1,PC=1,Yp=Y,Pp=P,PCp=2
+      		),
+      		(B=0 ; B=1)
+      	       ).
+query_naming(init(y,p,pc)).
+query_naming(phi0(y,p,pc)).
+query_naming(phi1(y,p,pc)).
+query_naming(p1(y,p,pc)).
+query_naming(next(y,p,pc,'y\'','p\'','pc\'')).
+query_naming(s15(y,p,pc,'y\'','p\'','pc\'')).
+query_naming(rank(y,p,pc,'y\'','p\'','pc\'')).
+query_naming(rank_p(y,p,pc,'y\'','p\'','pc\'')).
+
+% time ./ctlstar tests/ctlstar-Erics/49-AFEF-fail.qarmc -no-extra-insert-pred
+% CEX after 0.2 sec, p1 given *****!!

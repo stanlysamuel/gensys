@@ -1,0 +1,79 @@
+% No. 41 from Eric's paper
+% neg-afefp-fail/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED CHUTE:      __rho_1_ > 0
+//
+// EXPECTED RANKING:    x' < x      y' < y
+// ************************************************************
+
+int x, p, y;
+unsigned int pc;
+int __phi() { return CEG( CAG( CAP(p <= 0) ) ); }
+int __rho_1_;
+
+void init() { p = 0; x = 5; y = 5; }
+
+int body() {
+  while(1) {
+    if(y < 0) break;
+    y = y - 1; 
+  }
+
+  while(1) {
+    if(x < 0) break; 
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x - 1;
+    }
+  }
+  p = 1;
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+init(X,Y,P,PC):=X=5,Y=5,P=0,PC=1.
+next(X,Y,P,PC,Xp,Yp,Pp,PCp):=
+    Y<0,PC=1,Xp=X,Yp=Y,Pp=P,PCp=2;
+    Y>=0,PC=1,Xp=X,Yp=Y-1,Pp=P,PCp=1;
+    X<0,PC=2,Xp=X,Yp=Y,Pp=1,PCp=3;
+    X>=0,PC=2,Xp=X,Yp=Y,Pp=P,PCp=2;
+    X>=0,PC=2,Xp=X-1,Yp=Y,Pp=P,PCp=2.
+dst(X,Y,P,PC):=P=<0.
+
+% EG p1
+phi0(X,Y,P,PC):-init(X,Y,P,PC).
+exists([Xp,Yp,Pp,PCp],phi0(Xp,Yp,Pp,PCp)):-phi0(X,Y,P,PC),next(X,Y,P,PC,Xp,Yp,Pp,PCp).
+p1(X,Y,P,PC):-phi0(X,Y,P,PC).
+
+skolem_template(s3, [X,Y,P,PC,Xp,Yp,Pp,PCp],
+      		true,
+		true,
+%      		(Y<0,PC=1 ; Y>=0,PC=1 ; X<0,PC=2 ; B=0,X>=0,PC=2 ; B=1,X>=0,PC=2), 
+      		(
+      		  Y<0,PC=1,Xp=X,Yp=Y,Pp=P,PCp=2;
+     		  Y>=0,PC=1,Xp=X,Yp=Y-1,Pp=P,PCp=1;
+     		  X<0,PC=2,Xp=X,Yp=Y,Pp=1,PCp=3;
+     		  B=0,X>=0,PC=2,Xp=X,Yp=Y,Pp=P,PCp=2;
+     		  B=1,X>=0,PC=2,Xp=X-1,Yp=Y,Pp=P,PCp=2
+      		),
+      		(B=0 ; B=1)
+      	       ).
+% p1 => AG p=<0
+phi1(X,Y,P,PC):-p1(X,Y,P,PC).
+phi1(Xp,Yp,Pp,PCp):-phi1(X,Y,P,PC),next(X,Y,P,PC,Xp,Yp,Pp,PCp).
+dst(X,Y,P,PC):-phi1(X,Y,P,PC).
+
+query_naming(init(x,y,p,pc)).
+query_naming(phi0(x,y,p,pc)).
+query_naming(phi1(x,y,p,pc)).
+query_naming(next(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(s3(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(rank(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+query_naming(rank_p(x,y,p,pc,'x\'','y\'','p\'','pc\'')).
+
+% time ./ctlstar tests/ctlstar-Erics/41-EGAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.8 sec 

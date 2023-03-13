@@ -1,0 +1,32 @@
+% Property: EF (p>0), program is correct
+% Example adapted from agefp-succeed/original.c
+p0(P,X,PC):=P=0,X=5,PC=1.
+next(P,X,PC,Pp,Xp,PCp):=
+        X>=0,Pp=P,Xp=X-1,PC=1,PCp=1;
+	X>=0,Pp=P,Xp=X,PC=1,PCp=1;
+	X<0,Pp=1,Xp=X,PC=1,PCp=2.
+dst(P,X,PC):=P>0.
+
+phi0(P,X,PC):-p0(P,X,PC).
+exists([Pp,Xp,PCp],(next(P,X,PC,Pp,Xp,PCp),rank(P,X,PC,Pp,Xp,PCp),phi0(Pp,Xp,PCp))):-phi0(P,X,PC),\+dst(P,X,PC).
+wf(rank/6).
+
+skolem_template(s3, [P,X,PC,Pp,Xp,PCp],
+ 		true,
+ 		( X>=0,PC=1 ; B=0,X>=0,PC=1 ; X<0,PC=1 ),
+ 		(
+ 		  X>=0,Pp=P,Xp=X-1,PC=1,PCp=1;
+ 		  B=0,X>=0,Pp=P,Xp=X,PC=1,PCp=1; 
+ 		  X<0,Pp=1,Xp=X,PC=1,PCp=2
+ 		),
+ 		(B=0;B=1)
+ 	       ).
+query_naming(p0(p,x,pc)).
+query_naming(phi0(p,x,pc)).
+query_naming(next(p,x,pc,'p\'','x\'','pc\'')).
+query_naming(rank(p,x,pc,'p\'','x\'','pc\'')).
+query_naming(rank_p(p,x,pc,'p\'','x\'','pc\'')).
+query_naming(s3(p,x,pc,'p\'','x\'','pc\'')).
+
+% ./ctlstar -no-extra-insert-pred -use-next-skolem tests/ctlstar-unit/EF-succeed-head.qarmc
+% 'program correct' after 15 sec, s3 = (x>=0,p'=p,x'=x-1,pc=1,pc'=1 ; x<0,p'=1,x'=x,pc=1,pc'=2)

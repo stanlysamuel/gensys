@@ -1,0 +1,139 @@
+% No. 44 from Eric's paper (Industrial) neg-e-1394complete-succeed
+/*
+int __phi() { return COR(
+			 CAG(CAP(phi_io_compl != 1)),
+			 CAG(CAP(phi_nSUC_ret != 1))); }
+
+void init() {
+  keA = keR = ioA = ioR = 0; phi_nSUC_ret = 0; phi_io_compl = 0;
+}
+
+void KeAcquireSpinLock(int * lp, int * ip) { keA = 1; keA = 0; }
+void KeReleaseSpinLock(int * lp, int i) { keR = 1; keR = 0; }
+
+int body() {
+  KeAcquireSpinLock(lock3, Irql);
+  __rho_5_ = nondet(); k1 = __rho_5_;
+  while (1) {
+    if (!(k1>0)) break;
+    k1--;
+  }
+  KeReleaseSpinLock(lock3, Irql);
+  KeAcquireSpinLock(lock1, Irql);
+  __rho_4_ = nondet(); k2 = __rho_4_;
+  while (1) {
+    if (!(k2>0)) break;
+    k2--;
+  }
+  KeReleaseSpinLock(lock1, Irql);
+  __rho_10_ = nondet(); k3 = __rho_10_;
+  while (1) {
+    KeAcquireSpinLock(lock4, Irql);
+    if (k3>0) {
+      k3--;
+      KeReleaseSpinLock(lock4, Irql);
+    }
+    else {
+      KeReleaseSpinLock(lock4, Irql);
+      break;
+    }
+  }
+  while (1) {
+    KeAcquireSpinLock(lock5, Irql);
+  __rho_11_ = nondet(); k4 = __rho_11_;
+    if (k4>0) {
+      k4--;
+      KeReleaseSpinLock(lock5, Irql);
+    }
+    else {
+      KeReleaseSpinLock(lock5, Irql);
+      break;
+    }
+  }
+  KeAcquireSpinLock(lock6, Irql);
+  __rho_12_ = nondet(); k5 = __rho_12_;
+  if(__rho_666_>0) { k5 = 3; //assume(k5 > 0);
+		   } // Changed Eric's commented assume 
+  while (1) {
+    if (!(k5>0)) break;
+    k5--;
+    phi_io_compl = 1;
+  }
+  KeReleaseSpinLock(lock6, Irql);
+  if(__rho_666_<=0) { ntStatus = 1; //assume(ntStatus != STATUS_SUCCESS);
+		    } // Changed Eric's commented assume 
+  if(ntStatus != STATUS_SUCCESS) { phi_nSUC_ret = 0; } // reason to fail and difference with 14 & 15
+}
+*/
+% exists([x]: x>0 /\ (AG p1=\=x \/ AG p2=\=x))
+init(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC):-A=0,R=0,P1=0,P2=0,PC=1.
+next(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp):=
+     PC=1,Ap=1,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=2;
+     PC=2,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=3; % K1p = _rho
+     PC=3,K1>0,Ap=A,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1-1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=3; 
+     PC=3,K1=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=4;
+     PC=4,Ap=1,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5;
+     PC=5,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K3p=K3,K4p=K4,K5p=K5,PCp=6; % K2p = _rho
+     PC=6,K2>0,Ap=A,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2-1,K3p=K3,K4p=K4,K5p=K5,PCp=6; 
+     PC=6,K2=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=7;
+     PC=7,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K4p=K4,K5p=K5,PCp=8; % K3p = _rho
+     PC=8,Ap=1,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=9;
+     PC=9,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=10;
+     PC=10,K3>0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3-1,K4p=K4,K5p=K5,PCp=11; 
+     PC=11,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=8;
+     PC=10,K3=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=12;
+     PC=12,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=13;
+     PC=13,Ap=1,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=14;
+     PC=14,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K5p=K5,PCp=15; % K4p = _rho
+     PC=15,K4>0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4-1,K5p=K5,PCp=16; 
+     PC=16,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=13;
+     PC=15,K4=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=17;
+     PC=17,Ap=1,Rp=0,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=18;
+     PC=18,Ap=0,Rp=R,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,PCp=19; % K5p=_rho
+     PC=19,R6=<0,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=20;
+     PC=20,K5>0,Ap=A,Rp=R,P1p=1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5-1,PCp=20; 
+     PC=20,K5=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=21;
+     PC=21,Ap=A,Rp=0,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=22;
+     PC=22,R6=<0,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=1,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=23;
+     PC=22,R6>0,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=23;
+     PC=23,S=1,Ap=A,Rp=R,P1p=P1,P2p=0,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=24;
+     PC=19,R6>0,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=1,PCp=25;
+     PC=25,K5>0,Ap=A,Rp=R,P1p=1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5-1,PCp=25; 
+     PC=25,K5=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=26;
+     PC=26,Ap=A,Rp=0,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=27;
+     PC=27,R6=<0,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=1,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=28;
+     PC=27,R6>0,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=28;
+     PC=28,S=1,Ap=A,Rp=R,P1p=P1,P2p=0,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=29.
+dst1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):=(P1>=X+1;P1=<X-1).
+dst2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):=(P2>=X+1;P2=<X-1).
+% init(v) => exists([x], x>0,aux(v,x))
+exists([X],q1(X)):-id(1),init(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC).
+aux(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-s1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X),init(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC).
+X>0:-aux(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+skolem_template(s1, [A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X], true, true, X=Tx, (Tx=0;Tx=1)).
+% aux => p1 \/ p2
+p1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-false,aux(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+p2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-R6=<0,aux(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+% p1 => AG dst1
+phi1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-p1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+phi1(Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp,X):-
+  	phi1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X),next(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp).
+dst1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-phi1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+
+% p2 => AG dst2
+phi2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-p2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+phi2(Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp,X):-
+  	phi2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X),next(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp).
+dst2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X):-phi2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,X).
+
+query_naming(s1(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,x)).
+query_naming(phi1(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,x)).
+query_naming(phi2(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,x)).
+
+query_finite_sorts(s1/13,[12]).
+query_finite_sorts(phi1/13,[12]).
+query_finite_sorts(phi2/13,[12]).
+
+% time ./ctlstar tests/ctlstar-ctlfo/44-AGorAG-succeed.qarmc -no-extra-insert-pred -use-next-skolem
+% 'program correct' after 0.5 sec with -exp-eval
+% 'program correct' after 3.4 sec without -exp-eval

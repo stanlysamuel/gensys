@@ -1,0 +1,138 @@
+% No. 36 from Eric's paper (Industrial)
+/*
+#include "../ctl.h"
+
+// Property: G(a => F r)
+
+#define STATUS_SUCCESS 1
+#define STATUS_OBJECT_NAME_COLLISION 2
+#define PC_IO 1
+#define PC_NIO 0
+int pc;
+int i; int Pdolen; int num; int DName;
+int lptNamei; //[5];
+int dcIdi; // [5];
+int Pdoi; //[5];
+int PdoType; int status;
+
+int set; int unset;
+int __phi() { return CEF(CAND(CAP(set==1),CAG(CAP(unset!=1)))); }
+
+void init() { set = unset = 0; }
+
+int __rho_9_;
+int __rho_10_;
+
+// The Program
+int PPMakeDeviceName(int a, int b, int c, int d) { 
+  __rho_9_ = nondet();
+  return __rho_9_; }
+int IoCreateDevice(int a) { 
+  __rho_10_ = nondet();
+  return __rho_10_; }
+void ExFreePool(int a) {}
+void PPBlockInits() {}
+void PPUnblockInits() {}
+void RtlInitUnicodeString(int a) {}
+
+int __rho_1_;
+int __rho_2_;
+int __rho_3_;
+
+void body() {
+  __rho_1_ = nondet();
+  if(__rho_1_>0) { set = 1; set = 0;}
+  // assume(__rho_1_>0); // CHEATING BY BYRON
+  PPBlockInits(); 
+  while (1) {
+    if (!(i < Pdolen)) break;
+    DName = PPMakeDeviceName(lptNamei, PdoType, dcIdi, num); 
+    if (DName>0) { break; } 
+    RtlInitUnicodeString(DName); 
+    status = IoCreateDevice(Pdoi); pc = PC_IO; pc = PC_NIO;
+    if (STATUS_SUCCESS != status) { 
+      Pdoi = 0; 
+      if (STATUS_OBJECT_NAME_COLLISION == status) { 
+	ExFreePool(DName); 
+	num++; 
+	//goto loc_continue; 
+      } 
+      break; 
+    } else { 
+      i++; 
+    } 
+  } 
+  num = 0; 
+  if(__rho_1_ <= 0)  { unset = 1; unset = 0; }
+  PPUnblockInits();
+ loc_continue:0;
+  while(1) { dummy=dummy; } L_return: return 0;
+}
+
+int main() { }
+*/
+% X stands for the variable __rho_1_
+% EF(exists([y], s=y /\ AG u!=1))
+init(I,P,X,S,U,PC):-S=0,U=0,PC=0.
+next(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp):=
+    PC=0,Ip=I,Pp=P,Sp=S,Up=U,PCp=1; % Xp=_ 
+    PC=1,X>=1,Ip=I,Pp=P,Xp=X,Sp=1,Up=U,PCp=2;
+    PC=1,X=<0,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+    PC=2,Ip=I,Pp=P,Xp=X,Sp=0,Up=U,PCp=3;
+    PC=3,I<P,Ip=I+1,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+    PC=3,I<P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+    PC=3,I>=P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+    PC=4,X=<0,Ip=I,Pp=P,Xp=X,Sp=S,Up=1,PCp=5;
+    PC=4,X>=1,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=6;
+    PC=5,Ip=I,Pp=P,Xp=X,Sp=S,Up=0,PCp=6.
+dst(I,P,X,S,U,PC,Y):=(U=<0;U>=2).
+p1(I,P,X,S,U,PC):=S=1,(U=<0;U>=2),X=1,PC=2.
+% init => EF p1
+phi0(I,P,X,S,U,PC):-init(I,P,X,S,U,PC).
+exists([Ip,Pp,Xp,Sp,Up,PCp],(rank(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp),phi0(Ip,Pp,Xp,Sp,Up,PCp))):-phi0(I,P,X,S,U,PC),\+p1(I,P,X,S,U,PC).
+wf(rank/12).
+skolem_template(s5, [I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp],
+     		true,
+    		(PC>=0, PC=<5),
+   		(
+ 		  PC=0,Ip=I,Pp=P,Xp=T1,Sp=S,Up=U,PCp=1;
+ 		  X>=1,PC=1,Ip=I,Pp=P,Xp=X,Sp=1,Up=U,PCp=2;
+ 		  X=<0,PC=1,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+ 		  PC=2,Ip=I,Pp=P,Xp=X,Sp=0,Up=U,PCp=3;
+ 		  B1=<0,PC=3,I<P,Ip=I+1,Pp=P,Xp=X,Sp=S,Up=U,PCp=3;
+ 		  B1>=1,PC=3,I<P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+ 		  PC=3,I>=P,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=4;
+ 		  PC=4,X=<0,Ip=I,Pp=P,Xp=X,Sp=S,Up=1,PCp=5;
+ 		  PC=4,X>=1,Ip=I,Pp=P,Xp=X,Sp=S,Up=U,PCp=6;
+ 		  PC=5,Ip=I,Pp=P,Xp=X,Sp=S,Up=0,PCp=6
+   		),
+     		((B1=0;B1=1),(T1=0;T1=1))
+     	       ).
+% p1(v) => exists([y], aux(v,y))
+exists([Y],q1(Y)):-id(1),p1(I,P,X,S,U,PC).
+aux(I,P,X,S,U,PC,Y):-s1(X,S,U,PC,Y),p1(I,P,X,S,U,PC).
+skolem_template(s1, [X,S,U,PC,Y], true, true, Y=Tx, (Tx=0;Tx=1)).
+% p1 => s=y /\ AG u!=1
+S=Y:-aux(I,P,X,S,U,PC,Y).
+phi1(I,P,X,S,U,PC,Y):-aux(I,P,X,S,U,PC,Y).
+phi1(Ip,Pp,Xp,Sp,Up,PCp,Y):-phi1(I,P,X,S,U,PC,Y),next(I,P,X,S,U,PC,Ip,Pp,Xp,Sp,Up,PCp). 
+dst(I,P,X,S,U,PC,Y):-phi1(I,P,X,S,U,PC,Y).
+
+query_naming(phi0(i,p,rho1,s,u,pc)).
+query_naming(aux(i,p,rho1,s,u,pc,y)).
+query_naming(phi1(i,p,rho1,s,u,pc,y)).
+query_naming(s1(rho1,s,u,pc,y)).
+query_naming(s8(i,p,rho1,s,u,pc,y,'i\'','p\'',rho1p,'s\'','u\'','pc\'')).
+query_naming(rank(i,p,rho1,s,u,pc,'i\'','p\'',rho1p,'s\'','u\'','pc\'')).
+query_naming(rank_p(i,p,rho1,s,u,pc,'i\'','p\'',rho1p,'s\'','u\'','pc\'')).
+
+query_finite_sorts(phi0/6,[6]).
+query_finite_sorts(aux/7,[6]).
+query_finite_sorts(phi1/7,[6]).
+query_finite_sorts(s1/5,[4]).
+query_finite_sorts(s8/13,[6,13]).
+query_finite_sorts(rank/12,[6,12]).
+query_finite_sorts(rank_p/12,[6,12]).
+
+% time ./ctlstar tests/ctlstar-ctlfo/36-2-EFandAG-succeed.qarmc -no-extra-insert-pred -use-next-skolem
+% 'program is correct' after 13.9 sec

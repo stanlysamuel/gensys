@@ -1,0 +1,17 @@
+%models([A,B],init,next,exists_path_next(p1)).
+%models([A,B],init,next,exists([C],forall_path_next(p1))).
+%models([A,B],init,next,exists([C],exists_path_next(p1))).
+%models([A,B],init,next,exists([C],forall_path_always(p1))).
+%models([A,B],init,next,forall_path_always(p1)).
+%models([A,B],init,next,exists([C],exists_path_always(p1))).
+%models([A,B],init,next,exists([C],forall_path_until(p1,p2))).
+%models([A,B],init,next,forall_path_until(p1,p2)).
+%models([A,B],init,next,exists_path_until(p1,p2)).
+%models([A,B],init,next,exists([C],exists_path_until(p1,p2))).
+%models([A,B],init,next,forall([C],forall_path_next(p1))).
+%models([A,B],init,next,(forall_path_next(p1),forall_path_next(p2))).
+%models([A,B],init,next,(p1->p2;p3)).
+%models([A,B],init,next,(p2;p3)).
+%models([A,B],init,next,(p2->p3)).
+%models([A,R,N,PC],init,next,forall_path_always(exists([X],(p1->forall_path_finally(p2))))).
+models([A,R,N,PC],init,next,forall_path_always(exists([X],(p1->forall_path_finally(p2))))).

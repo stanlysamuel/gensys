@@ -1,0 +1,33 @@
+/* 
+   init:    x=0, z=0;
+   thread1: { x+=z; x+=z; }
+   thread2: { z++;  z++;  }
+   error:   x=3;
+*/
+
+% V = (X,Z,PC1,PC2)
+% Aux. variables: A1,A2,B1,B2
+
+init(X,Z,PC1,PC2,A1,A2,B1,B2) := X=0, Z=0, PC1=1, PC2=1.
+choice(X,Z,PC1,PC2,A1,A2,B1,B2) := A1=3,A2=3,B1=3,B2=3.
+next1(X,Z,PC1,PC2,A1,A2,B1,B2,Xp,Zp,PC1p,PC2p,A1p,A2p,B1p,B2p) :=
+  A1=2, PC1=1, PC1p=2, Xp=X+Z, Zp=Z, PC2p=PC2, A1p=A1,A2p=A2,B1p=B1,B2p=B2
+  ; A2=3, PC1=2, PC1p=3, Xp=X+Z, Zp=Z, PC2p=PC2, A1p=A1,A2p=A2,B1p=B1,B2p=B2
+  % atomic section
+  ; A1=3, PC1=1, PC1p=3, Xp=X+Z+Z, Zp=Z, PC2p=PC2, A1p=A1,A2p=A2,B1p=B1,B2p=B2.
+next2(X,Z,PC1,PC2,A1,A2,B1,B2,Xp,Zp,PC1p,PC2p,A1p,A2p,B1p,B2p) :=
+  B1=2, PC2=1, PC2p=2, Zp=Z+1, Xp=X, PC1p=PC1, A1p=A1,A2p=A2,B1p=B1,B2p=B2
+  ; B2=3, PC2=2, PC2p=3, Zp=Z+1, Xp=X, PC1p=PC1, A1p=A1,A2p=A2,B1p=B1,B2p=B2
+  % atomic section
+  ; B1=3, PC2=1, PC2p=3, Zp=Z+2, Xp=X, PC1p=PC1, A1p=A1,A2p=A2,B1p=B1,B2p=B2.
+error(X,Z,PC1,PC2,A1,A2,B1,B2) := PC1=3, PC2=3, X=3.
+
+% find inv and choice such that:
+% exists([X,Z,PC1,PC2], init(X,Z,PC1,PC2), choice(X,Z,PC1,PC2)) :- 0=0.
+inv(X,Z,PC1,PC2,A1,A2,B1,B2) :- init(X,Z,PC1,PC2,A1,A2,B1,B2), choice(X,Z,PC1,PC2,A1,A2,B1,B2).
+inv(Xp,Zp,PC1p,PC2p,A1p,A2p,B1p,B2p) :- inv(X,Z,PC1,PC2,A1,A2,B1,B2), next1(X,Z,PC1,PC2,A1,A2,B1,B2,Xp,Zp,PC1p,PC2p,A1p,A2p,B1p,B2p).
+inv(Xp,Zp,PC1p,PC2p,A1p,A2p,B1p,B2p) :- inv(X,Z,PC1,PC2,A1,A2,B1,B2), next2(X,Z,PC1,PC2,A1,A2,B1,B2,Xp,Zp,PC1p,PC2p,A1p,A2p,B1p,B2p).
+false :- inv(X,Z,PC1,PC2,A1,A2,B1,B2), error(X,Z,PC1,PC2,A1,A2,B1,B2).
+
+% time ~/research/code/qarmc5/ctlstar -no-extra-insert-pred -nopreprocess synch-2.qarmc
+% 'program is correct' after 0.2s

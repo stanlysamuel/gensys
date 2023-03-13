@@ -1,0 +1,84 @@
+/*
+Heidy's cav2015: e-pgarch-succeed.t2
+property: EGF (AG w=1)
+*/
+initP(G,W,LT,CT,PC):=PC=0.
+nextP(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp):=
+(   PC=0,Wp=1,LTp=0,CTp=0,PCp=1; % Gp=?
+    PC=1,G>0,Gp=0,Wp=W,LTp=LT,CTp=CT,PCp=2;
+    PC=1,G=<0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=3;
+    PC=2,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=3;
+    PC=2,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=8;
+    PC=3,W>0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=4;
+    PC=3,W=<0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=5;
+    PC=4,Gp=G,Wp=0,LTp=CT,CTp=CT,PCp=5;
+    PC=5,W=<0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=6;
+    PC=6,CT-LT>10,Gp=G,Wp=1,LTp=LT,CTp=CT,PCp=7;
+    PC=6,CT-LT=<10,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=7;
+    PC=7,Gp=G,Wp=W,LTp=LT,CTp=CT+1,PCp=1;
+    PC=7,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=8;
+    PC=8,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=8
+).
+nextDetP(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp,Tt,B1,B2,B3):=
+(   PC=0,Gp=Tt,Wp=1,LTp=0,CTp=0,PCp=1; % Gp=Tt
+    PC=1,G>0,Gp=0,Wp=W,LTp=LT,CTp=CT,PCp=2;
+    PC=1,G=<0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=3;
+    B1>=1,PC=2,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=3;
+    B1=<0,PC=2,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=8;
+    PC=3,W>0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=4;
+    PC=3,W=<0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=5;
+    PC=4,Gp=G,Wp=0,LTp=LT,CTp=CT,PCp=5;
+    PC=5,W=<0,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=6;
+    B3>=1,PC=6,Gp=G,Wp=1,LTp=LT,CTp=CT,PCp=7;
+    B3=<0,PC=6,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=7;
+    B2>=1,PC=7,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=1;
+    B2=<0,PC=7,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=8;
+    PC=8,Gp=G,Wp=W,LTp=LT,CTp=CT,PCp=8
+).
+
+% EG p1
+phi1(G,W,LT,CT,PC):-initP(G,W,LT,CT,PC).
+phi1(Gp,Wp,LTp,CTp,PCp):-phi1(G,W,LT,CT,PC),nextDetP(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp,Tt,B1,B2,B3),witness1(Tt,B1,B2,B3).
+p1(G,W,LT,CT,PC):-phi1(G,W,LT,CT,PC).
+template(witness1, [Tt_V,B1_V,B2_V,B3_V], (Tt_V=Tt,B1_V=B1,B2_V=B2,B3_V=B3), ((Tt=0;Tt=1),(B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))).
+
+% computing p2 and ~p2
+p2(G,W,LT,CT,PC):-W=1,witp2(PC).
+neg_p2(G,W,LT,CT,PC):-W=<0;W>=2;witneg1_p2(PC);witneg2_p2(PC).
+template([(witp2, [PC], PC=T),
+	  (witneg1_p2, [PC], PC>=T+1),
+	  (witneg2_p2, [PC], PC+1=<T)
+	 ], (T=0;T=1;T=2;T=3;T=4;T=5;T=6;T=7;T=8)).
+
+%%% p2(G,W,LT,CT,PC):=W=1,PC=8.
+%%% neg_p2(G,W,LT,CT,PC):- \+p2(G,W,LT,CT,PC).
+
+% LTL: p1 => F p2
+initA(BC) := BC=1.
+nextA(BC,G,W,LT,CT,PC,BCp) := BC=1,neg_p2(G,W,LT,CT,PC),BCp=1.
+buechi(BC) := BC=1.
+
+init(G,W,LT,CT,PC,BCp) := p1(G,W,LT,CT,PC), initA(BC), nextA(BC,G,W,LT,CT,PC,BCp).
+next(G,W,LT,CT,PC,BC,Gp,Wp,LTp,CTp,PCp,BCp) := nextDetP(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp,Tt,B1,B2,B3),witness1(Tt,B1,B2,B3), nextA(BC,Gp,Wp,LTp,CTp,PCp,BCp).
+%next(G,W,LT,CT,PC,BC,Gp,Wp,LTp,CTp,PCp,BCp) := nextP(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp),nextA(BC,Gp,Wp,LTp,CTp,PCp,BCp).
+
+inv(G,W,LT,CT,PC,BC) :- init(G,W,LT,CT,PC,BC).
+ti(G,W,LT,CT,PC,BC,Gp,Wp,LTp,CTp,PCp,BCp), inv(Gp,Wp,LTp,CTp,PCp,BCp) :- inv(G,W,LT,CT,PC,BC), next(G,W,LT,CT,PC,BC,Gp,Wp,LTp,CTp,PCp,BCp).
+ti(G,W,LT,CT,PC,BC,Gpp,Wpp,LTpp,CTpp,PCpp,BCpp) :- ti(G,W,LT,CT,PC,BC,Gp,Wp,LTp,CTp,PCp,BCp), next(Gp,Wp,LTp,CTp,PCp,BCp,Gpp,Wpp,LTpp,CTpp,PCpp,BCpp).
+round(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp) :- ti(G,W,LT,CT,PC,BC,Gp,Wp,LTp,CTp,PCp,BCp), buechi(BC), buechi(BCp).
+dwf(round/10).
+
+% p2 => AG w=1
+% EG p1
+phi2(G,W,LT,CT,PC):-p2(G,W,LT,CT,PC).
+phi2(Gp,Wp,LTp,CTp,PCp):-phi2(G,W,LT,CT,PC),nextP(G,W,LT,CT,PC,Gp,Wp,LTp,CTp,PCp).
+W=1:-phi2(G,W,LT,CT,PC).
+
+query_naming(witness1, [tt,b1,b2,b3]).
+query_naming(p2, [g,w,lt,ct,pc]).
+query_naming(neg_p2, [g,w,lt,ct,pc]).
+query_naming(phi1, [g,w,lt,ct,pc]).
+query_naming(phi2, [g,w,lt,ct,pc]).
+
+query_naming(round, [g,w,lt,ct,pc,'g\'','w\'','lt\'','ct\'','pc\'']).
+query_naming(ti, [g,w,lt,ct,pc,bc,'g\'','w\'','lt\'','ct\'','pc\'','bc\'']).

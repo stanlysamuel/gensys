@@ -1,0 +1,18 @@
+% Property: AF (x=<1) = not(EG (x>1)), program is not correct
+% Example adapted from egp-succeed/original.c
+init(X):=X=2.
+next(X,Xp):=
+ Xp=X+1;
+ Xp=X-1.
+dst(X):=X=<1.
+
+% Queries: inv0, rank
+inv0(X):-init(X).
+%exists([Xp],next(X,Xp)):-inv0(X),\+dst(X).
+true:-inv0(X),\+dst(X). % domain clause
+rank(X,Xp):-inv0(X),\+dst(X),next(X,Xp).
+inv0(Xp):-inv0(X),\+dst(X),next(X,Xp).
+wf(rank/2).
+
+% ./ctlstar tests/ctlstar-unit/AF-fail.qarmc -use-next-skolem -no-extra-insert-pred
+% CEX after 0.5 sec

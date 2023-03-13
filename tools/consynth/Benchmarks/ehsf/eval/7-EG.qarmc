@@ -1,0 +1,20 @@
+/*
+EG(x>=2)
+init(x) = (x=2)
+rho(x,x') = (x'=x-1 ; x'=x-2) // program is not correct
+*/
+
+p0(X,PC):=X=2,PC=1.
+fds_transrel(X,PC,Xp,PCp):=
+   Xp=X-1,PC=1,PCp=1
+  ;Xp=X-2,PC=1,PCp=1.
+phi0(X,PC):-p0(X,PC).
+exists([Xp,PCp],(fds_transrel(X,PC,Xp,PCp),phi0(Xp,PCp))):-phi0(X,PC).
+X>=2:-phi0(X,PC).
+
+skolem_template(s3, [X, PC, X1], [[1=1]], [], [[X1=T*X+T0]], true).
+% Program is not correct
+% sk0(x,x') = true
+% sk1(x,x') = (x'=x)
+% sk2(x,x') = (x'=-2x+4)
+% sk3(x,x') = (x'=x-2)

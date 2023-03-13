@@ -1,0 +1,16 @@
+/*
+EG(x>=2)
+init(x) = (x=2)
+rho(x,x') = (x'=x+1 ; x'=x-1) // program is correct
+*/
+
+p0(X,PC):=X=2,PC=1.
+fds_transrel(X,PC,Xp,PCp):=
+   Xp=X+1,PC=1,PCp=1
+  ;Xp=X-1,PC=1,PCp=1.
+phi0(X,PC):-p0(X,PC).
+exists([Xp,PCp],(fds_transrel(X,PC,Xp,PCp),phi0(Xp,PCp))):-phi0(X,PC).
+X>=2:-phi0(X,PC).
+
+skolem_template(s3, [X,PC,X1], [[1=1]], [], [[X1=TX*X+T]], true).
+% Program is proven correct with solution: s3(X,X1) = (X1=1*X+1)

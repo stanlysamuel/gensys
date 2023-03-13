@@ -1,0 +1,24 @@
+init(C,R,CS,PC):=C>=1,R=0,CS=8,PC=1.
+next(C,R,CS,PC,Cp,Rp,CSp,PCp):=
+    PC=1,CS=<0,Cp=C,Rp=R,CSp=CS,PCp=5;
+    PC=1,CS>0,Cp=C,Rp=R,CSp=CS,PCp=2;
+    PC=2,Cp=C,Rp=R,CSp=CS,PCp=3;
+    PC=2,Cp=C,Rp=R,CSp=CS,PCp=4;
+    PC=3,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    PC=4,C<CS,Cp=C,Rp=R,CSp=CS-1,PCp=1.
+dst(C,R,CS,PC):=R>=6.
+
+% init => (c<=5 \/ AF r>5) = init /\ c > 5 => AF r>5
+phi0(C,R,CS,PC):-init(C,R,CS,PC),C>=6.
+(PC>=1,PC=<3;PC=4,C<CS):-phi0(C,R,CS,PC),\+dst(C,R,CS,PC).
+phi0(Cp,Rp,CSp,PCp):-phi0(C,R,CS,PC),next(C,R,CS,PC,Cp,Rp,CSp,PCp),\+dst(C,R,CS,PC).
+rank(C,R,CS,PC,Cp,Rp,CSp,PCp):-phi0(C,R,CS,PC),next(C,R,CS,PC,Cp,Rp,CSp,PCp),\+dst(C,R,CS,PC).
+wf(rank/8).
+
+query_naming(phi0(c,r,cs,pc)).
+query_naming(rank(c,r,cs,pc,'c\'','r\'','cs\'','pc\'')).
+query_naming(rank_p(c,r,cs,pc,'c\'','r\'','cs\'','pc\'')).
+
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(rank/8,[4,8]).
+query_finite_sorts(rank_p/8,[4,8]).

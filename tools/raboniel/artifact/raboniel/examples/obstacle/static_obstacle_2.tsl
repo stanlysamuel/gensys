@@ -1,0 +1,37 @@
+//-- State: x, y, size, width
+
+assume {
+  ge x i0();
+  le x size;
+  ge y i0();
+  le y size;
+
+  ge width i5();
+  le width i10();
+  
+  ge size i50();
+
+  !(ge r_x width && le r_x (sub size width) && ge r_y width && le r_y (sub size width));
+}
+
+always guarantee {
+  ge x i0();    /* INV */
+  le x size;  /* INV */
+  ge y i0();    /* INV */
+  le y size;  /* INV */
+
+  !(ge r_x width && le r_x (sub size width) && ge r_y width && le r_y (sub size width));
+
+  ([x <- add x i1()] && [y <- y]) ||
+  ([x <- x] && [y <- add y i1()]) ||
+  ([x <- sub x i1()] && [y <- y]) ||
+  ([x <- x] && [y <- sub y i1()]);
+
+  ([x <- add x i1()] && [y <- y]) -> (X !([x <- sub x i1()] && [y <- y]));
+  ([x <- x] && [y <- add y i1()]) -> (X !([x <- x] && [y <- sub y i1()]));
+  ([x <- sub x i1()] && [y <- y]) -> (X !([x <- add x i1()] && [y <- y]));
+  ([x <- x] && [y <- sub y i1()]) -> (X !([x <- x] && [y <- add y i1()]));
+
+  [size <- size];
+  [width <- width];
+}

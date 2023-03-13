@@ -1,0 +1,45 @@
+% Figure 4 from Sipma-et-al ISIC95.
+% Variables: V = (F,V,W,C,T) for (flow,v,w,com,time)
+% Constants fixed to: (M=2, L=60, H=76, A=1/8, cv=1) to simplify the problem
+% The input variable 'flow' is fixed to 0.5 (stays constant!)
+% Property: EG not(error)
+
+init(F,V,W,C,T) := F=0.5, W=68, V=0, C=0, T=0.
+env(F,V,W,C,T,Fp) := Fp=F. % the important restriction
+vessel(F,V,W,C,T,Wp,Tp) :=
+  0=<T, T<1.5, Wp=W+4*1.5, Tp=T+1.5 ;
+  1.5=<T, T<3.5, Wp=W+4*2.0, Tp=T+2.0 ; % this is not a reachable phase
+  1.5=<T, T<2.5, Wp=W-5, Tp=T+1 ;
+  2.5=<T, T<2.6, Wp=W-1, Tp=T+0.1 ;
+  2.6=<T, T<3.0, Wp=W+6, Tp=T+0.4.
+valve(F,V,W,C,T,Vp) :=
+  0=<T, T<1.5, C=0, V=0, Vp=0 ;
+  1.5=<T, T<3.5, C=0, V=0, Vp=0 ; % this is not a reachable phase
+  1.5=<T, T<2.5, C=1, V<1, Vp=V+1*1 ;
+  2.5=<T, T<2.6, C=1, V=1, Vp=V ;
+  2.6=<T, T<3.0, C=0, V>0, Vp=V-1*0.4.
+error(F,V,W,C,T) := W=<59 ; W>=77.
+
+inv(F,V,W,C,T) :- init(F,V,W,C,T).
+exists([Fp], env(F,V,W,C,T,Fp)) :- inv(F,V,W,C,T).
+exists([Cp], inv(Fp,Vp,Wp,Cp,Tp)) :-
+	id(contr), inv(F,V,W,C,T), env(F,V,W,C,T,Fp),
+	vessel(F,V,W,C,T,Wp,Tp),
+	valve(F,V,W,C,T,Vp).
+false :- inv(F,V,W,C,T), error(F,V,W,C,T).
+
+% template for contr(V,Vp):
+skolem_template(scontr, [F,V,W,C,T,_,_,_,_,Cp],
+		true,
+		true,
+		( W<SomeLowBound,Cp=0
+		; SomeLowBound=<W, W=<SomeHighBound, Cp=C
+		; SomeHighBound<W, Cp=1),
+		(   ( SomeLowBound = 68 ; SomeLowBound = 66 ; SomeLowBound = 64 ),
+		    ( SomeHighBound = 72 ; SomeHighBound = 74 ; SomeHighBound = 76 ) )
+	       ).
+
+% time ctlstar -use-next-skolem fig4-isic95.qarmc
+% Without the 2nd disjunct: 'program is correct' (too easy?)
+% With second disjunct:
+% - z3 T/O (stuck at one refinement), Barcelogic T/O (loops through different solutions)

@@ -1,0 +1,71 @@
+init(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC):=A=0,R=0,P1=0,P2=0,PC=1.
+nondet_next(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp,T1,T2,T3,T4,T5,BB):=
+     PC=1,Ap=1,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=2;
+     PC=2,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=T1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=3; % K1p = _rho
+     PC=3,K1>0,Ap=A,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1-1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=3; 
+     PC=3,K1=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=4;
+     PC=4,Ap=1,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=5;
+     PC=5,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=T2,K3p=K3,K4p=K4,K5p=K5,PCp=6; % K2p = _rho
+     PC=6,K2>0,Ap=A,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2-1,K3p=K3,K4p=K4,K5p=K5,PCp=6; 
+     PC=6,K2=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=7;
+     PC=7,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=T3,K4p=K4,K5p=K5,PCp=8; % K3p = _rho
+     PC=8,Ap=1,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=9;
+     PC=9,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=10;
+     PC=10,K3>0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3-1,K4p=K4,K5p=K5,PCp=11; 
+     PC=11,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=8;
+     PC=10,K3=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=12;
+     PC=12,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=13;
+     PC=13,Ap=1,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=14;
+     PC=14,Ap=0,Rp=R,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=T4,K5p=K5,PCp=15; % K4p = _rho
+     PC=15,K4>0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4-1,K5p=K5,PCp=16; 
+     PC=16,Ap=A,Rp=0,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=13;
+     PC=15,K4=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=17;
+     PC=17,Ap=1,Rp=0,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=18;
+     PC=18,Ap=0,Rp=R,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=T5,PCp=19; % K5p=_rho
+     PC=19,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=20;
+     PC=20,K5>0,Ap=A,Rp=R,P1p=1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5-1,PCp=20; 
+     PC=20,K5=<0,Ap=A,Rp=1,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=21;
+     PC=21,Ap=A,Rp=0,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=22;
+     BB>=1,PC=22,Ap=A,Rp=R,P1p=P1,P2p=0,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=23;
+     BB=<0,PC=22,Ap=A,Rp=R,P1p=P1,P2p=P2,Sp=S,R6p=R6,K1p=K1,K2p=K2,K3p=K3,K4p=K4,K5p=K5,PCp=23.
+dst1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC):=P1=1.
+dst2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC):=P2=1.
+% init  => EF dst1
+phi1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC):-init(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC).
+(PC>=1,PC=<22):-phi1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC),\+dst1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC).
+phi1(Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp),rank1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp):-
+ 	phi1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC),\+dst1(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC),
+	nondet_next(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp,T1,T2,T3,T4,T5,B),
+	witness1(T1,T2,T3,T4,T5,B).
+wf(rank1/24).
+
+template(witness1, [T1_V,T2_V,T3_V,T4_V,T5_V,Bv], (T1_V=T1,T2_V=T2,T3_V=T3,T4_V=T4,T5_V=T5,Bv=B),
+	 ((T1=0),(T2=0),(T3=0),(T4=0;T4=1),(T5=0;T5=1),(B=0;B=1))).
+
+% p2 => EF dst2
+phi2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC):-init(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC).
+(PC>=1,PC=<22):-phi2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC),\+dst2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC).
+phi2(Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp),rank2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp):-
+ 	phi2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC),\+dst2(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC),
+	nondet_next(A,R,P1,P2,S,R6,K1,K2,K3,K4,K5,PC,Ap,Rp,P1p,P2p,Sp,R6p,K1p,K2p,K3p,K4p,K5p,PCp,T1,T2,T3,T4,T5,B),
+	witness2(T1,T2,T3,T4,T5,B).
+wf(rank2/24).
+
+template(witness2, [T1_V,T2_V,T3_V,T4_V,T5_V,Bv], (T1_V=T1,T2_V=T2,T3_V=T3,T4_V=T4,T5_V=T5,Bv=B),
+	 ((T1=0),(T2=0),(T3=0),(T4=0;T4=1),(T5=0;T5=1),(B=0;B=1))).
+
+query_naming(phi1(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc)).
+query_naming(phi2(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc)).
+query_naming(rank1(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,'a\'','r\'','p1\'','p2\'','s\'','r6\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+query_naming(rank1_p(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,'a\'','r\'','p1\'','p2\'','s\'','r6\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+query_naming(witness1(t1,t2,t3,t4,t5,bb)).
+query_naming(witness2(t1,t2,t3,t4,t5,bb)).
+query_naming(rank2(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,'a\'','r\'','p1\'','p2\'','s\'','r6\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+query_naming(rank2_p(a,r,p1,p2,s,r6,k1,k2,k3,k4,k5,pc,'a\'','r\'','p1\'','p2\'','s\'','r6\'','k1\'','k2\'','k3\'','k4\'','k5\'','pc\'')).
+
+query_finite_sorts(phi1/12,[12]).
+query_finite_sorts(phi2/12,[12]).
+query_finite_sorts(rank1/24,[12,24]).
+query_finite_sorts(rank1_p/24,[12,24]).
+query_finite_sorts(rank2/24,[12,24]).
+query_finite_sorts(rank2_p/24,[12,24]).

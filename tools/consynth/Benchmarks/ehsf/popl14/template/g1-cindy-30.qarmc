@@ -1,0 +1,55 @@
+% finds a strategy for cindy (based on the round-robin template) to win the game with G not(overflow) objective for bucket capacity = 30.
+init(B1, B2, B3, B4, B5, R) := B1=0, B2=0, B3=0, B4=0, B5=0, R=1.
+stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp) :=
+        B1p>=B1, B2p>=B2, B3p>=B3, B4p>=B4, B5p>=B5, B1p+B2p+B3p+B4p+B5p-B1-B2-B3-B4-B5=10, Rp=R.
+overflow(B1, B2, B3, B4, B5, R) := B1>=31 ; B2>=31 ; B3>=31 ; B4>=31 ; B5>=31.
+
+% cindy wins := EG ~overflow
+inv(B1, B2, B3, B4, B5, R) :- init(B1, B2, B3, B4, B5, R).
+%%% exists([B1pp, B2pp, B3pp, B4pp, B5pp, Rpp],
+%%%        inv(B1pp, B2pp, B3pp, B4pp, B5pp, Rpp)
+%%%       ) :-
+%%% 	inv(B1, B2, B3, B4, B5, R),
+%%% 	stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp).
+inv(B1pp, B2pp, B3pp, B4pp, B5pp, Rpp):-
+	inv(B1, B2, B3, B4, B5, R),
+	stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp),
+	s3(B1p, B2p, B3p, B4p, B5p, Rp, B1pp, B2pp, B3pp, B4pp, B5pp, Rpp).
+%	s3(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp, B1pp, B2pp, B3pp, B4pp, B5pp, Rpp).
+false :-
+	inv(B1, B2, B3, B4, B5, R),
+	stepmother(B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp),
+	overflow(B1p, B2p, B3p, B4p, B5p, Rp).
+
+%%% skolem_template(s3, [_B1, _B2, _B3, _B4, _B5, _R,
+%%%  		     B1, B2, B3, B4, B5, R,
+%%%  		     B1p, B2p, B3p, B4p, B5p, Rp],
+%%%   		true,
+%%% 		( R>=1, R=<5 ),
+%%%   		(   R=1, Rp=T1, B1p=0,  B2p=0,  B3p=B3, B4p=B4, B5p=B5
+%%% 		;   R=2, Rp=T2, B1p=B1, B2p=0,  B3p=0,  B4p=B4, B5p=B5
+%%% 		;   R=3, Rp=T3, B1p=B1, B2p=B2, B3p=0,  B4p=0,  B5p=B5
+%%% 		;   R=4, Rp=T4, B1p=B1, B2p=B2, B3p=B3, B4p=0,  B5p=0
+%%% 		;   R=5, Rp=2, B1p=0,  B2p=B2, B3p=B3, B4p=B4, B5p=0
+%%% 		),
+%%% 		(T1>=1,T1=<5,T2>=1,T2=<5,T3>=1,T3=<5,T4>=1,T4=<5,T5>=1,T5=<5)
+%%%   	       ).
+%template(s3, [_B1, _B2, _B3, _B4, _B5, _R, B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp],
+template(s3, [B1, B2, B3, B4, B5, R, B1p, B2p, B3p, B4p, B5p, Rp],
+	 %true,
+	 %( R>=1, R=<5 ),
+	 (   R=1, Rp=T1, B1p=0,  B2p=0,  B3p=B3, B4p=B4, B5p=B5
+	 ;   R=2, Rp=T2, B1p=B1, B2p=0,  B3p=0,  B4p=B4, B5p=B5
+	 ;   R=3, Rp=T3, B1p=B1, B2p=B2, B3p=0,  B4p=0,  B5p=B5
+	 ;   R=4, Rp=T4, B1p=B1, B2p=B2, B3p=B3, B4p=0,  B5p=0
+	 ;   R=5, Rp=2, B1p=0,  B2p=B2, B3p=B3, B4p=B4, B5p=0
+	 ),
+	 (T1>=1,T1=<5,T2>=1,T2=<5,T3>=1,T3=<5,T4>=1,T4=<5,T5>=1,T5=<5)
+	).
+
+query_naming(inv(b1, b2, b3, b4, b5, r)).
+%%% query_naming(s3('_b1', '_b2', '_b3', '_b4', '_b5', '_r',
+%%% 		b1, b2, b3, b4, b5, r, 'b1\'', 'b2\'', 'b3\'', 'b4\'', 'b5\'', 'r\'')).
+query_naming(s3(b1, b2, b3, b4, b5, r, 'b1\'', 'b2\'', 'b3\'', 'b4\'', 'b5\'', 'r\'')).
+%%% query_finite_sorts(inv/6, [5]).
+%%% query_finite_sorts(s3/18, [5,10]).

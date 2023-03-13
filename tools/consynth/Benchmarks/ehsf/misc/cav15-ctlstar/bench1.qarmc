@@ -1,0 +1,105 @@
+/*
+Heidy's cav2015: ctlstar_5.t2
+property: EFG (x=1 & EG y=0)
+
+Plan of attack:
+   1. decomposition into (a) EF p1 , (b) p1 => G p2 , and (c) p2 => x=1 & EG y=0
+   2. (a) and (c) are basic CTL state formulas. We already 'know' what to do.
+   3. (b) is an LTL formula.
+*/
+initP(X,Y,N,PC):=PC=0.
+nextP(X,Y,N,PC,Xp,Yp,Np,PCp):=
+(   PC=0,Xp=1,Yp=0,PCp=1; % Np=?
+    PC=1,N>0,Xp=X,Yp=Y,Np=N,PCp=1; 
+    PC=1,N=<0,Xp=X,Yp=Y,Np=N,PCp=2;
+    PC=2,Xp=0,Yp=Y,Np=N,PCp=3; 
+    PC=3,Xp=1,Yp=Y,Np=N,PCp=4; 
+    PC=3,Xp=0,Yp=1,Np=N,PCp=4; 
+    PC=4,Xp=X,Yp=Y,Np=N,PCp=4 
+).
+nextDetP(X,Y,N,PC,Xp,Yp,Np,PCp,B1,B2):=
+(   B1>=1,PC=0,Xp=1,Yp=0,Np=1,PCp=1; % Np=?
+    B1=<0,PC=0,Xp=1,Yp=0,Np=0,PCp=1; % Np=?
+    PC=1,N>0,Xp=X,Yp=Y,Np=N,PCp=1; 
+    PC=1,N=<0,Xp=X,Yp=Y,Np=N,PCp=2;
+    PC=2,Xp=0,Yp=Y,Np=N,PCp=3; 
+    B2>=1,PC=3,Xp=1,Yp=Y,Np=N,PCp=4; 
+    B2=<0,PC=3,Xp=0,Yp=1,Np=N,PCp=4; 
+    PC=4,Xp=X,Yp=Y,Np=N,PCp=4 
+).
+
+% computing p1 and ~p1
+p1(X,Y,N,PC):-X=1,Y=0,witp1(N,PC).
+neg_p1(X,Y,N,PC):-(X=<0;X>=2;Y<0;Y>=1);witneg1_p1(N,PC);witneg2_p1(N,PC);witneg3_p1(N,PC);witneg4_p1(N,PC).
+template([(witp1, [N,PC], (N=B,PC=T)),
+	  (witneg1_p1, [N,PC], PC>=T+1),
+	  (witneg2_p1, [N,PC], N+1=<B),
+	  (witneg3_p1, [N,PC], N>=B+1),
+	  (witneg4_p1, [N,PC], PC+1=<T)
+	 ], ((B=0;B=1),(T=0;T=1;T=2;T=3;T=4))).
+
+% computing p2 and ~p2
+p2(X,Y,N,PC):-X=1,Y=0,witp2(N,PC).
+neg_p2(X,Y,N,PC):-(X=<0;X>=2;Y<0;Y>=1);witneg1_p2(N,PC);witneg2_p2(N,PC);witneg3_p2(N,PC);witneg4_p2(N,PC).
+template([(witp2, [N,PC], (N=B,PC=T)),
+	  (witneg1_p2, [N,PC], PC>=T+1),
+	  (witneg2_p2, [N,PC], N+1=<B),
+	  (witneg3_p2, [N,PC], N>=B+1),
+	  (witneg4_p2, [N,PC], PC+1=<T)
+	 ], ((B=0;B=1),(T=0;T=1;T=2;T=3;T=4))).
+
+
+% CTL: EF p1
+phi0(X,Y,N,PC):-initP(X,Y,N,PC).
+(PC>=0,PC=<4):-phi0(X,Y,N,PC),neg_p1(X,Y,N,PC).
+rank(X,Y,N,PC,Xp,Yp,Np,PCp),phi0(Xp,Yp,Np,PCp):-phi0(X,Y,N,PC),neg_p1(X,Y,N,PC),nextDetP(X,Y,N,PC,Xp,Yp,Np,PCp,B1,B2),witness1(B1,B2).
+wf(rank/8).
+template(witness1, [B1_V,B2_V], (B1_V=B1, B2_V=B2), ((B1=0;B1=1),(B2=0;B2=1))).
+
+
+% LTL: p1 => G p2
+initA(BC) := BC=1.
+nextA(BC,X,Y,N,PC,BCp) :-
+(   BC=1,BCp=1;
+    BC=1,neg_p2(X,Y,N,PC),BCp=2;
+    BC=2,BCp=2
+).
+buechi(BC) := BC=2.
+
+init(X,Y,N,PC,BCp) := p1(X,Y,N,PC), initA(BC), nextA(BC,X,Y,N,PC,BCp).
+next(X,Y,N,PC,BC,Xp,Yp,Np,PCp,BCp) := nextP(X,Y,N,PC,Xp,Yp,Np,PCp), nextA(BC,Xp,Yp,Np,PCp,BCp).
+
+inv(X,Y,N,PC,BC) :- init(X,Y,N,PC,BC).
+ti(X,Y,N,PC,BC,Xp,Yp,Np,PCp,BCp), inv(Xp,Yp,Np,PCp,BCp) :- inv(X,Y,N,PC,BC), next(X,Y,N,PC,BC,Xp,Yp,Np,PCp,BCp).
+ti(X,Y,N,PC,BC,Xpp,Ypp,Npp,PCpp,BCpp) :- ti(X,Y,N,PC,BC,Xp,Yp,Np,PCp,BCp), next(Xp,Yp,Np,PCp,BCp,Xpp,Ypp,Npp,PCpp,BCpp).
+round(X,Y,N,PC,Xp,Yp,Np,PCp) :- ti(X,Y,N,PC,BC,Xp,Yp,Np,PCp,BCp), buechi(BC), buechi(BCp).
+dwf(round/8).
+
+% p2 => x=1 & EG y=0
+X=1:-p2(X,Y,N,PC).
+phi1(X,Y,N,PC):-p2(X,Y,N,PC).
+phi1(Xp,Yp,Np,PCp):-phi1(X,Y,N,PC),nextDetP(X,Y,N,PC,Xp,Yp,Np,PCp,B1,B2),witness2(B1,B2).
+Y=0:-phi1(X,Y,N,PC).
+template(witness2, [B1_V,B2_V], (B1_V=B1, B2_V=B2), ((B1=0;B1=1),(B2=0;B2=1))).
+
+query_naming(witness1, [b1,b2]).
+query_naming(witness2, [b1,b2]).
+query_naming(witp1, [n,pc]).
+query_naming(witneg1_p1, [n,pc]).
+query_naming(witneg2_p1, [n,pc]).
+query_naming(witneg3_p1, [n,pc]).
+query_naming(witneg4_p1, [n,pc]).
+query_naming(witp2, [n,pc]).
+query_naming(witneg1_p2, [n,pc]).
+query_naming(witneg2_p2, [n,pc]).
+query_naming(witneg3_p2, [n,pc]).
+query_naming(witneg4_p2, [n,pc]).
+
+query_naming(inv, [x,y,t,pc,bc]).
+query_naming(phi0, [x,y,t,pc]).
+query_naming(phi1, [x,y,t,pc]).
+
+query_naming(round, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(rank1, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(rank1_p, [x,y,t,pc,'x\'','y\'','t\'','pc\'']).
+query_naming(ti, [x,y,t,pc,bc,'x\'','y\'','t\'','pc\'','bc\'']).

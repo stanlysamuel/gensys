@@ -1,0 +1,67 @@
+cabal-version:      2.4
+name:               raboniel
+version:            0.1.0.0
+
+-- A short (one-line) description of the package.
+synopsis: A synthesis tool for temporal stream logic (TSL) modulo theories.
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
+license:            NONE
+author:             Benedikt Maderbacher
+maintainer:         benedikt.maderbacher@iaik.tugraz.at
+
+-- A copyright notice.
+-- copyright:
+-- category:
+extra-source-files: CHANGELOG.md
+
+library
+    exposed-modules: Raboniel.Context, Raboniel.Synthesis, Raboniel.CodeGeneration
+
+    -- Modules included in this library but not exported.
+    other-modules:
+        Raboniel.APparser,
+        Raboniel.TSLMetaParser,
+        Raboniel.Expression,
+        Raboniel.Z3Expression,
+        Raboniel.Checks,
+        Raboniel.KISSparser,
+        Raboniel.SMTparser,
+        Raboniel.PythonCodeGen
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:    
+        base ^>=4.14.1.0,
+        z3 ^>= 408.2,
+        megaparsec ^>= 9.0.1,
+        containers ^>= 0.6.2.0,
+        transformers ^>= 0.5.6.0,
+        text ^>= 1.2.4.0,
+        process ^>= 1.6.9.0,
+        directory ^>= 1.3.6.0,
+        deepseq ^>= 1.4.4.0
+
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable raboniel
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:
+        base ^>=4.14.1.0,
+        optparse-generic ^>= 1.4.4,
+        raboniel
+
+    hs-source-dirs:   app
+    default-language: Haskell2010
+    ghc-options: -rtsopts

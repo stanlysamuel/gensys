@@ -1,0 +1,16 @@
+% EF (x>5), program is correct
+init(X,PC):=X=0,PC=1.
+fds_transrel(X,PC,Xp,PCp):=
+    Xp=X+1,PC=1,PCp=1
+  ; Xp=X-1,PC=1,PCp=1.
+
+phi0(X,PC):-init(X,PC).
+exists([Xp,PCp],(fds_transrel(X,PC,Xp,PCp),phi0(Xp,PCp))):-phi0(X,PC),\+X>5.
+rel0(X,PC,Xp,PCp):-phi0(X,PC),\+X>5,fds_transrel(X,PC,Xp,PCp),phi0(Xp,PCp),\+Xp>5.
+trel0(X,PC,Xp,PCp):-rel0(X,PC,Xp,PCp).
+trel0(X,PC,E,F):-trel0(X,PC,Xp,PCp),rel0(Xp,PCp,E,F).
+dwf(trel0(X,PC,Xp,PCp)).
+skolem_template(s3, [X,PC,Xp],
+		[[Xp=X+1,PC=1]
+		 ],
+		[], [[Xp=T*X+T0]], true).

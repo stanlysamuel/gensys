@@ -1,0 +1,22 @@
+% SLAM example from Jobstmann-et-al CAV'95 paper (only verification - should fail)
+% V = (L,GL,PC) for variables L, got_lock and pc
+
+init(L,GL,PC) := GL=0, L=0, PC=0.
+next(L,GL,PC,Lp,GLp,PCp) :=
+    PC=0, PCp=2, Lp=L, GLp=GL
+  ; PC=2, PCp=4, L=<0, Lp=1, GLp=GL+1
+  ; PC=0, PCp=4, Lp=L, GLp=GL
+  ; PC=4, PCp=5, (GL>=1 ; GL=< -1), Lp=L, GLp=GL
+  ; PC=5, PCp=6, L>=1, Lp=0, GLp=GL
+  ; PC=4, PCp=6, GL=0, Lp=L, GLp=GL
+  ; PC=6, PCp=0, Lp=L, GLp=GL-1.
+error(L,GL,PC) := PC=2, L>=1 ; PC=5, L=<0.
+
+% Queries: inv
+inv(L,GL,PC) :- init(L,GL,PC).
+inv(Lp,GLp,PCp) :- inv(L,GL,PC), next(L,GL,PC,Lp,GLp,PCp).
+false :- inv(L,GL,PC), error(L,GL,PC).
+query_naming(inv(l,gl,pc)).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred slam_cav95_BUG.qarmc
+% SVN revision 17985: 'program is not correct' after 0.14s

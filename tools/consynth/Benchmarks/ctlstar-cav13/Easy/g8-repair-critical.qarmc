@@ -1,0 +1,141 @@
+/*
+**Critical Sections Program**: Property check with the correct version of the program
+  Fairness encoded as ... AG ((pc1=3 -> AF pc1=4) /\ (pc1=7 -> AF pc1=8) /\ (pc2=3 -> AF pc2=4) /\ (pc2=6 -> AF pc2=7))
+  Propery to check: EG ((pc2=3 -> AF pc2=4) /\ (pc2=6 -> AF pc2=7))
+Process A
+1  flag1A = true;
+2  turn1B = false;
+3  while(flag1B && turn1B);
+4  x=x&&y; **********
+   flag1A = false;
+5  if(turn1B){
+       flag2A = true;
+6      turn2B = true;
+7      while(flag2B && turn2B);
+8      y = false; *************
+       flag2A = false;}
+9  goto 1;
+Process B
+1  flag1B = true;
+2  turn1B = false;
+3  while(flag1A && !turn1B);
+4  x=x&&y; **********
+   flag2B = true;
+5  turn2B = false;
+6  while(flag2A && !turn2B);
+7  y=!y; ******************
+   x=x||y;
+   flag2B = false;
+8  flag1B = false;
+9  goto 1;
+*/
+init(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2):=F1A=0,F1B=0,T1B=0,F2A=0,F2B=0,T2B=0,K1>=0,K2>=0,PC1=1,PC2=1.
+nextDT(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):=   
+     % thread A
+     K1=<K2,K1p>=0,K2p=K2-1,PC1=1,F1Ap=1,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=2,PC2p=PC2;
+%     K1p=K1,K2p=K2,PC1=2,F1Ap=F1A,F1Bp=F1B,T1Bp=1,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2; %  Error T1Bp=0, 
+     K1=<K2,K1p>=0,K2p=K2-1,PC1=3,F1B=1,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=3,(F1B=0;T1B=0),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=4,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=4,F1Ap=0,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=5,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=5,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=1,  F2Bp=F2B,T2Bp=T2B,PC1p=6,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=5,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=9,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=6,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,  F2Bp=F2B,T2Bp=1,  PC1p=7,PC2p=PC2;
+     K1=<K2,K1p>=0,K2p=K2-1,PC1=7,F2B=1,T2B=1,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=7,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=7,(F2B=0;T2B=0),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=8,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=8,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=0,  F2Bp=F2B,T2Bp=T2B,PC1p=9,PC2p=PC2;
+     K1p=K1,K2p=K2,PC1=9,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=1,PC2p=PC2;
+     % thread B
+     K2=<K1,K1p=K1-1,K2p>=0,PC2=1,F1Ap=F1A,F1Bp=1,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=2;
+     K1p=K1,K2p=K2,PC2=2,F1Ap=F1A,F1Bp=F1B,T1Bp=0,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=3;
+     K2=<K1,K1p=K1-1,K2p>=0,PC2=3,F1A=1,T1B=0,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=3;
+     K1p=K1,K2p=K2,PC2=3,(F1A=0;T1B=1),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=4;
+     K1p=K1,K2p=K2,PC2=4,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=1,T2Bp=T2B,PC1p=PC1,PC2p=5;
+     K1p=K1,K2p=K2,PC2=5,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=0,PC1p=PC1,PC2p=6;
+     K2=<K1,K1p=K1-1,K2p>=0,PC2=6,F2A=1,T2B=0,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=6;
+     K1p=K1,K2p=K2,PC2=6,(F2A=0;T2B=1),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=7;
+     K1p=K1,K2p=K2,PC2=7,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=0,T2Bp=T2B,PC1p=PC1,PC2p=8;
+     K1p=K1,K2p=K2,PC2=8,F1Ap=F1A,F1Bp=0,T1Bp=T1B,F2Ap=F2A,F2Bp=F1B,T2Bp=T2B,PC1p=PC1,PC2p=9;
+     K1p=K1,K2p=K2,PC2=9,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=1.
+nextNDT(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):=   
+     % thread A
+     K1p=K1,K2p=K2,PC1=2,F1Ap=F1A,F1Bp=F1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2. % T1Bp=rho,
+
+next(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):=
+     nextDT(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p);
+     nextNDT(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p).
+% init => EG p
+phi(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2):-init(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2).
+phi(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):-
+    	phi(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),nextDT(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p).
+exists([F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p],phi(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p)):-phi(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2).
+p(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2):-phi(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2).
+skolem_template(s5, [F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p],
+  		true,
+  		true,
+  		(
+		  K1p=K1,K2p=K2,PC1=2,F1Ap=F1A,F1Bp=F1B,T1Bp=T1,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2 % T1Bp=rho,
+		),
+  		(T1=0;T1=1)
+  	       ).
+
+% p /\ pc2=3 => AF pc2=4
+phi3(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2):-p(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),PC2=3.
+(PC1>=1,PC1=<9,PC2>=1,PC2=<9):-phi3(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),\+(PC2=4).
+phi3(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):-
+   	phi3(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),
+  	next(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p),
+  	\+(PC2=4).
+rank3(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):-
+   	phi3(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),
+  	next(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p),
+  	\+(PC2=4).
+wf(rank3/20).
+% p /\ pc2=6 => AF pc2=7
+phi4(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2):-p(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),PC2=6.
+(PC1>=1,PC1=<9,PC2>=1,PC2=<9):-phi4(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),\+(PC2=7).
+phi4(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):-
+   	phi4(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),
+  	next(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p),
+  	\+(PC2=7).
+rank4(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p):-
+   	phi4(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2),
+  	next(F1A,F1B,T1B,F2A,F2B,T2B,K1,K2,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,K1p,K2p,PC1p,PC2p),
+  	\+(PC2=7).
+wf(rank4/20).
+
+%%% query_finite_sorts(p/10,[9,10]).
+%%% query_finite_sorts(phi/10,[9,10]).
+%%% query_finite_sorts(phi3/10,[9,10]).
+%%% query_finite_sorts(phi4/10,[9,10]).
+%%% query_finite_sorts(s5/20,[9,10,19,20]).
+%%% query_finite_sorts(rank3/20,[9,10,19,20]).
+%%% query_finite_sorts(rank3_p/20,[9,10,19,20]).
+%%% query_finite_sorts(rank4/20,[9,10,19,20]).
+%%% query_finite_sorts(rank4_p/20,[9,10,19,20]).
+
+query_finite_sorts(p/10,[10]).
+query_finite_sorts(phi/10,[10]).
+query_finite_sorts(phi3/10,[10]).
+query_finite_sorts(phi4/10,[10]).
+query_finite_sorts(s5/20,[10,20]).
+query_finite_sorts(rank3/20,[10,20]).
+query_finite_sorts(rank3_p/20,[10,20]).
+query_finite_sorts(rank4/20,[10,20]).
+query_finite_sorts(rank4_p/20,[10,20]).
+
+query_naming(s5(f1A,f1B,t1B,f2A,f2B,t2B,k1,k2,pc1,pc2,'f1A\'','f1B\'','t1B\'','f2A\'','f2B\'','t2B\'','k1\'','k2\'','pc1\'','pc2\'')).
+query_naming(phi(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2)).
+query_naming(p(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2)).
+query_naming(phi3(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2)).
+query_naming(phi4(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2)).
+query_naming(rank3(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2,'f1a\'','f1b\'','t1b\'','f2a\'','f2b\'','t2b\'','k1\'','k2\'','pc1\'','pc2\'')).
+query_naming(rank3_p(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2,'f1a\'','f1b\'','t1b\'','f2a\'','f2b\'','t2b\'','k1\'','k2\'','pc1\'','pc2\'')).
+query_naming(rank4(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2,'f1a\'','f1b\'','t1b\'','f2a\'','f2b\'','t2b\'','k1\'','k2\'','pc1\'','pc2\'')).
+query_naming(rank4_p(f1a,f1b,t1b,f2a,f2b,t2b,k1,k2,pc1,pc2,'f1a\'','f1b\'','t1b\'','f2a\'','f2b\'','t2b\'','k1\'','k2\'','pc1\'','pc2\'')).
+
+
+
+% ./ctlstar tests/ctlstar-synth/g8-repair-critsec.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program correct' after 1m4.9s without any option
+% 'program correct' after 13.3s with -exp-eval
+% 'program correct' after 2m22.3s with -case-split

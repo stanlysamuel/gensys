@@ -1,0 +1,46 @@
+% SLAM example from Jobstmann-et-al CAV'95 paper
+% V = (L,GL,PC) for variables L, got_lock and pc
+
+init(L,GL,PC) := GL=0, L=0, PC=0.
+next(L,GL,PC,Lp,GLp,PCp) :=
+    PC=0, PCp=2, Lp=L, GLp=GL
+  ; PC=2, PCp=4, L=<0, Lp=1
+  ; PC=0, PCp=4, Lp=L, GLp=GL
+  ; PC=4, PCp=5, GL>=1, Lp=L, GLp=GL
+  ; PC=4, PCp=5, GL=< -1, Lp=L, GLp=GL
+  ; PC=5, PCp=6, L>=1, Lp=0, GLp=GL
+  ; PC=4, PCp=6, GL=0, Lp=L, GLp=GL
+  ; PC=6, PCp=0, Lp=L.
+error(L,GL,PC) := PC=2, L>=1 ; PC=5, L=<0.
+
+% Queries: inv
+inv(L,GL,PC) :- init(L,GL,PC).
+exists([Lp,GLp,PCp],inv(Lp,GLp,PCp)) :- inv(L,GL,PC). %, next(L,GL,PC,Lp,GLp,PCp).
+false :- inv(L,GL,PC), error(L,GL,PC).
+
+skolem_template(s3, [L,GL,PC,Lp,GLp,PCp],
+ 		true,
+ 		(true),
+ 		(
+		  PC=0, PCp=2, Lp=L, GLp=GL
+		; PC=2, PCp=4, L=<0, Lp=1, GLp=T1
+		; PC=0, PCp=4, Lp=L, GLp=GL
+		; PC=4, PCp=5, GL>=1, Lp=L, GLp=GL
+		; PC=4, PCp=5, GL=< -1, Lp=L, GLp=GL
+		; PC=5, PCp=6, L>=1, Lp=0, GLp=GL
+		; PC=4, PCp=6, GL=0, Lp=L, GLp=GL
+		; PC=6, PCp=0, GLp=T2, Lp=L
+ 		),
+ 		((T1>=0,T1=<150000), (T2>=0,T2=<150000))
+ 	       ).
+
+query_naming(inv(l, gl,pc)).
+query_naming(s3(l, gl,pc, 'l\'', 'gl\'', 'pc\'')).
+
+query_finite_sorts(inv/3,[3]).
+query_finite_sorts(s3/6,[3,6]).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred g6-repair-lock.qarmc
+% 'program is correct' after 2.5s without any option
+% 'program is NOT correct' after 3.2s with -exp-eval ******
+% 'program is correct' after 0.3s with -case-split.

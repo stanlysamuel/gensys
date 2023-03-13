@@ -1,0 +1,72 @@
+/*
+**Critical Sections Program** (original, but correct version)
+  Propery to check: AG ((pc1=4 -> pc2!=4) /\ (pc1=10 -> pc2!=8))
+Process A
+1  flag1A = true;
+2  turn1B = false;
+3  while(flag1B && turn1B);
+4  x=x&&y; **********
+5  flag1A = false;
+6 if(turn1B){
+7   flag2A = true;
+8   turn2B = true;
+9   while(flag2B && turn2B);
+10    y = false; *************
+11  flag2A = false;}
+12 goto 1;
+Process B
+1  flag1B = true;
+2  turn1B = false;
+3  while(flag1A && !turn1B);
+4   x=x&&y; **********
+5  flag2B = true;
+6  turn2B = false;
+7  while(flag2A && !turn2B);
+8   y=!y; ******************
+    x=x||y;
+9  flag2B = false;
+10 flag1B = false;
+11 goto 1;
+*/
+query_naming(phi(f1a,f1b,t1b,f2a,f2b,t2b,pc1,pc2)).
+
+init(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):=F1A=0,F1B=0,T1B=0,F2A=0,F2B=0,T2B=0,PC1=1,PC2=1.
+next(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p):=   
+     % thread A
+     PC1=1,F1Ap=1,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=2,PC2p=PC2;
+     PC1=2,F1Ap=F1A,F1Bp=F1B,T1Bp=1,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2;
+     PC1=3,F1B=1,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=3,PC2p=PC2; 
+     PC1=3,(F1B=0;T1B=0),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=4,PC2p=PC2; 
+     PC1=4,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=5,PC2p=PC2; 
+     PC1=5,F1Ap=0,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=6,PC2p=PC2;
+     PC1=6,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,  F2Bp=F2B,T2Bp=T2B,  PC1p=7,PC2p=PC2;
+     PC1=6,T1B=0,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,  F2Bp=F2B,T2Bp=T2B,  PC1p=12,PC2p=PC2;
+     PC1=7,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=1,  F2Bp=F2B,T2Bp=T2B,  PC1p=8,PC2p=PC2;
+     PC1=8,T1B=1,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,  F2Bp=F2B,T2Bp=1,  PC1p=9,PC2p=PC2;
+     PC1=9,F2B=1,T2B=1,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=9, PC2p=PC2;
+     PC1=9,(F2B=0;T2B=0),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=10,PC2p=PC2;
+     PC1=10,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=11,PC2p=PC2;
+     PC1=11,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=0,  F2Bp=F2B,T2Bp=T2B,PC1p=12,PC2p=PC2;
+     PC1=12,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=1,PC2p=PC2;
+     % thread B
+     PC2=1,F1Ap=F1A,F1Bp=1,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=2;
+     PC2=2,F1Ap=F1A,F1Bp=F1B,T1Bp=0,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=3;
+     PC2=3,F1A=1,T1B=0,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=3;
+     PC2=3,(F1A=0;T1B=1),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=4;
+     PC2=4,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=5;
+     PC2=5,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=1,T2Bp=T2B,PC1p=PC1,PC2p=6;
+     PC2=6,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=0,PC1p=PC1,PC2p=7;
+     PC2=7,F2A=1,T2B=0,  F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=7;
+     PC2=7,(F2A=0;T2B=1),F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=8;
+     PC2=8,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=9;
+     PC2=9,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=0,T2Bp=T2B,PC1p=PC1,PC2p=10;
+     PC2=10,F1Ap=F1A,F1Bp=0,T1Bp=T1B,F2Ap=F2A,F2Bp=F1B,T2Bp=T2B,PC1p=PC1,PC2p=11;
+     PC2=11,F1Ap=F1A,F1Bp=F1B,T1Bp=T1B,F2Ap=F2A,F2Bp=F2B,T2Bp=T2B,PC1p=PC1,PC2p=1.
+dst(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):= ((PC1=<3;PC1>=5;PC2=<3;PC2>=5),(PC1=<9;PC1>=11;PC2=<7;PC2>=9)).
+% init => AG dst
+phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):-init(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2).
+phi(F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p):-
+      phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2),next(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2,F1Ap,F1Bp,T1Bp,F2Ap,F2Bp,T2Bp,PC1p,PC2p).
+dst(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2):-phi(F1A,F1B,T1B,F2A,F2B,T2B,PC1,PC2).
+
+query_finite_sorts(phi,[7,8]).

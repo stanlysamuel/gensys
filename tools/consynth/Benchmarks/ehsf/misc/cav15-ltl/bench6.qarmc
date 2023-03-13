@@ -1,0 +1,73 @@
+/*
+Heidy's cav2015: example10.t2
+property: AG((EFG x=0) & (EF x=20))
+*/
+initP(X,PC):=PC=0.
+nextP(X,PC,Xp,PCp):=
+(   PC=0,Xp=0,PCp=1;
+    PC=1,X<20,Xp=X,PCp=2;
+    PC=2,X=0,Xp=0,PCp=3;
+    PC=2,X=1,Xp=20,PCp=3;
+    PC=3,Xp=X,PCp=3
+).
+% No NONDET step!
+
+% AG p1 & p2
+phi1(X,PC):-initP(X,PC).
+phi1(Xp,PCp):-phi1(X,PC),nextP(X,PC,Xp,PCp).
+p1(X,PC),p2(X,PC):-phi1(X,PC).
+
+% computing p3 and ~p3
+p3(X,PC):-X=0,witp3(PC).
+neg_p3(X,PC):-X<0;X>=1;witneg1_p3(PC);witneg2_p3(PC).
+template([(witp3, [PC], PC=T),
+	  (witneg1_p3, [PC], PC>=T+1),
+	  (witneg2_p3, [PC], PC+1=<T)
+	 ], (T=0;T=1;T=2;T=3)).
+
+% p1 => EF p3 ... same as p1 => AF p3 since no NONDET in nextP 
+phi2(X,PC):-p1(X,PC).
+(PC>=0,PC=<3):-phi2(X,PC),neg_p3(X,PC).
+rank2(X,PC,Xp,PCp),phi2(Xp,PCp):-phi2(X,PC),neg_p3(X,PC),nextP(X,PC,Xp,PCp).
+wf(rank2/4).
+
+% LTL: p3 => G x=0
+initA(BC) := BC=1.
+nextA(BC,X,BCp) :=
+(   BC=1,BCp=1;
+    BC=1,X<0,BCp=2;
+    BC=1,X>=1,BCp=2;
+    BC=2,BCp=2
+).
+buechi(BC) := BC=2.
+
+init(X,PC,BCp) := p3(X,PC), initA(BC), nextA(BC,X,BCp).
+next(X,PC,BC,Xp,PCp,BCp) := nextP(X,PC,Xp,PCp), nextA(BC,Xp,BCp).
+
+inv(X,PC,BC) :- init(X,PC,BC).
+ti(X,PC,BC,Xp,PCp,BCp), inv(Xp,PCp,BCp) :- inv(X,PC,BC), next(X,PC,BC,Xp,PCp,BCp).
+ti(X,PC,BC,Xpp,PCpp,BCpp) :- ti(X,PC,BC,Xp,PCp,BCp), next(Xp,PCp,BCp,Xpp,PCpp,BCpp).
+round(X,PC,Xp,PCp) :- ti(X,PC,BC,Xp,PCp,BCp), buechi(BC), buechi(BCp).
+dwf(round/4).
+
+% p2 => EF x=20... same as p1 => AF x=20 since no NONDET in nextP 
+phi3(X,PC):-p2(X,PC).
+(PC>=0,PC=<3):-phi3(X,PC),(X=<19;X>=21).
+rank3(X,PC,Xp,PCp),phi3(Xp,PCp):-phi3(X,PC),(X=<19;X>=21),nextP(X,PC,Xp,PCp).
+wf(rank3/4).
+
+
+query_naming(phi1, [x,pc]).
+query_naming(witp3, [pc]).
+query_naming(witneg1_p3, [pc]).
+query_naming(witneg2_p3, [pc]).
+query_naming(neg_p3, [x,pc]).
+query_naming(phi2, [x,pc]).
+query_naming(rank2, [x,pc,'x\'','pc\'']).
+query_naming(inv, [x,pc,bc]).
+query_naming(round, [x,pc,'x\'','pc\'']).
+query_naming(ti, [x,pc,bc,'x\'','pc\'','bc\'']).
+query_naming(phi3, [x,pc]).
+query_naming(rank3, [x,pc,'x\'','pc\'']).
+
+

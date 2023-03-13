@@ -1,0 +1,44 @@
+/* AF (AG (p>0)) ; program is correct
+int x, p, nd;
+void init() { p = 0; }
+
+int body() {
+  while(1) {
+    if (!(x > 0)) break;
+    nd = nondet();
+    if (nd > 0) {
+      x = x - 1; 
+    } else {
+      x = x - 2; 
+    }
+  }
+  while(1) {
+    nd = nondet();
+    if (nd > 0)
+      p = 1;
+    else 
+      p = 2;
+  }
+}
+*/
+
+init(P,X,PC):=P=0,PC=1.
+step(P,X,PC,Pp,Xp,PCp):=
+ X>0,Pp=P,Xp=X-1,PC=1,PCp=1;
+ X>0,Pp=P,Xp=X-2,PC=1,PCp=1;
+ X=<0,Pp=P,Xp=X,PC=1,PCp=2;
+ Pp=1,Xp=X,PC=2,PCp=2;
+ Pp=2,Xp=X,PC=2,PCp=2.
+
+p1(P,X,PC):= P>0, PC=2. % The right solution for p1
+% p1(P,X,PC) := P>0. % Is this a solution as well? 
+phi0(P,X,PC):-init(P,X,PC).
+exists([Pp,Xp,PCp],step(P,X,PC,Pp,Xp,PCp)):-phi0(P,X,PC),\+p1(P,X,PC).
+phi0(Pp,Xp,PCp):-phi0(P,X,PC),step(P,X,PC,Pp,Xp,PCp),\+p1(P,X,PC).
+rel0(P,X,PC,Pp,Xp,PCp):-phi0(P,X,PC),\+p1(P,X,PC),step(P,X,PC,Pp,Xp,PCp).
+trel0(P,X,PC,Pp,Xp,PCp):-rel0(P,X,PC,Pp,Xp,PCp).
+trel0(P,X,PC,G,H,I):-trel0(P,X,PC,Pp,Xp,PCp),rel0(Pp,Xp,PCp,G,H,I).
+dwf(trel0(P,X,PC,Pp,Xp,PCp)).
+phi1(P,X,PC):-p1(P,X,PC).
+phi1(Pp,Xp,PCp):-phi1(P,X,PC),step(P,X,PC,Pp,Xp,PCp).
+P>0:-phi1(P,X,PC).

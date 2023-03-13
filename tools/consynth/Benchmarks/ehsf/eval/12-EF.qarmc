@@ -1,0 +1,33 @@
+% Property: EF (p>0), program is correct
+init(P,X,PC):=P=0,X=5,PC=1.
+next(P,X,PC,Pp,Xp,PCp):=
+ X>=0,Xp=X-1,Pp=P,PC=1,PCp=1;
+ X>=0,Xp=X,Pp=P,PC=1,PCp=1;
+ X<0,Pp=1,Xp=X,PC=1,PCp=2.
+
+% Queries: inv0, rank, trank
+inv0(P,X,PC):-init(P,X,PC).
+% ==== Move next(V,V') to the body or not ? NO ====
+exists([Pp,Xp,PCp],(next(P,X,PC,Pp,Xp,PCp),rank(P,X,PC,Pp,Xp,PCp),inv0(Pp,Xp,PCp))):-inv0(P,X,PC),\+P>0.
+%exists([Pp,Xp,PCp],(rank(P,X,PC,Pp,Xp,PCp),inv0(Pp,Xp,PCp))):-next(P,X,PC,Pp,Xp,PCp),inv0(P,X,PC),\+P>0.
+trank(P,X,PC,Pp,Xp,PCp):-rank(P,X,PC,Pp,Xp,PCp).
+trank(P,X,PC,Ppp,Xpp,PCpp):-trank(P,X,PC,Pp,Xp,PCp),rank(Pp,Xp,PCp,Ppp,Xpp,PCpp).
+dwf(trank(P,X,PC,Pp,Xp,PCp)).
+
+query_naming(init(p,x,pc)).
+query_naming(next(p,x,pc,'p\'','x\'','pc\'')).
+query_naming(inv0(p,x,pc)).
+query_naming(rank(p,x,pc,'p\'','x\'','pc\'')).
+query_naming(trank(p,x,pc,'p\'','x\'','pc\'')).
+query_naming(s3(p,x,pc,'p\'','x\'','pc\'')).
+
+skolem_template(s3, [P,X,PC,Pp,Xp,PCp],
+ 		true,
+ 		( B1=1, X>=0, PC=1 ; B2=1, X>=0,PC=1 ; B3=1, X<0,PC=1 ; PC=2 ),
+ 		(
+ 		  B1=1,X>=0,Xp=X-1,Pp=P,PC=1,PCp=1;
+ 		  B2=1,X>=0,Xp=X,Pp=P,PC=1,PCp=1; 
+ 		  B3=1,X<0,Pp=1,Xp=X,PC=1,PCp=2
+ 		),
+ 		((B1=1;B1=0), (B2=1;B2=0), (B3=0;B3=1))
+ 	       ).

@@ -1,0 +1,53 @@
+init(W,G,PC):=W=1,PC=1,G=1. % need G=_
+next(W,G,PC,Wp,Gp,PCp):=
+    PC=1,PCp=2,Wp=1,Gp=G;
+    PC=2,PCp=3,G>=1,Wp=W,Gp=0;
+    PC=2,G=<0,Wp=W,Gp=G,PCp=4;
+    PC=3,PCp=4,Wp=W,Gp=G;
+    PC=3,PCp=7,Wp=W,Gp=G;
+    PC=4,PCp=5,W=<0,Wp=W,Gp=G;
+    PC=4,PCp=5,W>=1,Wp=0,Gp=G;
+    PC=5,PCp=6,W>=1,Wp=W,Gp=G;
+    PC=5,PCp=6,W=<0,Wp=1,Gp=G;
+    PC=5,PCp=6,W=<0,Wp=W,Gp=G;
+    PC=6,PCp=7,Wp=W,Gp=G;
+    PC=6,PCp=2,Wp=W,Gp=G;
+    PC=7,PCp=7,Wp=1,Gp=G.
+nondet_next(W,G,PC,Wp,Gp,PCp,B1,B2,B3):=
+    PC=1,PCp=2,Wp=1,Gp=G;
+    PC=2,PCp=3,G>=1,Wp=W,Gp=0;
+    PC=2,G=<0,Wp=W,Gp=G,PCp=4;
+    B1>=1,PC=3,PCp=4,Wp=W,Gp=G;
+    B1=<0,PC=3,PCp=7,Wp=W,Gp=G;
+    PC=4,PCp=5,W=<0,Wp=W,Gp=G;
+    PC=4,PCp=5,W>=1,Wp=0,Gp=G;
+    PC=5,PCp=6,W>=1,Wp=W,Gp=G;
+    B2>=1,PC=5,PCp=6,W=<0,Wp=1,Gp=G;
+    B2=<0,PC=5,PCp=6,W=<0,Wp=W,Gp=G;
+    B3>=1,PC=6,PCp=7,Wp=W,Gp=G;
+    B3=<0,PC=6,PCp=2,Wp=W,Gp=G;
+    PC=7,PCp=7,Wp=1,Gp=G.
+dst(W,G,PC):=W=0.
+p1(W,G,PC):=PC=7,W=0.
+% EF p1
+phi0(W,G,PC):-init(W,G,PC).
+(PC>=1,PC=<6):-phi0(W,G,PC),\+p1(W,G,PC).
+rank(W,G,PC,Wp,Gp,PCp),phi0(Wp,Gp,PCp):-phi0(W,G,PC),\+p1(W,G,PC),nondet_next(W,G,PC,Wp,Gp,PCp,B1,B2,B3),witness(B1,B2,B3).
+wf(rank/6).
+template(witness, [B1v,B2v,B3v], (B1v=B1,B2v=B2,B3v=B3), ((B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))).
+
+% p1 => AG w!=1
+phi1(W,G,PC):-p1(W,G,PC).
+phi1(Wp,Gp,PCp):-phi1(W,G,PC),next(W,G,PC,Wp,Gp,PCp).
+dst(W,G,PC):-phi1(W,G,PC).
+
+query_naming(phi0(w,g,pc)).
+query_naming(phi1(w,g,pc)).
+query_naming(witness(b1,b2,b3)).
+query_naming(rank(w,g,pc,'w\'','g\'','pc\'')).
+query_naming(rank_p(w,g,pc,'w\'','g\'','pc\'')).
+
+query_finite_sorts(phi0/3,[3]).
+query_finite_sorts(phi1/3,[3]).
+query_finite_sorts(rank/6,[3,6]).
+query_finite_sorts(rank_p/6,[3,6]).

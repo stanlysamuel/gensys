@@ -1,0 +1,40 @@
+/* AF (pc1=l3 && pc2=m3) ; program is correct
+int x, y;
+void init() { x>=1; y >=1; }
+
+void t1() {
+  while (x>=1) {
+    x--; 
+  }
+}
+
+void t2() {
+  while (y>=1) { 
+    y--;
+  }
+}
+*/
+
+% With same names in query_naming for phi0 and rel0, qarmc is slower.
+query_naming(phi0(xx,yy,pc_1,pc_2)).
+query_naming(rel0(x,y,pc1,pc2,xp,yp,pc1p,pc2p)).
+query_naming(trel0(x,y,pc1,pc2,xp,yp,pc1p,pc2p)).
+
+% I used the property (pc1>=3 && pc2>=3) instead of (pc1=3 && pc2=3).
+
+init(X,Y,PC1,PC2):=X>=1,Y>=1,PC1=1,PC2=1.
+step(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p):=
+   X>=1,Xp=X,Yp=Y,PC1=1,PC1p=2,PC2p=PC2
+ ; Xp=X-1,Yp=Y,PC1=2,PC1p=1,PC2p=PC2
+ ; X=<0,Xp=X,Yp=Y,PC1=1,PC1p=3,PC2p=PC2
+ ; Y>=1,Xp=X,Yp=Y,PC2=1,PC2p=2,PC1p=PC1
+ ; Xp=X,Yp=Y-1,PC2=2,PC2p=1,PC1p=PC1
+ ; Y=<0,Xp=X,Yp=Y,PC2=1,PC2p=3,PC1p=PC1.
+
+phi0(X,Y,PC1,PC2):-init(X,Y,PC1,PC2).
+exists([Xp,Yp,PC1p,PC2p],step(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p)):-phi0(X,Y,PC1,PC2),\+ (PC1>=3,PC2>=3).
+phi0(Xp,Yp,PC1p,PC2p):-phi0(X,Y,PC1,PC2),step(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p),\+ (PC1>=3,PC2>=3).
+rel0(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p):-phi0(X,Y,PC1,PC2),\+ (PC1>=3,PC2>=3),step(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p),phi0(Xp,Yp,PC1p,PC2p).
+trel0(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p):-rel0(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p).
+trel0(X,Y,PC1,PC2,I,J,K,L):-trel0(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p),rel0(Xp,Yp,PC1p,PC2p,I,J,K,L).
+dwf(trel0(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p)).

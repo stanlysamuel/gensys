@@ -1,0 +1,24 @@
+% Property: EG (x>=2), program is correct
+init(X):=X=2.
+next(X,Xp):=
+   X=<4,Xp=X+1;
+   Xp=X-1.
+dst(X):=X>=2.
+
+% Queries: inv0
+inv0(X):-init(X).
+exists([Xp],(next(X,Xp),inv0(Xp))):-inv0(X).
+dst(X):-inv0(X).
+
+skolem_template(s3, [X,Xp],
+		true,
+ 		( X=T1 ; X=T2 ),
+ 		(
+ 		  X=T1, Xp=X+1;
+ 		  X=T2, Xp=X-1
+ 		),
+ 		( T1=2, T2=3 )
+ 	       ).
+
+% 'program is correct' after 0.1s:
+% sk(X,Xp) = (X=2, Xp=X+1 ; X=3, Xp=X-1)

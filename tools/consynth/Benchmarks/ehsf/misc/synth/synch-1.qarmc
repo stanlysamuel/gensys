@@ -1,0 +1,25 @@
+/* 
+   init:    x=0, z=0;
+   thread1: { x+=z; x+=z; }
+   thread2: { z++;  z++;  }
+   error:   x=3;
+*/
+
+% V = (X,Z,PC1,PC2)
+init(X,Z,PC1,PC2) := X=0, Z=0, PC1=1, PC2=1.
+next1(X,Z,PC1,PC2,Xp,Zp,PC1p,PC2p) :=
+  PC1=1, PC1p=2, Xp=X+Z, Zp=Z, PC2p=PC2
+  ; PC1=2, PC1p=3, Xp=X+Z, Zp=Z, PC2p=PC2.
+next2(X,Z,PC1,PC2,Xp,Zp,PC1p,PC2p) :=
+  PC2=1, PC2p=2, Zp=Z+1, Xp=X, PC1p=PC1
+  ; PC2=2, PC2p=3, Zp=Z+1, Xp=X, PC1p=PC1.
+error(X,Z,PC1,PC2) := PC1=3, PC2=3, X=3.
+
+% find inv such that:
+inv(X,Z,PC1,PC2) :- init(X,Z,PC1,PC2).
+inv(Xp,Zp,PC1p,PC2p) :- inv(X,Z,PC1,PC2), next1(X,Z,PC1,PC2,Xp,Zp,PC1p,PC2p).
+inv(Xp,Zp,PC1p,PC2p) :- inv(X,Z,PC1,PC2), next2(X,Z,PC1,PC2,Xp,Zp,PC1p,PC2p).
+false :- inv(X,Z,PC1,PC2), error(X,Z,PC1,PC2).
+
+% time ~/research/code/qarmc5/ctlstar -no-extra-insert-pred -nopreprocess synch-1.qarmc
+% 'program is not correct' after 0.1s

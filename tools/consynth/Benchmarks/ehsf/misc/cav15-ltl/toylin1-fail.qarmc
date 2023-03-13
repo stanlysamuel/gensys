@@ -1,0 +1,35 @@
+/*
+  Benchmark: toylin1.c
+  Property: c > 5 => F(resp > 5)
+*/
+
+initP(C,R,CS,PC):=C>=1,R=0,CS=4,PC=1.
+nextP(C,R,CS,PC,Cp,Rp,CSp,PCp):=
+    PC=1,CS=<0,Cp=C,Rp=R,CSp=CS,PCp=3;
+    PC=1,CS>0,Cp=C,Rp=R,CSp=CS,PCp=2;
+    PC=2,Cp=C-1,Rp=R+1,CSp=CS-1,PCp=1;
+    PC=2,C<CS,Cp=C-1,Rp=R,CSp=CS,PCp=1;
+    PC=3,Cp=C,Rp=R,CSp=CS,PCp=3.
+
+
+initA(BC) := BC=1.
+nextA(BC,C,R,BCp) :=
+(   BC=1, C>5, R=<5, BCp=2;
+    BC=2, R=<5, BCp=2
+).
+buechi(BC) := (BC=1;BC=2).
+
+init(C,R,CS,PC,BCp) := initP(C,R,CS,PC), initA(BC), nextA(BC,C,R,BCp).
+next(C,R,CS,PC,BC,Cp,Rp,CSp,PCp,BCp) := nextP(C,R,CS,PC,Cp,Rp,CSp,PCp), nextA(BC,Cp,Rp,BCp).
+
+inv(C,R,CS,PC,BC) :- init(C,R,CS,PC,BC).
+ti(C,R,CS,PC,BC,Cp,Rp,CSp,PCp,BCp), inv(Cp,Rp,CSp,PCp,BCp) :- inv(C,R,CS,PC,BC), next(C,R,CS,PC,BC,Cp,Rp,CSp,PCp,BCp).
+ti(C,R,CS,PC,BC,Cpp,Rpp,CSpp,PCpp,BCpp) :- ti(C,R,CS,PC,BC,Cp,Rp,CSp,PCp,BCp), next(Cp,Rp,CSp,PCp,BCp,Cpp,Rpp,CSpp,PCpp,BCpp).
+
+round(C,R,CS,PC,Cp,Rp,CSp,PCp) :- ti(C,R,CS,PC,BC,Cp,Rp,CSp,PCp,BCp), buechi(BC), buechi(BCp).
+
+dwf(round/8).
+
+query_naming(inv, [c,r,cs,pc,bc]).
+query_naming(round, [c,r,cs,pc,'c\'','r\'','cs\'','pc\'']).
+query_naming(ti, [c,r,cs,pc,bc,'c\'','r\'','cs\'','pc\'','bc\'']).

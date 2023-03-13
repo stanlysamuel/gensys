@@ -1,0 +1,23 @@
+% Figure 4 from Sipma-et-al ISIC95. Only verification (for the solution given in the paper).
+% Variables: V = (F,V,W,C) for (flow,v,w,com)
+% Constants: (A,cv) fixed to (1,2) to get linear transition relations
+%   (L,H,M) fixed to (0,10,4) but could be given arbitrary values. (off,on) encoded as (0,1).
+% WRONG: The domain of variable v is changed from [0,1] to [0,10] to allow v to discrete values
+% Solution: (W=<1, Cp=0) ; (W>=6, Cp=1) ; (2=<W=<5, Cp=C)
+
+init(F,V,W,C) := 0=<F, F=<4, V=0, 0=<W, W=<10, 0=<C, C=<1.
+env(F,V,W,C,Fp,Vp,Wp,Cp) := 0=<F, F=<4, 0=<Fp, Fp=<4.
+vessel(F,V,W,C,Fp,Vp,Wp,Cp) := Wp=W+F-V-V.
+valve(F,V,W,C,Fp,Vp,Wp,Cp) :=
+  C=0, V>=1, Vp=V-1 ; C=0, V=0, Vp=V ; C=1, V=<9, Vp=V+1 ; C=1, V=10, Vp=V.
+contr(F,V,W,C,Fp,Vp,Wp,Cp) :=
+  W=<1, Cp=0 ; 2=<W, W=<5, Cp=C ; 6=<W, Cp=1.
+error(F,V,W,C) := W+1=<0 ; W>=10+1.
+
+inv(F,V,W,C) :- init(F,V,W,C).
+inv(Fp,Vp,Wp,Cp) :- inv(F,V,W,C), env(F,V,W,C,Fp,Vp,Wp,Cp), vessel(F,V,W,C,Fp,Vp,Wp,Cp),
+	valve(F,V,W,C,Fp,Vp,Wp,Cp), contr(F,V,W,C,Fp,Vp,Wp,Cp).
+false :- inv(F,V,W,C), error(F,V,W,C).
+
+% time ~/research/code/qarmc5/ctlstar -use-next-skolem -no-extra-insert-pred -case-split -nopreprocess fig4-isic95.verif.qarmc 
+% ??

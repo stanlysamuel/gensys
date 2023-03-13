@@ -1,0 +1,30 @@
+//-- State: x, y, ax, ay
+//-- Inputs: dax, day
+
+assume {
+  !(eq x ax && eq y ay);
+}
+
+always assume {
+  (eq dax i1() && eq day i0()) ||
+  (eq dax i0() && eq day i1()) ||
+  (eq dax im1() && eq day i0()) ||
+  (eq dax i0() && eq day im1());
+}
+
+always guarantee {
+  !(eq x ax && eq y ay);
+
+  [ax <- add ax dax];
+  [ay <- add ay day];
+
+  ([x <- add x i1()] && [y <- y]) ||
+  ([x <- x] && [y <- add y i1()]) ||
+  ([x <- sub x i1()] && [y <- y]) ||
+  ([x <- x] && [y <- sub y i1()]);
+
+  ([x <- add x i1()] && [y <- y]) -> (X !([x <- sub x i1()] && [y <- y]));
+  ([x <- x] && [y <- add y i1()]) -> (X !([x <- x] && [y <- sub y i1()]));
+  ([x <- sub x i1()] && [y <- y]) -> (X !([x <- add x i1()] && [y <- y]));
+  ([x <- x] && [y <- sub y i1()]) -> (X !([x <- x] && [y <- add y i1()]));
+}

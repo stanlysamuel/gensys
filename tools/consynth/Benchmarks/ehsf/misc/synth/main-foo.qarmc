@@ -1,0 +1,46 @@
+% ==== Example from Swarat's email ====
+% A safety game: (init, ctr, env) |= G (not error)
+% The game can be won for error(PCm) := PCm=3 ; PCm=4.
+% The game cannot be won for error(PCm) := PCm=1 ; PCm=4.
+
+% Two procedures, each procedure has only one variable, the program counter.
+% Vmain = PCm, dom(PCm) = {0, 1, 2, 3, 4}
+% Vfoo  = PCf, dom(PCf) = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+init(PCm) :=
+  PCm=0.
+call(PCm,PCf) :=
+  PCm=0, PCf= -1.
+env(PCf,PCfp) :=
+  PCf= -1, PCfp=0 ;
+  PCf=1, PCfp=3 ; PCf=1, PCfp=4 ;
+  PCf=2, PCfp=5 ; PCf=2, PCfp=6.
+ctr(PCf, PCfp) :=
+  PCf=0, PCfp=1 ; PCf=0, PCfp=2 ;
+  PCf=3, PCfp=7 ; PCf=4, PCfp=8 ; PCf=5, PCfp=9 ; PCf=6, PCfp=10.
+ret(PCf, PCm) :=
+  PCf=7, PCm=1 ; PCf=8, PCm=2 ; PCf=9, PCm=3 ; PCf=10, PCm=4.
+error(PCm) :=
+  PCm=3 ; PCm=4.
+
+% Find 3 auxiliary assertions, sum_m, sum_f, aux_mf:
+sum_m(PCm,PCm) :- init(PCm).
+exists([PCfppp], (
+		   %ctr(PCfpp,PCfppp),
+		   sum_f(PCf,PCfppp))) :- sum_f(PCf,PCfp), env(PCfp,PCfpp).
+skolem_template(s3, [_PCf,_PCfp,PCfpp,PCfppp], true,
+		(PCfpp=0 ; PCfpp=3 ; PCfpp=4 ; PCfpp=5 ; PCfpp=6),
+		(   B=<0, PCfpp=0, PCfppp=1 ;
+		    B>=1, PCfpp=0, PCfppp=2 ;
+		    PCfpp=3, PCfppp=7 ; PCfpp=4, PCfppp=8 ;
+		    PCfpp=5, PCfppp=9 ; PCfpp=6, PCfppp=10
+		),
+		( B=0 ; B=1 )
+	       ).
+sum_f(PCf,PCf) :- sum_m(PCm,PCmp), call(PCmp,PCf).
+% ==== Existential here? no ====
+%exists([PCfp], (sum_f(PCf,PCfp), aux_mf(PCm,PCfp))) :- sum_m(PCm,PCmp), call(PCm,PCf).
+%skolem_template(s7, [PCf,PCm,_,PCfp], true, true, true, true).
+aux_mf(PCm,PCfp) :- sum_m(PCm,PCmp), call(PCm,PCf), sum_f(PCf,PCfp).
+sum_m(PCm,PCmp) :- aux_mf(PCm,PCf), ret(PCf,PCmp).
+false :- sum_m(PCm,PCmp), error(PCmp).

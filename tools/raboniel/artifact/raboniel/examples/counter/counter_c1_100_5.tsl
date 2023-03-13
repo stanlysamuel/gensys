@@ -1,0 +1,20 @@
+//-- State: counter
+//-- Inputs: i
+
+assume {
+  ge counter i0();
+  le counter i100();
+}
+
+always assume {
+  ge i i0();
+  le i i5();
+}
+
+always guarantee {
+  ge counter i0();  /* INV */
+  le counter i100(); /* INV */
+
+  [ counter <- add counter i ] || [ counter <- sub counter i ];
+
+}

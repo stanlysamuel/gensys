@@ -1,0 +1,41 @@
+/*
+#include "../ctl.h"
+
+// ************************************************************
+// EXPECTED RANKING:    y' < y  /\  y > 0
+// ************************************************************
+
+int x, y, p;
+unsigned int pc;
+int __phi() { return CAG( CAF( CAP(p > 0) )); }
+int __rho_1_;
+int __rho_2_;
+
+void init() { p = 0; }
+
+int body() {
+  if(x>0) {
+    p = p + 1;
+  }
+  else {
+    while(1) { if (!(y > 0)) break; y = y - 1; }
+    p = 1;
+  }
+  while(1) { if(dummy>0) break; } L_return: return 0;
+}
+
+int main() {}
+*/
+
+p0(A,B,C,D):=A=0,D=1.
+fds_transrel(A,B,C,D,E,F,G,H):=B>0,F=B,G=C,D=1,H=2;E=A+1,F=B,G=C,D=2,H=3;B=<0,F=B,G=C,D=1,H=3;C>0,F=B,G=C,D=3,H=4;G=C-1,F=B,D=4,H=3;C=<0,F=B,G=C,D=3,H=5;E=1,F=B,G=C,D=5,H=6.
+phi0(A,B,C,D):-p0(A,B,C,D).
+phi0(E,F,G,H):-phi0(A,B,C,D),fds_transrel(A,B,C,D,E,F,G,H).
+p1(A,B,C,D):-phi0(A,B,C,D).
+phi1(A,B,C,D):-p1(A,B,C,D).
+exists([E,F,G,H],fds_transrel(A,B,C,D,E,F,G,H)):-phi1(A,B,C,D),\+A>0.
+true,phi1(E,F,G,H):-phi1(A,B,C,D),fds_transrel(A,B,C,D,E,F,G,H),\+A>0.
+rel0(A,B,C,D,E,F,G,H):-phi1(A,B,C,D),\+A>0,fds_transrel(A,B,C,D,E,F,G,H),phi1(E,F,G,H),\+E>0.
+trel0(A,B,C,D,E,F,G,H):-rel0(A,B,C,D,E,F,G,H).
+trel0(A,B,C,D,I,J,K,L):-trel0(A,B,C,D,E,F,G,H),rel0(E,F,G,H,I,J,K,L).
+dwf(trel0(A,B,C,D,E,F,G,H)).

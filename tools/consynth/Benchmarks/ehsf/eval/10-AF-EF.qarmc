@@ -1,0 +1,47 @@
+% AF (EF (p>0)), program is correct
+/*
+
+int x, p, y;
+void init() { p = 0; x = 5; y = 5; }
+
+int body() {
+  while(1) {
+    if(y < 0) break;
+    y = y - 1; 
+  }
+
+  while(1) {
+    if(x < 0) break; 
+    __rho_1_ = nondet();
+    if (__rho_1_ > 0) {
+      x = x - 1;
+    }
+  }
+  p = 1;
+}
+*/
+
+init(P,X,Y,PC):=P=0,X=5,Y=5,PC=1.
+step(P,X,Y,PC,Pp,Xp,Yp,PCp):=
+ Y>=0,Pp=P,Xp=X,Yp=Y,PC=1,PCp=2;
+ Yp=Y-1,Pp=P,Xp=X,PC=2,PCp=1;
+ Y<0,Pp=P,Xp=X,Yp=Y,PC=1,PCp=3;
+ X>=0,Pp=P,Xp=X,Yp=Y,PC=3,PCp=4;
+ Xp=X-1,Pp=P,Yp=Y,PC=4,PCp=3;
+ X<0,Pp=P,Xp=X,Yp=Y,PC=3,PCp=5;
+ Pp=1,Xp=X,Yp=Y,PC=5,PCp=6.
+phi0(P,X,Y,PC):-init(P,X,Y,PC).
+exists([Pp,Xp,Yp,PCp],step(P,X,Y,PC,Pp,Xp,Yp,PCp)):-phi0(P,X,Y,PC),\+p1(P,X,Y,PC).
+phi0(Pp,Xp,Yp,PCp):-phi0(P,X,Y,PC),step(P,X,Y,PC,Pp,Xp,Yp,PCp),\+p1(P,X,Y,PC).
+rel0(P,X,Y,PC,Pp,Xp,Yp,PCp):-phi0(P,X,Y,PC),\+p1(P,X,Y,PC),step(P,X,Y,PC,Pp,Xp,Yp,PCp).
+trel0(P,X,Y,PC,Pp,Xp,Yp,PCp):-rel0(P,X,Y,PC,Pp,Xp,Yp,PCp).
+trel0(P,X,Y,PC,Ppp,Xpp,Ypp,PCpp):-trel0(P,X,Y,PC,Pp,Xp,Yp,PCp),rel0(Pp,Xp,Yp,PCp,Ppp,Xpp,Ypp,PCpp).
+dwf(trel0(P,X,Y,PC,Pp,Xp,Yp,PCp)).
+phi1(P,X,Y,PC):-p1(P,X,Y,PC).
+% step(V,V') moved from the head to the body. Please use '-next' flag for ctlstar.
+exists([Pp,Xp,Yp,PCp],phi1(Pp,Xp,Yp,PCp)):-phi1(P,X,Y,PC),\+P>0, step(P,X,Y,PC,Pp,Xp,Yp,PCp).
+rel1(P,X,Y,PC,Pp,Xp,Yp,PCp):-phi1(P,X,Y,PC),\+P>0,step(P,X,Y,PC,Pp,Xp,Yp,PCp),phi1(Pp,Xp,Yp,PCp),\+Pp>0.
+trel1(P,X,Y,PC,Pp,Xp,Yp,PCp):-rel1(P,X,Y,PC,Pp,Xp,Yp,PCp).
+trel1(P,X,Y,PC,Ppp,Xpp,Ypp,PCpp):-trel1(P,X,Y,PC,Pp,Xp,Yp,PCp),rel1(Pp,Xp,Yp,PCp,Ppp,Xpp,Ypp,PCpp).
+dwf(trel1(P,X,Y,PC,Pp,Xp,Yp,PCp)).
+skolem_template(s15, [P,X,Y,PC,Pp,Xp,Yp,PCp], [[1=1]], [], [[Xp=T*X+T0]], true).

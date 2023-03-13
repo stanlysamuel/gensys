@@ -1,0 +1,45 @@
+/* EG(x>=y) ; program is correct
+int x, y; // init = (x>=1 && y>=1 && x>=y)
+
+void t1() {
+  while (x>=1) { x--; }
+}
+
+void t2() {
+  while (y>=1) { y--; }
+}
+*/
+
+init(X,Y,PC1,PC2):=X>=1,Y>=1,X>=Y,PC1=1,PC2=1.
+next(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p):=
+  X>=1,PC1=1,Xp=X-1,Yp=Y,PC1p=1,PC2p=PC2;
+  X=<0,PC1=1,Xp=X,Yp=Y,PC1p=2,PC2p=PC2;
+  Y>=1,PC2=1,Xp=X,Yp=Y-1,PC2p=1,PC1p=PC1;
+  Y=<0,PC2=1,Xp=X,Yp=Y,PC2p=2,PC1p=PC1.
+dst(X,Y,PC1,PC2):=X>=Y.
+% clauses for EG
+phi0(X,Y,PC1,PC2):-init(X,Y,PC1,PC2).
+exists([Xp,Yp,PC1p,PC2p],phi0(Xp,Yp,PC1p,PC2p)):-phi0(X,Y,PC1,PC2),next(X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p).
+dst(X,Y,PC1,PC2):-phi0(X,Y,PC1,PC2).
+
+skolem_template(s3, [X,Y,PC1,PC2,Xp,Yp,PC1p,PC2p],
+		true,
+		( X+T1Y*Y+T1>=0, X>=1, PC1=1 ; X=<0, PC1=1 ; X+T1Y*Y+T1<0, Y>=1, PC2=1 ; Y=<0, PC2=1 ),
+		(
+		  X+T1Y*Y+T1>=0, X>=1,PC1=1,Xp=X-1,Yp=Y,PC1p=1,PC2p=PC2;
+		  X=<0,PC1=1,Xp=X,Yp=Y,PC1p=2,PC2p=PC2;
+		  X+T1Y*Y+T1<0, Y>=1,PC2=1,Xp=X,Yp=Y-1,PC2p=1,PC1p=PC1;
+		  Y=<0,PC2=1,Xp=X,Yp=Y,PC2p=2,PC1p=PC1
+		),
+		( true )
+	       ).
+
+query_naming(init(x,y,pc1,pc2)).
+query_naming(next(x,y,pc1,pc2,'x\'','y\'','pc1\'','pc2\'')).
+query_naming(phi0(x,y,pc1,pc2)).
+
+
+% time ./ctlstar tests/ctlstar-eval/19-EG.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program correct' after 0.3 sec, s3 = (x>=y+1 /\ d1) \/ d2 \/ (x<y+1 /\ d3) \/ d4
+% next = d1 \/ d2 \/ d3 \/ d4
+

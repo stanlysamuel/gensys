@@ -1,0 +1,27 @@
+% [ssh/t2.c.armc]
+% read_file 0.01 s
+query_naming(h1, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h1-[A,B,C,D,E,A,B,C,D,E] :- true. % s_main
+query_naming(h2, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h2-[A,B,C,D,E,F,G,H,I,J] :- I=K, H=L, G=1, F=0, h1-[A,B,C,D,E,M,N,O,P,J]. % extra(main_15)
+query_naming(h3, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h3-[A,B,C,D,E,F,G,H,I,J] :- h2-[A,B,C,D,E,F,G,H,I,J]. % extra(main_16)
+query_naming(h4, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h4-[A,B,C,D,E,F,G,H,I,J] :- K=L, h3-[A,B,C,D,E,F,G,H,I,J]. % extra(main_25)
+false-[] :- h4-[A,B,C,D,E,F,G,H,I,J]. % main_17
+query_naming(h5, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h5-[A,B,C,D,E,F,G,H,I,J] :- K=\=L, h3-[A,B,C,D,E,F,G,H,I,J]. % extra(main_26)
+query_naming(h6, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h6-[A,B,C,D,E,F,G,H,I,J] :- J=0, h5-[A,B,C,D,E,F,G,H,I,K]. % extra(main_20)
+query_naming(h7, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+query_naming(h8, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h8-[A,B,C,D,E,F,G,H,I,J] :- h7-[A,B,C,D,E,F,G,H,I,J]. % extra(main_19)
+query_naming(h9, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h9-[A,B,C,D,E,F,G,H,I,J] :- h8-[A,B,C,D,E,F,G,H,I,J]. % extra(main_23)
+query_naming(h10, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h10-[A,B,C,D,E,F,G,H,I,J] :- h6-[A,B,C,D,E,F,G,H,I,J]. % extra(main_21)
+h9-[A,B,C,D,E,F,G,H,I,J] :- h10-[A,B,C,D,E,F,G,H,I,J]. % extra(main_23)
+query_naming(h11, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h9-[A,B,C,D,E,F,G,H,I,J] :- h11-[A,B,C,D,E,F,G,H,I,J]. % extra(main_23)
+query_naming(h12, [x,y,p1,p2,'__retres5','x\'','y\'','p1\'','p2\'','__retres5\'']).
+h12-[A,B,C,D,E,F,G,H,I,J] :- h9-[A,B,C,D,E,F,G,H,I,J]. % extra(e_main)

@@ -1,0 +1,65 @@
+% No. 25 from Eric's paper (Industrial)
+/*
+init(X):=X=0.
+adam(X,Xp):=
+    X=Xp-1;
+    X=Xp.
+eve(X,Xp):=
+    X=Xp;
+    X=Xp+1, X=<50000.
+safe(X):= X>=0,X=<100000.
+% init => (c>5 /\ AG r=<5)
+inv(X):-init(X).
+exists([Xpp], (eve(Xp,Xpp),inv(Xpp))):-adam(X,Xp),inv(X).
+safe(Xp):-adam(X,Xp),phi0(X).
+safe(X):-phi0(X).
+
+
+skolem_template(s3, [X,Xp,Xpp],
+	true,
+	true,
+	(
+		Xpp=T,Xp=Xpp+1;
+		Xpp=T,Xp=Xpp
+		
+	),
+	( (T=< 50000, T>=0) )
+	).
+
+
+query_naming(phi0(x)).
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(s3/8, [4,8]).
+*/
+init(X):=X=0.
+adam(X,Xp):=
+    X=Xp-1;
+    X=Xp.
+eve(X,Xp):=
+    X=Xp;
+    X=Xp+1, X=<5.
+safe(X):= X>=0,X=<100000.
+% init => (c>5 /\ AG r=<5)
+inv(X):-init(X).
+exists([Xpp], (inv(Xpp))):-adam(X,Xp),inv(X).
+false :- inv(X),adam(X,Xp),\+ safe(X).
+
+
+skolem_template(s3, [X,Xp,Xpp],
+	true,
+	(X>=0, X=<50000),
+	(
+		Xpp=T,Xp=X;
+		Xpp=T+1,Xp-1=X
+		
+	),
+	( (T=< 5, T>=0) )
+	).
+
+
+query_naming(phi0(x)).
+query_finite_sorts(phi0/4,[4]).
+query_finite_sorts(s3/8, [4,8]).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/55-pandAG-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.1 sec
+% With '-case-split': CEX after 0.1 sec

@@ -1,0 +1,416 @@
+===> 1 level nesting cases
+
+  D1. AG(AG safe) ...= AG safe  ==> OK
+  D2. AG(AF dst)   ==> OK
+  D3. AG(EG safe) ==> OK
+  D4. AG(EF dst)  ==> OK
+  D5. AF(AG safe) 
+
+==> Current proof rule (non-horn)
+
+                   init(v) -> phi0(v)                                                                                   
+                   phi0(v) /\ !mid(v) -> exists v':next(v,v')                                                
+                   phi0(v) /\ !mid(v) /\ next(v,v') -> phi0(v') /\ rank(v,v')                         
+                   wf(rank)
+
+		   mid(v) -> phi1(v)
+		   phi1(v) /\ next(v,v') -> phi1(v')
+		   phi1(v) -> safe(v)
+                 ____________________________________________________
+                                       
+                            (init(v),next(v,v')) |= AF(AG safe(v))
+ 
+==> Intended proof rule (horn like... without 'mid')
+
+                   init(v) -> phi0(v)                                                              
+                   phi0(v) /\ aux(v) -> exists v':next(v,v')                            
+                   phi0(v) /\ aux(v) /\ next(v,v') -> phi0(v') /\ rank(v,v')     
+		   wf(rank)             
+
+		   v=v' -> next*(v,v')
+		   next*(v,v') /\ next(v',v'') -> next*(v,v'')
+		   next*(v,v') /\!safe(v') -> aux(v)
+                _________________________________________________
+                                       
+                            (init(v),next(v,v')) |= AF(AG safe(v))
+ 
+ 
+  D6. AF(AF dst) ...= AF dst  ==> OK
+  D7. AF(EG safe)
+
+==> Current proof rule (non-horn)
+
+                   init(v) -> phi0(v)                                                                                   
+                   phi0(v) /\ !mid(v) -> exists v':next(v,v')                                                
+                   phi0(v) /\ !mid(v) /\ next(v,v') -> phi0(v') /\ rank(v,v')                         
+                   wf(rank)
+
+		   mid(v) -> phi1(v)
+		   phi1(v) /\ next(v,v') -> exists v': phi1(v')
+		   phi1(v) -> safe(v)
+                 ____________________________________________________
+                                       
+                            (init(v),next(v,v')) |= AF(EG safe(v))
+ 
+==> Intended proof rule (horn like... without 'mid')
+
+                   init(v) -> phi0(v)                                                              
+                   phi0(v) /\ aux(v) -> exists v':next(v,v')                            
+                   phi0(v) /\ aux(v) /\ next(v,v') -> phi0(v') /\ rank(v,v')     
+		   wf(rank)             
+
+		   v=v' -> next*(v,v')
+		   next*(v,v') /\ next(v',v'') -> exists v'': next*(v,v'')
+		   next*(v,v') /\!safe(v') -> aux(v)
+                _________________________________________________
+                                       
+                            (init(v),next(v,v')) |= AF(EG safe(v))
+ 
+  D8. AF(EF dst) ...= EF dst  ==> OK
+  D9. EG(AG safe)  ==> OK
+  D10. EG(AF dst)  ==> OK
+  D11. EG(EG safe) ...= EG safe  ==> OK
+  D12. EG(EF dst)  ==> OK
+  D13. EF(AG safe)
+
+==> Current proof rule (non-horn)
+
+                   init(v) -> phi0(v)								                               
+		   phi0(v) /\ !mid(v) -> exists v':phi0(v') /\ rank(v,v')                                                
+       		   wf(rank)
+
+		   mid(v) -> phi1(v)
+		   phi1(v) /\ next(v,v') -> phi1(v')
+		   phi1(v) -> safe(v)
+                 ____________________________________________________
+                                       
+                            (init(v),next(v,v')) |= EF(AG safe(v))
+ 
+==> Intended proof rule (horn like... without 'mid')
+
+                   init(v) -> phi0(v)                                                              
+                   phi0(v) /\ aux(v) -> exists v':phi0(v') /\ rank(v,v')                                                
+       		   wf(rank)             
+
+		   v=v' -> next*(v,v')
+		   next*(v,v') /\ next(v',v'') -> next*(v,v'')
+		   next*(v,v') /\!safe(v') -> aux(v)
+                _________________________________________________
+                                       
+                            (init(v),next(v,v')) |= EF(AG safe(v))
+  
+  D14. EF(AF dst) ...= EF dst  ==> OK
+  D15. EF(EG safe)
+
+==> Current proof rule (non-horn)
+
+                   init(v) -> phi0(v)								                               
+		   phi0(v) /\ !mid(v) -> exists v':phi0(v') /\ rank(v,v')                                                
+       		   wf(rank)
+
+		   mid(v) -> phi1(v)
+		   phi1(v) /\ next(v,v') -> exists v': phi1(v')
+		   phi1(v) -> safe(v)
+                 ____________________________________________________
+                                       
+                            (init(v),next(v,v')) |= EF(EG safe(v))
+ 
+==> Intended proof rule (horn like... without 'mid')
+
+                   init(v) -> phi0(v)                                                              
+                   phi0(v) /\ aux(v) -> exists v':phi0(v') /\ rank(v,v')                                                
+       		   wf(rank)             
+
+		   v=v' -> next*(v,v')
+		   next*(v,v') /\ next(v',v'') -> exists v'': next*(v,v'')
+		   next*(v,v') /\!safe(v') -> aux(v)
+                _________________________________________________
+                                       
+                            (init(v),next(v,v')) |= EF(EG safe(v))
+  
+  D16. EF(EF dst) ...= EF dst  ==> OK
+
+================================================================================
+                                                2 level nesting of CTL formulas
+================================================================================
+- with 2 option for path quantifiers(A and E) and 2 for temporal operators(G and F), we have a total of (2 * 2)^3 = 64 options
+
+==> AG as the outer operator
+
+  1. AG(AG(AG safe)) ...= AG safe
+  2. AG(AG(AF dst)) ...= AG(AF dst)
+  3. AG(AG(EG safe)) ...= AG(EG safe)
+  4. AG(AG(EF dst)) ...= AG(EF dst)
+  5. AG(AF(AG safe)) ...= AG p1 and p1 => AF(AG safe)
+  6. AG(AF(AF dst)) ...= AG(AF dst)
+  7. AG(AF(EG safe)) ...= AG p1 and p1 => AF(EG safe)
+  8. AG(AF(EF dst)) ...= AG(EF dst)
+  9. AG(EG(AG safe)) ...= AG p1 and p1 => EG(AG safe)
+  10. AG(EG(AF dst)) ...= AG p1 and p1 => EG(AF dst)
+  11. AG(EG(EG safe)) ...= AG(EG safe)
+  12. AG(EG(EF dst)) ...= AG p1 and p1 => EG(EF dst)
+  13. AG(EF(AG safe)) ...= AG p1 and p1 => EF(AG safe)
+  14. AG(EF(AF dst)) ...= AG(EF dst)
+  15. AG(EF(EG safe))   ...= AG p1 and p1 => EF(EG safe)
+  16. AG(EF(EF dst)) ...= AG(EF dst)
+
+==> AF as the outer operator (*)
+
+  1. AF(AG(AG safe)) ...= AF(AG safe) 
+  2. AF(AG(AF dst)) ...= AG(AF dst) [' equivalence can be shown easily']
+  3. AF(AG(EG safe))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux1(v) -> grd(next)
+                          phi0(v) /\ aux1(v) /\ next(v,v') -> phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> next1*(v,v'')
+			  next1*(v,v') /\ aux2(v) -> aux1(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> exists v': next2*(v,v'')
+			  next2*(v,v') /\ !safe(v) -> aux2(v)
+		________________________________________________________________________
+
+                                  (init, next) |= AF(AG(EG safe))	  
+
+  4. AF(AG(EF dst)) ...= AG(EF dst) [' equivalence can be shown easily']
+  5. AF(AF(AG safe)) ...= AF(AG safe)
+  6. AF(AF(AF dst)) ...= AF dst
+  7. AF(AF(EG safe)) ...= AF(EG safe)
+  8. AF(AF(EF dst)) ...= EF dst
+  9. AF(EG(AG safe))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux1(v) -> grd(next)
+                          phi0(v) /\ aux1(v) /\ next(v,v') -> phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> exists v': next1*(v,v'')
+			  next1*(v,v') /\ aux2(v) -> aux1(v)
+
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> next2*(v,v'')
+			  next2*(v,v') /\ !safe(v) -> aux2(v)
+            ________________________________________________________________________
+
+                                  (init, next) |= AF(AG(EG safe))	  
+
+  10. AF(EG(AF dst)) ...= EG(AF dst) [' equivalence can be shown easily']
+  11. AF(EG(EG safe)) ...= AF(EG safe)
+  12. AF(EG(EF dst)) ...= EG(EF dst) [' equivalence can be shown easily']
+  13. AF(EF(AG safe)) ...= EF(AG safe)
+  14. AF(EF(AF dst)) ...= EF(AF dst)
+  15. AF(EF(EG safe)) ...= EF(EG safe)
+  16. AF(EF(EF dst)) ...= EF dst
+
+==> EG as the outer operator (similar to AG case)
+
+  1. EG(AG(AG safe)) ...= EG(AG safe)
+  2. EG(AG(AF dst)) 
+  3. EG(AG(EG safe)) 
+  4. EG(AG(EF dst)) 
+  5. EG(AF(AG safe))
+  6. EG(AF(AF dst)) ...= EG(AF dst)
+  7. EG(AF(EG safe))
+  8. EG(AF(EF dst)) ...= EG(EF dst)
+  9. EG(EG(AG safe)) ...= EG(AG safe)
+  10. EG(EG(AF dst)) ...= EG(AF dst)
+  11. EG(EG(EG safe)) ...= EG safe
+  12. EG(EG(EF dst)) ...= EG(EF dst)
+  13. EG(EF(AG safe))
+  14. EG(EF(AF dst)) ...= EG(EF dst)
+  15. EG(EF(EG safe))
+  16. EG(EF(EF dst)) ...= EG(EF dst)
+
+==> EF as the outer operator (***)
+
+  1. EF(AG(AG safe)) ...= EF(AG safe) 
+  2. EF(AG(AF dst))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux(v) -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> next1*(v,v'')
+			  next1*(v,v') /\ next2*(v',v'') -> aux(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> exists v'': next2*(v,v'')
+			  next2*(v,v') -> !dst(v')
+		________________________________________________________________________
+
+                                  (init, next) |= EF(AG(AF dst))	  
+
+  3. EF(AG(EG safe))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux1(v) -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> next1*(v,v'')
+			  next1*(v,v') /\ aux2(v) -> aux1(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> exists v': next2*(v,v'')
+			  next2*(v,v') /\ !safe(v) -> aux2(v)
+		________________________________________________________________________
+
+                                  (init, next) |= EF(AG(EG safe))	  
+
+  4. EF(AG(EF dst)) 
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux(v) -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> next1*(v,v'')
+			  next1*(v,v') /\ next2*(v',v'') -> aux(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> next2*(v,v'')
+			  next2*(v,v') -> !dst(v')
+		________________________________________________________________________
+
+                                  (init, next) |= EF(AG(EF dst))	  
+
+  5. EF(AF(AG safe)) 
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ next1*(v,v') -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> exists v'': next1*(v,v'')
+			  next1*(v,v')  -> aux(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> next2*(v,v'')
+			  next2*(v,v') /\ !safe(v') -> aux(v)
+		________________________________________________________________________
+
+                                  (init, next) |= EF(AF(AG safe))	  
+
+  6. EF(AF(AF dst)) ...= EF(AF dst)
+  7. EF(AF(EG safe)) 
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ next1*(v,v') -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> exists v'': next1*(v,v'')
+			  next1*(v,v')  -> aux(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> exists v'': next2*(v,v'')
+			  next2*(v,v') /\ !safe(v') -> aux(v)
+		________________________________________________________________________
+
+                                  (init, next) |= EF(AF(EG safe))	  
+
+  8. EF(AF(EF dst)) ...= EF dst
+  9. EF(EG(AG safe))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux1(v) -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> exists v'': next1*(v,v'')
+			  next1*(v,v') /\ aux2(v) -> aux1(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> next2*(v,v'')
+			  next2*(v,v') /\ !safe(v) -> aux2(v)
+		________________________________________________________________________
+
+                                  (init, next) |= EF(EG(AG safe))	  
+
+  10. EF(EG(AF dst))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux(v) -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> exists v'': next1*(v,v'')
+			  next1*(v,v') /\ next2*(v',v'') -> aux(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> exists v'': next2*(v,v'')
+			  next2*(v,v') -> !dst(v')
+		________________________________________________________________________
+
+                                  (init, next) |= EF(EG(AF dst))	  
+
+  11. EF(EG(EG safe)) ...= EF(EG safe)
+  12. EF(EG(EF dst))
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ aux(v) -> exists v': phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> exists v'': next1*(v,v'')
+			  next1*(v,v') /\ next2*(v',v'') -> aux(v)
+			  
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ next(v',v'') -> next2*(v,v'')
+			  next2*(v,v') -> !dst(v')
+		________________________________________________________________________
+
+                                  (init, next) |= EF(EG(EF dst))	  
+  13. EF(EF(AG safe)) ...= EF(AG safe)
+  14. EF(EF(AF dst)) ...= EF dst
+  15. EF(EF(EG safe)) ...= EF(EG safe)
+  16. EF(EF(EF dst)) ...= EF dst
+
+
+
+=============================================================================================
+==> Adding Until to the 1-level neting cases (now total possibilities rise up to 36)
+- we focus on the additional ones only ...
+    1. AG(AU(p,q))      OK      
+    2. AG(EU(p,q))      OK
+    3. AF(AU(p,q))       
+
+                          init(v) -> phi0(v)
+                          phi0(v) /\ (aux(v) \/  next1*(v,v')) -> grd(next)
+                          phi0(v) /\ (aux(v) \/  next1*(v,v')) /\ next(v,v') -> phi0(v')  /\ rank(v,v')
+                          wf(rank)
+
+			  v=v' -> next1*(v,v')
+			  next1*(v,v') /\ next(v',v'') -> next1*(v,v'')
+			  next1*(v,v')  -> !q(v')
+
+			  v=v' -> next2*(v,v')
+			  next2*(v,v') /\ !q(v') /\ next(v',v'') -> next2*(v,v'')
+			  next2*(v,v') /\ !p(v') /\ !q(v')-> aux(v)
+            ________________________________________________________________________
+
+                                  (init, next) |= AF(AU(p,q))	  
+
+    4. AF(EU(p,q))  **** from (3)
+    5. AU(AG p)       
+    6. AU(AF p)
+    7. AU(AU(p,q))       
+    8. AU(EG p)       
+    9. AU(EF p)
+    10. AU(EU(p,q))       
+    11. EG(AU(p,q))      OK
+    12. EG(EU(p,q))      OK
+    13. EF(AU(p,q)) **** from (3)      
+    14. EF(EU(p,q)) **** from (3)
+    15. EU(AG p)       
+    16. EU(AF p)
+    17. EU(AU(p,q))       
+    18. EU(EG p)       
+    19. EU(EF p)
+    20. EU(EU(p,q))       

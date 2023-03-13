@@ -1,0 +1,39 @@
+/*
+  Benchmark: win6.c
+  Property: F G WItemsNum >= 1
+*/
+initP(W,PC):=PC=1.
+nextP(W,PC,Wp,PCp):=
+(  PC=1,PCp=2;
+   PC=2,W=<5,Wp=W,PCp=3;
+   PC=2,W>5,Wp=W,PCp=3;
+   PC=3,Wp=W+1,PCp=2;
+   PC=2,W>5,Wp=W,PCp=4;
+   PC=4,W>2,Wp=W-1,PCp=4;
+   PC=4,W=<2,Wp=W,PCp=5;
+   PC=5,Wp=W,PCp=5
+).
+
+initA(BC) := BC=1.
+nextA(BC,W,BCp) :=
+(   BC=1, BCp=1;
+    BC=1, W=<0, BCp=2;
+    BC=2, W=<0, BCp=2;
+    BC=2, BCp=1
+).
+buechi(BC) := BC=2.
+
+init(W,PC,BCp) := initP(W,PC), initA(BC), nextA(BC,W,BCp).
+next(W,PC,BC,Wp,PCp,BCp) := nextP(W,PC,Wp,PCp), nextA(BC,Wp,BCp).
+
+inv(W,PC,BC) :- init(W,PC,BC).
+ti(W,PC,BC,Wp,PCp,BCp), inv(Wp,PCp,BCp) :- inv(W,PC,BC), next(W,PC,BC,Wp,PCp,BCp).
+ti(W,PC,BC,Wpp,PCpp,BCpp) :- ti(W,PC,BC,Wp,PCp,BCp), next(Wp,PCp,BCp,Wpp,PCpp,BCpp).
+
+round(W,PC,Wp,PCp) :- ti(W,PC,BC,Wp,PCp,BCp), buechi(BC), buechi(BCp).
+
+dwf(round/4).
+
+query_naming(inv, [w,pc,bc]).
+query_naming(round, [w,pc,'w\'','pc\'']).
+query_naming(ti, [w,pc,bc,'w\'','pc\'','bc\'']).

@@ -1,0 +1,85 @@
+% globals: 
+% init: 
+
+%
+% function main
+% locals: x, y, p1, p2, __retres5
+% formals: 
+fundec_src_file('main', 't2.c').
+var2names('main', [_x, _y, _p1, _p2, ___retres5], [(_x, 'x'), (_y, 'y'), (_p1, 'p1'), (_p2, 'p2'), (___retres5, '__retres5')]).
+trans_preds('main', [_x, _y, _p1, _p2, ___retres5], [_x_1, _y_1, _p1_1, _p2_1, ___retres5_1], []).
+program_node(s_main, enter('main')).
+proc_of(s_main, 'main').
+node_location(s_main, 1).
+program_edge(s_main, 'main_15').
+
+% print_stmt: main_15
+program_node('main_15', trans(t_main_15)).
+proc_of('main_15', 'main').
+node_location('main_15', 2).
+trans(t_main_15, [_x, _y, _p1, _p2, ___retres5], [_x_1, _y_1, _p1_1, _p2_1, ___retres5], (_p2_1 = ___non_det2, _p1_1 = ___non_det1, _y_1 = 1, _x_1 = 0)). % x = 0; y = 1; p1 = & x; p2 = & y
+program_edge('main_15', 'main_16').
+
+% print_stmt: main_16
+program_node('main_16', skip).
+proc_of('main_16', 'main').
+node_location('main_16', 7).
+program_node('main_25', trans(a_main_25)).
+proc_of('main_25', 'main').
+node_location('main_25', 7).
+trans(a_main_25, [_x, _y, _p1, _p2, ___retres5], [_x, _y, _p1, _p2, ___retres5], (___non_det4 = ___non_det3)). % *p1 == *p2
+program_edge('main_16', 'main_25').
+program_edge('main_25', 'main_17').
+program_node('main_26', trans(a_main_26)).
+proc_of('main_26', 'main').
+node_location('main_26', 7).
+trans(a_main_26, [_x, _y, _p1, _p2, ___retres5], [_x, _y, _p1, _p2, ___retres5], (___non_det6 =\= ___non_det5)). % *p1 != *p2
+program_edge('main_16', 'main_26').
+program_edge('main_26', 'main_20').
+
+% print_stmt: main_17
+program_node('main_17', error).
+proc_of('main_17', 'main').
+node_location('main_17', 9).
+
+% print_stmt: main_18
+program_node('main_18', trans(t_main_18)).
+proc_of('main_18', 'main').
+node_location('main_18', 10).
+trans(t_main_18, [_x, _y, _p1, _p2, ___retres5], [_x, _y, _p1, _p2, ___retres5_1], (___retres5_1 = 0)). % __retres5 = 0
+program_edge('main_18', 'main_19').
+
+% print_stmt: main_19
+program_node('main_19', skip).
+proc_of('main_19', 'main').
+node_location('main_19', 10).
+program_edge('main_19', 'main_23').
+
+% print_stmt: main_20
+program_node('main_20', trans(t_main_20)).
+proc_of('main_20', 'main').
+node_location('main_20', 12).
+trans(t_main_20, [_x, _y, _p1, _p2, ___retres5], [_x, _y, _p1, _p2, ___retres5_1], (___retres5_1 = 0)). % __retres5 = 0
+program_edge('main_20', 'main_21').
+
+% print_stmt: main_21
+program_node('main_21', skip).
+proc_of('main_21', 'main').
+node_location('main_21', 12).
+program_edge('main_21', 'main_23').
+
+% print_stmt: main_22
+program_node('main_22', trans(t_main_22)).
+proc_of('main_22', 'main').
+node_location('main_22', 14).
+trans(t_main_22, [_x, _y, _p1, _p2, ___retres5], [_x, _y, _p1, _p2, ___retres5_1], (___retres5_1 = 0)). % __retres5 = 0
+program_edge('main_22', 'main_23').
+
+% print_stmt: main_23
+program_node('main_23', return('main')).
+proc_of('main_23', 'main').
+node_location('main_23', 1).
+program_node(e_main, exit('main')).
+proc_of(e_main, 'main').
+node_location(e_main, 1).
+program_edge('main_23', e_main).

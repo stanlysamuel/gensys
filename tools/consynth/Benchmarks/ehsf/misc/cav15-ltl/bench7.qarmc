@@ -1,0 +1,112 @@
+/*
+Heidy's cav2015: ctlstar_test.t2
+property: EFG x=0 & EFG x=1
+*/
+initP(X,PC):=PC=0.
+nextP(X,PC,Xp,PCp):=
+(   PC=0,Xp=1,PCp=1;
+    PC=1,Xp=X,PCp=1;
+    PC=1,Xp=0,PCp=2;
+    PC=2,Xp=0,PCp=3;
+    PC=2,Xp=1,PCp=3;
+    PC=3,Xp=X,PCp=3
+).
+nextDetP(X,PC,Xp,PCp,B1,B2):=
+(   PC=0,Xp=1,PCp=1;
+    B1>=1,PC=1,Xp=X,PCp=1;
+    B1=<0,PC=1,Xp=0,PCp=2;
+    B2>=1,PC=2,Xp=0,PCp=3;
+    B2=<0,PC=2,Xp=1,PCp=3;
+    PC=3,Xp=X,PCp=3
+).
+
+% computing p1 and ~p1
+p1(X,PC):-X=0,witp1(PC).
+neg_p1(X,PC):-X<0;X>=1;witneg1_p1(PC);witneg2_p1(PC).
+template([(witp1, [PC], PC=T),
+	  (witneg1_p1, [PC], PC>=T+1),
+	  (witneg2_p1, [PC], PC+1=<T)
+	 ], (T=0;T=1;T=2;T=3)).
+
+% EF p1
+phi1(X,PC):-initP(X,PC).
+(PC>=0,PC=<3):-phi1(X,PC),neg_p1(X,PC).
+rank1(X,PC,Xp,PCp),phi1(Xp,PCp):-phi1(X,PC),neg_p1(X,PC),nextDetP(X,PC,Xp,PCp,B1,B2),witness1(B1,B2).
+wf(rank1/4).
+template(witness1, [Bv1,Bv2], (Bv1=B1,Bv2=B2), ((B1=0;B1=1),(B2=0;B2=1))).
+
+% LTL: p1 => G x=0
+initA1(BC) := BC=1.
+nextA1(BC,X,BCp) :=
+(   BC=1,BCp=1;
+    BC=1,X<0,BCp=2;
+    BC=1,X>=1,BCp=2;
+    BC=2,BCp=2
+).
+buechi1(BC) := BC=2.
+
+init1(X,PC,BCp) := p1(X,PC), initA1(BC), nextA1(BC,X,BCp).
+next1(X,PC,BC,Xp,PCp,BCp) := nextP(X,PC,Xp,PCp), nextA1(BC,Xp,BCp).
+
+inv1(X,PC,BC) :- init1(X,PC,BC).
+ti1(X,PC,BC,Xp,PCp,BCp), inv1(Xp,PCp,BCp) :- inv1(X,PC,BC), next1(X,PC,BC,Xp,PCp,BCp).
+ti1(X,PC,BC,Xpp,PCpp,BCpp) :- ti1(X,PC,BC,Xp,PCp,BCp), next1(Xp,PCp,BCp,Xpp,PCpp,BCpp).
+
+round1(X,PC,Xp,PCp) :- ti1(X,PC,BC,Xp,PCp,BCp), buechi1(BC), buechi1(BCp).
+
+dwf(round1/4).
+
+% computing p2 and ~p2
+p2(X,PC):-X=1,witp2(PC).
+neg_p2(X,PC):-X=<0;X>=2;witneg1_p2(PC);witneg2_p2(PC).
+template([(witp2, [PC], PC=T),
+	  (witneg1_p2, [PC], PC>=T+1),
+	  (witneg2_p2, [PC], PC+1=<T)
+	 ], (T=0;T=1;T=2;T=3)).
+
+% EF p2
+phi2(X,PC):-initP(X,PC).
+(PC>=0,PC=<3):-phi2(X,PC),neg_p2(X,PC).
+rank2(X,PC,Xp,PCp),phi2(Xp,PCp):-phi2(X,PC),neg_p2(X,PC),nextDetP(X,PC,Xp,PCp,B1,B2),witness2(B1,B2).
+wf(rank2/4).
+template(witness2, [Bv1,Bv2], (Bv1=B1,Bv2=B2), ((B1=0;B1=1),(B2=0;B2=1))).
+
+% LTL: p2 => G x=0
+initA2(BC) := BC=1.
+nextA2(BC,X,BCp) :=
+(   BC=1,BCp=1;
+    BC=1,X=<0,BCp=2;
+    BC=1,X>=2,BCp=2;
+    BC=2,BCp=2
+).
+buechi2(BC) := BC=2.
+
+init2(X,PC,BCp) := p2(X,PC), initA2(BC), nextA2(BC,X,BCp).
+next2(X,PC,BC,Xp,PCp,BCp) := nextP(X,PC,Xp,PCp), nextA2(BC,Xp,BCp).
+
+inv2(X,PC,BC) :- init2(X,PC,BC).
+ti2(X,PC,BC,Xp,PCp,BCp), inv2(Xp,PCp,BCp) :- inv2(X,PC,BC), next2(X,PC,BC,Xp,PCp,BCp).
+ti2(X,PC,BC,Xpp,PCpp,BCpp) :- ti2(X,PC,BC,Xp,PCp,BCp), next2(Xp,PCp,BCp,Xpp,PCpp,BCpp).
+
+round2(X,PC,Xp,PCp) :- ti2(X,PC,BC,Xp,PCp,BCp), buechi2(BC), buechi2(BCp).
+
+dwf(round2/4).
+
+
+query_naming(witp1, [pc]).
+query_naming(witneg1_p1, [pc]).
+query_naming(witneg2_p1, [pc]).
+query_naming(phi1, [x,pc]).
+query_naming(witness1, [b1,b2]).
+query_naming(inv1, [x,pc,bc]).
+query_naming(round1, [x,pc,'x\'','pc\'']).
+query_naming(ti1, [x,pc,bc,'x\'','pc\'','bc\'']).
+
+query_naming(witp2, [pc]).
+query_naming(witneg1_p2, [pc]).
+query_naming(witneg2_p2, [pc]).
+query_naming(phi2, [x,pc]).
+query_naming(witness2, [b1,b2]).
+query_naming(inv2, [x,pc,bc]).
+query_naming(round2, [x,pc,'x\'','pc\'']).
+query_naming(ti2, [x,pc,bc,'x\'','pc\'','bc\'']).

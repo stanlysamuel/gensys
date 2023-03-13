@@ -1,0 +1,35 @@
+init(X) := X>=0, X=<10.
+dst1(X) := X=<5.
+dst2(X) := X>=3.
+
+/* 
+p1(X), p2(X) :- init(X).
+dst1(X) :- p1(X).
+dst2(X) :- p2(X).
+*/
+
+/*
+init(X) -> exists(X: p1(X)).
+init(X) -> exists(X: p2(X)).
+p1(X) -> dst1(X).
+p2(X) -> dst2(X).
+
+Solutions:
+  p1(X) = X=<5 
+  p2(X) = X>=6
+(T1=1, T2=5)
+*/
+
+exists([X], p1(X)) :- id(here), Flag=0, init(X).
+exists([X], p2(X)) :- id(here), Flag=1, init(X).
+dst1(X) :- p1(X).
+dst2(X) :- p2(X).
+
+skolem_template(shere, [Flag, X], true,
+		( Flag>=1, X>=0, X=<10, T1*X=<T2, T3*X=<T4 ; Flag=<0, X>=0, X=<10, (T1*X>=T2+1 ; T3*X>=T4+1) ),
+		( Flag>=1, X>=0, X=<10, T1*X=<T2, T3*X=<T4 ; Flag=<0, X>=0, X=<10, (T1*X>=T2+1 ; T3*X>=T4+1) ),
+		true).
+
+% ~/research/code/qarmc5/ctlstar -use-next-skolem -no-extra-insert-pred -nopreprocess tests/ctlstar-unit/disj.qarmc
+% Error: ! collect_query_map:multiple_occurence(true,node(true,[],0,empty,empty))
+% SVN revision 17224

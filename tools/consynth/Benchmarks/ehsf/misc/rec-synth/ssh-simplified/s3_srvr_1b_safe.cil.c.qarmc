@@ -1,0 +1,177 @@
+% [s3_srvr_1b_safe.cil.c.armc]
+% read_file 0.02 s
+query_naming(h1, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h1-[A,B,C,D,E,F,A,B,C,D,E,F] :- true. % s_main
+query_naming(h2, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h2-[A,B,C,D,E,F,G,H,I,J,K,L] :- h1-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_95)
+query_naming(h3, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h3-[A,B,C,D,E,F,G,H,I,J,K,L] :- h2-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_95_ret)
+query_naming(h4, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h4-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=0, G=8466, H=I, h3-[A,B,C,D,E,F,M,N,I,O,K,L]. % extra(main_96)
+query_naming(h5, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h5-[A,B,C,D,E,F,G,H,I,J,K,L] :- h4-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_97)
+query_naming(h6, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h6-[A,B,C,D,E,F,G,H,I,J,K,L] :- h5-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_98)
+query_naming(h7, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h7-[A,B,C,D,E,F,G,H,I,J,K,L] :- h6-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_99)
+query_naming(h8, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h8-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=<8512, h7-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_144)
+query_naming(h9, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h9-[A,B,C,D,E,F,G,H,I,J,K,L] :- h8-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_100)
+query_naming(h10, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h10-[A,B,C,D,E,F,G,H,I,J,K,L] :- G>=1+8512, h7-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_145)
+query_naming(h11, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h11-[A,B,C,D,E,F,G,H,I,J,K,L] :- h10-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_102)
+query_naming(h12, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h12-[A,B,C,D,E,F,G,H,I,J,K,L] :- J>=1+2, h9-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_146)
+false-[] :- h12-[A,B,C,D,E,F,G,H,I,J,K,L]. % main_101
+query_naming(h13, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h13-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=<2, h9-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_147)
+h11-[A,B,C,D,E,F,G,H,I,J,K,L] :- h13-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_102)
+query_naming(h14, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h14-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8466, h11-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_148)
+query_naming(h15, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h15-[A,B,C,D,E,F,G,H,I,J,K,L] :- h14-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_103)
+query_naming(h16, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h16-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=\=8466, h11-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_149)
+query_naming(h17, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h17-[A,B,C,D,E,F,G,H,I,J,K,L] :- h16-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_104)
+query_naming(h18, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h18-[A,B,C,D,E,F,G,H,I,J,K,L] :- h15-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_111)
+query_naming(h19, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h19-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8512, h17-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_150)
+query_naming(h20, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h20-[A,B,C,D,E,F,G,H,I,J,K,L] :- h19-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_105)
+query_naming(h21, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h21-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=\=8512, h17-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_151)
+query_naming(h22, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h22-[A,B,C,D,E,F,G,H,I,J,K,L] :- h21-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_106)
+query_naming(h23, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h23-[A,B,C,D,E,F,G,H,I,J,K,L] :- h20-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_117)
+query_naming(h24, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h24-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8640, h22-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_152)
+query_naming(h25, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h25-[A,B,C,D,E,F,G,H,I,J,K,L] :- h24-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_107)
+query_naming(h26, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h26-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=\=8640, h22-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_153)
+query_naming(h27, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h27-[A,B,C,D,E,F,G,H,I,J,K,L] :- h26-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_108)
+query_naming(h28, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h28-[A,B,C,D,E,F,G,H,I,J,K,L] :- h25-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_122)
+query_naming(h29, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h29-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8656, h27-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_154)
+query_naming(h30, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h30-[A,B,C,D,E,F,G,H,I,J,K,L] :- h29-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_109)
+query_naming(h31, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h31-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=\=8656, h27-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_155)
+query_naming(h32, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h32-[A,B,C,D,E,F,G,H,I,J,K,L] :- h31-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_110)
+query_naming(h33, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h33-[A,B,C,D,E,F,G,H,I,J,K,L] :- h30-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_128)
+query_naming(h34, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h34-[A,B,C,D,E,F,G,H,I,J,K,L] :- L= -1, h32-[A,B,C,D,E,F,G,H,I,J,K,M]. % extra(main_139)
+query_naming(h35, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h35-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=0, h18-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_156)
+query_naming(h36, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h36-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=2, h35-[A,B,C,D,E,F,G,H,I,M,K,L]. % extra(main_112)
+query_naming(h37, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h37-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=\=0, h18-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_157)
+query_naming(h38, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h38-[A,B,C,D,E,F,G,H,I,J,K,L] :- h37-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_113)
+h38-[A,B,C,D,E,F,G,H,I,J,K,L] :- h36-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_113)
+query_naming(h39, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h39-[A,B,C,D,E,F,G,H,I,J,K,L] :- H=\=0, h38-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_158)
+query_naming(h40, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h40-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8656, h39-[A,B,C,D,E,F,M,H,I,J,K,L]. % extra(main_114)
+query_naming(h41, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h41-[A,B,C,D,E,F,G,H,I,J,K,L] :- H=0, h38-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_159)
+query_naming(h42, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h42-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8512, h41-[A,B,C,D,E,F,M,H,I,J,K,L]. % extra(main_115)
+query_naming(h43, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h43-[A,B,C,D,E,F,G,H,I,J,K,L] :- h40-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_116)
+h43-[A,B,C,D,E,F,G,H,I,J,K,L] :- h42-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_116)
+query_naming(h44, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h44-[A,B,C,D,E,F,G,H,I,J,K,L] :- h43-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_138)
+query_naming(h45, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h45-[A,B,C,D,E,F,G,H,I,J,K,L] :- h23-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_117_ret)
+query_naming(h46, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h46-[A,B,C,D,E,F,G,H,I,J,K,L] :- h45-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_118)
+query_naming(h47, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h47-[A,B,C,D,E,F,G,H,I,J,K,L] :- K=\=0, h46-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_160)
+query_naming(h48, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h48-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8466, h47-[A,B,C,D,E,F,M,H,I,J,K,L]. % extra(main_119)
+query_naming(h49, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h49-[A,B,C,D,E,F,G,H,I,J,K,L] :- K=0, h46-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_161)
+query_naming(h50, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h50-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8640, h49-[A,B,C,D,E,F,M,H,I,J,K,L]. % extra(main_120)
+query_naming(h51, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h51-[A,B,C,D,E,F,G,H,I,J,K,L] :- h48-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_121)
+h51-[A,B,C,D,E,F,G,H,I,J,K,L] :- h50-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_121)
+h44-[A,B,C,D,E,F,G,H,I,J,K,L] :- h51-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_138)
+query_naming(h52, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h52-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=3, h28-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_162)
+query_naming(h53, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h53-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=4, h52-[A,B,C,D,E,F,G,H,I,M,K,L]. % extra(main_123)
+query_naming(h54, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h54-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=\=3, h28-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_163)
+query_naming(h55, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h55-[A,B,C,D,E,F,G,H,I,J,K,L] :- h54-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_124)
+h55-[A,B,C,D,E,F,G,H,I,J,K,L] :- h53-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_124)
+query_naming(h56, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h56-[A,B,C,D,E,F,G,H,I,J,K,L] :- H=\=0, h55-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_164)
+query_naming(h57, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h57-[A,B,C,D,E,F,G,H,I,J,K,L] :- h56-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_125)
+query_naming(h58, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h58-[A,B,C,D,E,F,G,H,I,J,K,L] :- H=0, h55-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_165)
+query_naming(h59, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h59-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8656, h58-[A,B,C,D,E,F,M,H,I,J,K,L]. % extra(main_126)
+h34-[A,B,C,D,E,F,G,H,I,J,K,L] :- L= -1, h57-[A,B,C,D,E,F,G,H,I,J,K,M]. % extra(main_139)
+query_naming(h60, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h60-[A,B,C,D,E,F,G,H,I,J,K,L] :- h59-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_127)
+h44-[A,B,C,D,E,F,G,H,I,J,K,L] :- h60-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_138)
+query_naming(h61, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h61-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=2, h33-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_166)
+query_naming(h62, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h62-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=3, h61-[A,B,C,D,E,F,G,H,I,M,K,L]. % extra(main_129)
+query_naming(h63, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h63-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=\=2, h33-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_167)
+query_naming(h64, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h64-[A,B,C,D,E,F,G,H,I,J,K,L] :- h63-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_130)
+h64-[A,B,C,D,E,F,G,H,I,J,K,L] :- h62-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_130)
+query_naming(h65, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h65-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=4, h64-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_168)
+query_naming(h66, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h66-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=5, h65-[A,B,C,D,E,F,G,H,I,M,K,L]. % extra(main_131)
+query_naming(h67, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h67-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=\=4, h64-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_169)
+query_naming(h68, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h68-[A,B,C,D,E,F,G,H,I,J,K,L] :- h67-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_132)
+query_naming(h69, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h69-[A,B,C,D,E,F,G,H,I,J,K,L] :- h66-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_134)
+query_naming(h70, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h70-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=5, h68-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_170)
+false-[] :- h70-[A,B,C,D,E,F,G,H,I,J,K,L]. % main_133
+query_naming(h71, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h71-[A,B,C,D,E,F,G,H,I,J,K,L] :- J=\=5, h68-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_171)
+h69-[A,B,C,D,E,F,G,H,I,J,K,L] :- h71-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_134)
+query_naming(h72, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h72-[A,B,C,D,E,F,G,H,I,J,K,L] :- H=\=0, h69-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_172)
+query_naming(h73, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h73-[A,B,C,D,E,F,G,H,I,J,K,L] :- G=8640, h72-[A,B,C,D,E,F,M,H,I,J,K,L]. % extra(main_135)
+query_naming(h74, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h74-[A,B,C,D,E,F,G,H,I,J,K,L] :- H=0, h69-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_173)
+query_naming(h75, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h75-[A,B,C,D,E,F,G,H,I,J,K,L] :- h74-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_136)
+query_naming(h76, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h76-[A,B,C,D,E,F,G,H,I,J,K,L] :- h73-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_137)
+h34-[A,B,C,D,E,F,G,H,I,J,K,L] :- L= -1, h75-[A,B,C,D,E,F,G,H,I,J,K,M]. % extra(main_139)
+h44-[A,B,C,D,E,F,G,H,I,J,K,L] :- h76-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_138)
+h7-[A,B,C,D,E,F,G,H,I,J,K,L] :- h44-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_99)
+query_naming(h77, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h77-[A,B,C,D,E,F,G,H,I,J,K,L] :- h34-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_140)
+query_naming(h78, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h78-[A,B,C,D,E,F,G,H,I,J,K,L] :- h77-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_142)
+query_naming(h79, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h78-[A,B,C,D,E,F,G,H,I,J,K,L] :- h79-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(main_142)
+query_naming(h80, [s__state,s__hit,tmp,blastFlag,tmp___1,'__retres6','s__state\'','s__hit\'','tmp\'','blastFlag\'','tmp___1\'','__retres6\'']).
+h80-[A,B,C,D,E,F,G,H,I,J,K,L] :- h78-[A,B,C,D,E,F,G,H,I,J,K,L]. % extra(e_main)

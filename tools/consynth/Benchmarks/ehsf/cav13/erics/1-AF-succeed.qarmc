@@ -1,0 +1,37 @@
+% No. 1 from Eric's paper
+% afp-succeed/original.c in the benchmarks
+/*
+#include "../ctl.h"
+
+int y, p;
+unsigned int pc;
+int __phi() { return CAF( CAP(p > 0) ); }
+
+void init() { p = 0; assume(y > 0); }
+
+int body() {
+  while(1) {
+    if (! y > 0) break;
+    y = y - 1;
+  }
+  p = 1;
+ while(1) { if(dummy>0) break; } L_return: return 0;  
+}
+
+int main() {}
+*/
+init(Y,P,PC):=Y>0,P=0,PC=1.
+next(Y,P,PC,Yp,Pp,PCp):=
+ Y>0,Yp=Y-1,Pp=P,PC=1,PCp=1;
+ Y=<0,Yp=Y,Pp=1,PC=1,PCp=2.
+dst(Y,P,PC):=P>0.
+
+% Queries: inv0, rank
+inv0(Y,P,PC):-init(Y,P,PC).
+exists([Yp,Pp,PCp],next(Y,P,PC,Yp,Pp,PCp)):-inv0(Y,P,PC),\+dst(Y,P,PC).
+rank(Y,P,PC,Yp,Pp,PCp):-inv0(Y,P,PC),\+dst(Y,P,PC),next(Y,P,PC,Yp,Pp,PCp).
+inv0(Yp,Pp,PCp):-inv0(Y,P,PC),\+dst(Y,P,PC),next(Y,P,PC,Yp,Pp,PCp).
+wf(rank/6).
+
+% ./ctlstar tests/ctlstar-Erics/1-AF-succeed.qarmc -use-next-skolem -no-extra-insert-pred
+% 'program correct' after 0.6 sec

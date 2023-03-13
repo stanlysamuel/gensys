@@ -1,0 +1,70 @@
+/*
+  EF(pc=end /\ s>=n)
+
+int sum(int n)
+{
+  int s;
+  if (n>0) {
+    s=sum(n-1);
+    if(nondet){s--;}
+    return s+n;
+  } else { return 0; }
+}
+
+*/
+
+skip_data(N,S,Ret,Np,Sp,Retp):=Np=N, Sp=S, Retp=Ret.
+skip(N,S,Ret,PC,Np,Sp,Retp,PCp):=Np=N, Sp=S, Retp=Ret, PCp=PC.
+init(N,S,Ret,PC):=PC=1.
+loc(N,S,Ret,PC,Np,Sp,Retp,PCp):=
+  PC=2, PCp=3.
+call(N,S,Ret,PC,Np,Sp,Retp,PCp):=
+  PC=2, PCp=1.
+ret(N,S,Ret,PC,Np,Sp,Retp,PCp):=
+  PC=6, PCp=3.
+op(N,S,Ret,PC,Np,Sp,Retp,PCp):=
+  PC=1, PCp=2;
+  PC=1, PCp=5;
+  PC=3, PCp=4;
+%  PC=3, PCp=4;
+  PC=4, PCp=6;
+  PC=5, PCp=6.
+dst(N,S,Ret,PC):=PC=6, S>=N.
+
+summ(N,S,Ret,PC,Np,Sp,Retp,PCp) :- init(N,S,Ret,PC), skip(N,S,Ret,PC,Np,Sp,Retp,PCp).
+summ(N,S,Ret,PC,Npp,Spp,Retpp,PCpp) :- summ(N,S,Ret,PC,Np,Sp,Retp,PCp), op(Np,Sp,Retp,PCp,Npp,Spp,Retpp,PCpp).
+summ(Npp,Spp,Retpp,PCpp,Nppp,Sppp,Retppp,PCppp) :- summ(N,S,Ret,PC,Np,Sp,Retp,PCp), call(Np,Sp,Retp,PCp,Npp,Spp,Retpp,PCpp), skip(Npp,Spp,Retpp,PCpp,Nppp,Sppp,Retppp,PCppp).
+summ(N,S,Ret,PC,Npppp,Spppp,Retpppp,PCpppp) :- summ(N,S,Ret,PC,Np,Sp,Retp,PCp), call(Np,Sp,Retp,PCp,Npp,Spp,Retpp,PCpp), summ(Npp,Spp,Retpp,PCpp,Nppp,Sppp,Retppp,PCppp),
+ 	ret(Nppp,Sppp,Retppp,PCppp,Npppp,Spppp,Retpppp,PCpppp), loc(Np,Sp,Retp,PCp,Npppp,Spppp,Retpppp,PCpppp).
+
+next(N,S,Ret,PC,Np,Sp,Retp,PCp):-
+  op(N,S,Ret,PC,Np,Sp,Retp,PCp);
+  call(N,S,Ret,PC,Npp,Spp,Retpp,PCpp), summ(Npp,Spp,Retpp,PCpp,Nppp,Sppp,Retppp,PCppp), ret(Nppp,Sppp,Retppp,PCppp,Np,Sp,Retp,PCp), loc(N,S,Ret,PC,Np,Sp,Retp,PCp).
+
+% clauses for (init => EF dst(V))
+inv(N,S,Ret,PC) :- init(N,S,Ret,PC).
+exists([Np,Sp,Retp,PCp],next(N,S,Ret,PC,Np,Sp,Retp,PCp)):-inv(N,S,Ret,PC),\+dst(N,S,Ret,PC).
+inv(Np,Sp,Retp,PCp), rank(N,S,Ret,PC,Np,Sp,Retp,PCp):-inv(N,S,Ret,PC),\+dst(N,S,Ret,PC),next(N,S,Ret,PC,Np,Sp,Retp,PCp).
+wf(rank/8).
+
+%%% skolem_template(s13, [N,S,Ret,PC,Np,Sp,Retp,PCp],
+%%%  		true,
+%%%  		true, 
+%%% 		(
+%%% 		  PC=1, PCp=2;
+%%% 		  PC=1, PCp=5;
+%%% 		  PC=3, PCp=4;
+%%% 		  PC=3, PCp=4;
+%%% 		  PC=4, PCp=6;
+%%% 		  PC=5, PCp=6
+%%% 		),
+%%%  		true
+%%%  	       ).
+
+% query_naming(init(x,y,pc1,pc2)).
+% query_naming(next(x,y,pc1,pc2,'x\'','y\'','pc1\'','pc2\'')).
+
+
+% time ./ctlstar tests/ctlstar-eval/20-AGAF-succeed.qarmc -use-next-skolem -no-extra-insert-pred
+% ??
+

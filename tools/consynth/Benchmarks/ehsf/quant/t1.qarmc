@@ -1,0 +1,5 @@
+inv(X,Y) := X>=0,Y>X.
+exists([Z],q1(Z)):-id(1),X>=0.
+false :- inv(X,Y),s1(X,Y).
+s1(X,Y):-X>=0,Y>=1.
+skolem_template(s1,[X,Z],true,true,Z=B1*X+B2,true).

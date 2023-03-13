@@ -1,0 +1,52 @@
+/*
+Heidy's cav2015: ctlstar_3.t2
+property: EGF x>0
+*/
+initP(X,N,PC):=PC=0.
+nextP(X,N,PC,Xp,Np,PCp):=
+(   PC=0,Xp=1,PCp=1;% Np=?
+    PC=1,N>0,Xp=0,Np=N,PCp=1;
+    PC=1,N=<0,Xp=X,Np=N,PCp=2;
+    PC=2,Xp=1,Np=N,PCp=3;
+    PC=3,Xp=X,Np=N,PCp=3
+).
+nextDetP(X,N,PC,Xp,Np,PCp,T):=
+(   PC=0,Xp=1,Np=T,PCp=1;% Np=?
+    PC=1,N>0,Xp=0,Np=N,PCp=1;
+    PC=1,N=<0,Xp=X,Np=N,PCp=2;
+    PC=2,Xp=1,Np=N,PCp=3;
+    PC=3,Xp=X,Np=N,PCp=3
+).
+
+% EG p1
+phi1(X,N,PC):-initP(X,N,PC).
+phi1(Xp,Np,PCp):-phi1(X,N,PC),nextDetP(X,N,PC,Xp,Np,PCp,T),witness(T).
+p1(X,N,PC):-phi1(X,N,PC).
+template(witness, [T_V], (T_V=B), (B=0;B=1)).
+
+% LTL: p1 => F x>0
+initA(BC) := BC=1.
+nextA(BC,X,BCp) := BC=1,X=<0,BCp=1.
+buechi(BC) := BC=1.
+
+init(X,N,PC,BCp) := p1(X,N,PC), initA(BC), nextA(BC,X,BCp).
+next(X,N,PC,BC,Xp,Np,PCp,BCp) := nextP(X,N,PC,Xp,Np,PCp), nextA(BC,Xp,BCp).
+
+inv(X,N,PC,BC) :- init(X,N,PC,BC).
+ti(X,N,PC,BC,Xp,Np,PCp,BCp), inv(Xp,Np,PCp,BCp) :- inv(X,N,PC,BC), next(X,N,PC,BC,Xp,Np,PCp,BCp).
+ti(X,N,PC,BC,Xpp,Npp,PCpp,BCpp) :- ti(X,N,PC,BC,Xp,Np,PCp,BCp), next(Xp,Np,PCp,BCp,Xpp,Npp,PCpp,BCpp).
+round(X,N,PC,Xp,Np,PCp) :- ti(X,N,PC,BC,Xp,Np,PCp,BCp), buechi(BC), buechi(BCp).
+dwf(round/6).
+
+query_naming(phi1, [x,n,pc]).
+query_naming(p1, [x,n,pc]).
+query_naming(witness, [t]).
+query_naming(inv, [x,n,pc,bc]).
+query_naming(round, [x,n,pc,'x\'','n\'','pc\'']).
+query_naming(ti, [x,n,pc,bc,'x\'','n\'','pc\'','bc\'']).
+
+
+
+
+
+    

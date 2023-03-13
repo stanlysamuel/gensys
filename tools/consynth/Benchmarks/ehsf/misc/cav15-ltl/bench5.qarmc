@@ -1,0 +1,45 @@
+/*
+Heidy's cav2015: ctlstar_4.t2
+property: AG (x=0 U b=0)
+*/
+initP(B,C,X,PC):=PC=0.
+nextP(B,C,X,PC,Bp,Cp,Xp,PCp):=
+(   PC=0,PCp=1;	% Bp=?,Cp=?,Xp=?
+    PC=1,C=<2,Bp=B,Cp=C,Xp=X,PCp=2;
+    PC=1,C>=4,Bp=B,Cp=C,Xp=X,PCp=2;
+    PC=2,C>=1,Bp=5,Cp=C,Xp=X,PCp=3;
+    PC=3,B>=1,Bp=B,Cp=C,Xp=0,PCp=4;
+    PC=3,B>=1,Bp=B,Cp=C,Xp=1,PCp=4;
+    PC=3,B=<0,Bp=B,Cp=C,Xp=X,PCp=2;
+    PC=4,Bp=B-1,Cp=C,Xp=X,PCp=3
+).
+
+% AG p1
+phi0(B,C,X,PC):-initP(B,C,X,PC).
+phi0(Bp,Cp,Xp,PCp):-phi0(B,C,X,PC),nextP(B,C,X,PC,Bp,Cp,Xp,PCp).
+p1(B,C,X,PC):-phi0(B,C,X,PC).
+
+% LTL:p1 => x=0 U b=0
+initA(BC) := BC=1.
+nextA(BC,B,X,BCp) :-
+(   BC=1,(B<0;B>=1),BCp=1;
+    BC=1,(B<0;B>=1),(X<0;X>=1),BCp=2;
+    BC=2,BCp=2
+).
+buechi(BC) := BC=1;BC=2.
+
+init(B,C,X,PC,BCp) := p1(B,C,X,PC), initA(BC), nextA(BC,B,X,BCp).
+next(B,C,X,PC,BC,Bp,Cp,Xp,PCp,BCp) := nextP(B,C,X,PC,Bp,Cp,Xp,PCp), nextA(BC,Bp,Xp,BCp).
+
+inv(B,C,X,PC,BC) :- init(B,C,X,PC,BC).
+ti(B,C,X,PC,BC,Bp,Cp,Xp,PCp,BCp), inv(Bp,Cp,Xp,PCp,BCp) :- inv(B,C,X,PC,BC), next(B,C,X,PC,BC,Bp,Cp,Xp,PCp,BCp).
+ti(B,C,X,PC,BC,Bpp,Cpp,Xpp,PCpp,BCpp) :- ti(B,C,X,PC,BC,Bp,Cp,Xp,PCp,BCp), next(Bp,Cp,Xp,PCp,BCp,Bpp,Cpp,Xpp,PCpp,BCpp).
+round(B,C,X,PC,Bp,Cp,Xp,PCp) :- ti(B,C,X,PC,BC,Bp,Cp,Xp,PCp,BCp), buechi(BC), buechi(BCp).
+dwf(round/8).
+
+query_naming(inv, [b,c,x,pc,bc]).
+query_naming(phi0, [b,c,x,pc]).
+query_naming(round, [b,c,x,pc,'b\'','c\'','x\'','pc\'']).
+query_naming(ti, [b,c,x,pc,bc,'b\'','c\'','x\'','pc\'','bc\'']).
+
+    

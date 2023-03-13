@@ -1,0 +1,40 @@
+/*
+  Benchmark: acqrel.c
+  Property: G(a => F r)
+*/
+initP(A,R,N,PC):=A=0,R=0,PC=1.
+nextP(A,R,N,PC,Ap,Rp,Np,PCp):=
+(  PC=1,Ap=1,Rp=R,PCp=2;
+   PC=2,Ap=0,Rp=R,PCp=3;
+   PC=3,N>0,Ap=A,Rp=R,Np=N-1,PCp=3;
+   PC=3,N=<0,Ap=A,Rp=R,Np=N,PCp=4;
+   PC=4,Ap=A,Rp=1,Np=N,PCp=5;
+   PC=5,Ap=A,Rp=0,Np=N,PCp=1;
+   PC=1,Ap=A,Rp=R,Np=N,PCp=6;
+   PC=6,Ap=A,Rp=R,Np=N,PCp=6
+).
+   
+initA(BC) := BC=1.
+nextA(BC,A,R,BCp) :=
+(   BC=1,BCp=1;
+    BC=1,A=1,R=<0,BCp=2;
+    BC=1,A=1,R>=2,BCp=2;
+    BC=2,R=<0,BCp=2;
+    BC=2,R>=2,BCp=2
+).
+buechi(BC) := BC=2.
+
+init(A,R,N,PC,BCp) := initP(A,R,N,PC), initA(BC), nextA(BC,A,R,BCp).
+next(A,R,N,PC,BC,Ap,Rp,Np,PCp,BCp) := nextP(A,R,N,PC,Ap,Rp,Np,PCp), nextA(BC,Ap,Rp,BCp).
+
+inv(A,R,N,PC,BC) :- init(A,R,N,PC,BC).
+ti(A,R,N,PC,BC,Ap,Rp,Np,PCp,BCp), inv(Ap,Rp,Np,PCp,BCp) :- inv(A,R,N,PC,BC), next(A,R,N,PC,BC,Ap,Rp,Np,PCp,BCp).
+ti(A,R,N,PC,BC,App,Rpp,Npp,PCpp,BCpp) :- ti(A,R,N,PC,BC,Ap,Rp,Np,PCp,BCp), next(Ap,Rp,Np,PCp,BCp,App,Rpp,Npp,PCpp,BCpp).
+
+round(A,R,N,PC,Ap,Rp,Np,PCp) :- ti(A,R,N,PC,BC,Ap,Rp,Np,PCp,BCp), buechi(BC), buechi(BCp).
+
+dwf(round/8).
+
+query_naming(inv, [a,r,n,pc,bc]).
+query_naming(round, [a,r,n,pc,'a\'','r\'','n\'','pc\'']).
+query_naming(ti, [a,r,n,pc,bc,'a\'','r\'','n\'','pc\'','bc\'']).

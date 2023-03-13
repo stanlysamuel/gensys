@@ -1,0 +1,102 @@
+% No. 24 from Eric's paper (Industrial)
+% e-pgarch-fail/original.c in the benchmarks
+/*
+int wakend, NONDET, got_SIGHUP;
+void init() { wakend = 1; got_SIGHUP = nondet(); }
+int __phi() { return CAG(CEF(CAP(wakend == 1))); }
+
+void body() {
+  wakend = 1;
+  while(1) {
+    if (got_SIGHUP>0) {
+      got_SIGHUP = 0;
+      if (NONDET) break; 
+    }
+    if (wakend>0) { wakend = 0; }
+    if (wakend<=0) {
+      if (NONDET) wakend = 1;
+    }
+    if (NONDET) { break; } *** variation in NONDET
+  }
+  while(1) {}
+  return 0;
+}
+*/
+init(W,G,PC):=W=1,PC=1.
+next(W,G,PC,Wp,Gp,PCp):=
+  PC=1,Wp=1,Gp=G,PCp=2;
+  PC=2,G=<0,Wp=W,Gp=G,PCp=3;
+  PC=2,G>0,Wp=W,Gp=0,PCp=3;
+  PC=2,G>0,Wp=W,Gp=0,PCp=6;
+  PC=3,W=<0,Wp=W,Gp=G,PCp=4;
+  PC=3,W>0,Wp=0,Gp=G,PCp=4;
+  PC=4,W>0,Wp=W,Gp=G,PCp=5;
+  PC=4,W=<0,Wp=W,Gp=G,PCp=5;
+  PC=4,W=<0,Wp=1,Gp=G,PCp=5;
+  PC=5,Wp=W,Gp=G,PCp=6;
+  PC=5,Wp=W,Gp=G,PCp=2;
+  PC=6,Wp=W,Gp=G,PCp=6.
+dst(W,G,PC):=W=1.
+% AG p1
+phi0(W,G,PC):-init(W,G,PC).
+phi0(Wp,Gp,PCp):-phi0(W,G,PC),next(W,G,PC,Wp,Gp,PCp).
+p1(W,G,PC):-phi0(W,G,PC).
+% p1 => EF w=1
+phi1(W,G,PC):-p1(W,G,PC).
+exists([Wp,Gp,PCp],(rank(W,G,PC,Wp,Gp,PCp),phi1(Wp,Gp,PCp))):-phi1(W,G,PC),\+dst(W,G,PC).
+wf(rank/6).
+
+skolem_template(s9, [W,G,PC,Wp,Gp,PCp],
+ 		true,
+		(PC>=1, PC=<6),
+ 		(
+		  PC=1,Wp=1,Gp=G,PCp=2;
+		  PC=2,G=<0,Wp=W,Gp=G,PCp=3;
+		  B1=<0,PC=2,G>0,Wp=W,Gp=0,PCp=3;
+		  B1>=1,PC=2,G>0,Wp=W,Gp=0,PCp=6;
+		  PC=3,W=<0,Wp=W,Gp=G,PCp=4;
+		  PC=3,W>0,Wp=0,Gp=G,PCp=4;
+		  PC=4,W>0,Wp=W,Gp=G,PCp=5;
+		  B2=<0,PC=4,W=<0,Wp=W,Gp=G,PCp=5;
+		  B2>=1,PC=4,W=<0,Wp=1,Gp=G,PCp=5;
+		  B3=<0,PC=5,Wp=W,Gp=G,PCp=6;
+		  B3>=1,PC=5,Wp=W,Gp=G,PCp=2;
+		  PC=6,Wp=W,Gp=G,PCp=6
+		),
+ 		((B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))
+ 	       ).
+
+query_naming(phi0(w,g,pc)).
+query_naming(phi1(w,g,pc)).
+query_naming(p1(w,g,pc)).
+query_naming(s9(w,g,pc,'w\'','g\'','pc\'')).
+query_naming(rank(w,g,pc,'w\'','g\'','pc\'')).
+query_naming(rank_p(w,g,pc,'w\'','g\'','pc\'')).
+
+query_finite_sorts(phi0/3,[3]).
+query_finite_sorts(p1/3,[3]).
+query_finite_sorts(phi1/3,[3]).
+query_finite_sorts(s9/6,[3,6]).
+query_finite_sorts(rank/6,[3,6]).
+query_finite_sorts(rank_p/6,[3,6]).
+
+prog_rep([W,G,PC,Wp,Gp,PCp],
+	 (W=1,PC=1),
+	 (
+	   PC=1,Wp=1,Gp=G,PCp=2;
+	   PC=2,G=<0,Wp=W,Gp=G,PCp=3;
+	   PC=2,G>0,Wp=W,Gp=0,PCp=3;
+	   PC=2,G>0,Wp=W,Gp=0,PCp=6;
+	   PC=3,W=<0,Wp=W,Gp=G,PCp=4;
+	   PC=3,W>0,Wp=0,Gp=G,PCp=4;
+	   PC=4,W>0,Wp=W,Gp=G,PCp=5;
+	   PC=4,W=<0,Wp=W,Gp=G,PCp=5;
+	   PC=4,W=<0,Wp=1,Gp=G,PCp=5;
+	   PC=5,Wp=W,Gp=G,PCp=6;
+	   PC=5,Wp=W,Gp=G,PCp=2;
+	   PC=6,Wp=W,Gp=G,PCp=6
+	 )
+	).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/24-AGEF-fail.qarmc -no-extra-insert-pred -use-next-skolem
+% CEX after 0.5 sec
+% With '-case-split': CEX after 0.8 sec

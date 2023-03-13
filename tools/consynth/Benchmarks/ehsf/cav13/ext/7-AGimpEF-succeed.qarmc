@@ -1,0 +1,145 @@
+% No. 7 from Eric's paper (Industrial)
+/*
+#include "../ctl.h"
+
+// Property: G(a => F r)
+
+#define STATUS_SUCCESS 1
+#define STATUS_OBJECT_NAME_COLLISION 2
+#define PC_IO 1
+#define PC_NIO 0
+int pc;
+int i; int Pdolen; int num; int DName;
+int lptNamei; //[5];
+int dcIdi; // [5];
+int Pdoi; //[5];
+int PdoType; int status;
+
+int set; int unset;
+int __phi() { return CAG(CIMP(CAP(set==1),CEF(CAP(unset==1)))); }
+
+void init() { set = unset = 0; }
+
+// The Program
+int PPMakeDeviceName(int a, int b, int c, int d) { return nondet(); }
+int IoCreateDevice(int a) { return nondet(); }
+void ExFreePool(int a) {}
+void PPBlockInits() {}
+void PPUnblockInits() {}
+void RtlInitUnicodeString(int a) {}
+
+int __rho_1_;
+int __rho_2_;
+int __rho_3_;
+
+void body() {
+  set = 1; set = 0;
+  PPBlockInits(); 
+  while (1) {
+    if (!(i < Pdolen)) break;
+    __rho_2_ = PPMakeDeviceName(lptNamei, PdoType, dcIdi, num); 
+    DName = __rho_2_;
+    if (DName>0) { break; } 
+    RtlInitUnicodeString(DName); 
+    __rho_3_ = IoCreateDevice(Pdoi); pc = PC_IO; pc = PC_NIO;
+    status = __rho_3_;
+    if (STATUS_SUCCESS != status) { 
+      Pdoi = 0; 
+      if (STATUS_OBJECT_NAME_COLLISION == status) { 
+	ExFreePool(DName); 
+	num++; 
+	//goto loc_continue; 
+      } 
+      break; 
+    } else { 
+      i++; 
+    } 
+  } 
+  num = 0; 
+  __rho_1_ = nondet();
+  dummy = __rho_1_;
+  if(dummy > 0) {
+    unset = 1; unset = 0;
+  }
+  PPUnblockInits();
+ loc_continue:0;
+  while(1) { dummy=dummy; } L_return: return 0;
+}
+int main() { }
+*/
+init(I,P,S,U,PC):=S=0,U=0,PC=1.
+next(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp):=
+    PC=1,Ip=I,Pp=P,Sp=1,Up=U,PCp=2;
+    PC=2,Ip=I,Pp=P,Sp=0,Up=U,PCp=3;
+    PC=3,I<P,Ip=I,Pp=P,Sp=S,Up=U,PCp=4;
+    PC=3,I>=P,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+    PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=5;
+    PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+    PC=5,Ip=I+1,Pp=P,Sp=S,Up=U,PCp=3;
+    PC=5,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+    PC=6,Ip=I,Pp=P,Sp=S,Up=1,PCp=7;
+    PC=6,Ip=I,Pp=P,Sp=S,Up=U,PCp=8;
+    PC=7,Ip=I,Pp=P,Sp=S,Up=0,PCp=8.
+dst(I,P,S,U,PC):=U=1.
+% AG p1
+phi0(I,P,S,U,PC):-init(I,P,S,U,PC).
+phi0(Ip,Pp,Sp,Up,PCp):-phi0(I,P,S,U,PC),next(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp).
+p1(I,P,S,U,PC):-phi0(I,P,S,U,PC).
+% p1 /\ s=1 => EF u=1
+phi1(I,P,S,U,PC):-p1(I,P,S,U,PC),S=1.
+exists([Ip,Pp,Sp,Up,PCp],(rank(I,P,S,U,PC,Ip,Pp,Sp,Up,PCp),phi1(Ip,Pp,Sp,Up,PCp))):-
+	phi1(I,P,S,U,PC),\+dst(I,P,S,U,PC).
+wf(rank/10).
+
+skolem_template(s9, [I,P,S,U,PC,Ip,Pp,Sp,Up,PCp],
+ 		true,
+		(PC>=1,PC=<7),
+	       (
+		 PC=1,Ip=I,Pp=P,Sp=1,Up=U,PCp=2;
+		 PC=2,Ip=I,Pp=P,Sp=0,Up=U,PCp=3;
+		 PC=3,I<P,Ip=I,Pp=P,Sp=S,Up=U,PCp=4;
+		 PC=3,I>=P,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+		 B1=0,PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=5;
+		 B1=1,PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+		 B2=0,PC=5,Ip=I+1,Pp=P,Sp=S,Up=U,PCp=3;
+		 B2=1,PC=5,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+		 B3=0,PC=6,Ip=I,Pp=P,Sp=S,Up=1,PCp=7;
+		 B3=1,PC=6,Ip=I,Pp=P,Sp=S,Up=U,PCp=8;
+		 PC=7,Ip=I,Pp=P,Sp=S,Up=0,PCp=8
+	       ),
+ 		((B1=0;B1=1),(B2=0;B2=1),(B3=0;B3=1))
+ 	       ).
+
+query_naming(phi0(i,p,s,u,pc)).
+query_naming(p1(i,p,s,u,pc)).
+query_naming(phi1(i,p,s,u,pc)).
+query_naming(s9(i,p,s,u,pc,'i\'','p\'','s\'','u\'','pc\'')).
+query_naming(rank(i,p,s,u,pc,'i\'','p\'','s\'','u\'','pc\'')).
+query_naming(rank_p(i,p,s,u,pc,'i\'','p\'','s\'','u\'','pc\'')).
+
+query_finite_sorts(phi0/5,[5]).
+query_finite_sorts(p1/5,[5]).
+query_finite_sorts(phi1/5,[5]).
+query_finite_sorts(s9/10,[5,10]).
+query_finite_sorts(rank/10,[5,10]).
+query_finite_sorts(rank_p/10,[5,10]).
+
+prog_rep([I,P,S,U,PC,Ip,Pp,Sp,Up,PCp],
+	 (S=0,U=0,PC=1),
+	 (
+	   PC=1,Ip=I,Pp=P,Sp=1,Up=U,PCp=2;
+	   PC=2,Ip=I,Pp=P,Sp=0,Up=U,PCp=3;
+	   PC=3,I<P,Ip=I,Pp=P,Sp=S,Up=U,PCp=4;
+	   PC=3,I>=P,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+	   PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=5;
+	   PC=4,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+	   PC=5,Ip=I+1,Pp=P,Sp=S,Up=U,PCp=3;
+	   PC=5,Ip=I,Pp=P,Sp=S,Up=U,PCp=6;
+	   PC=6,Ip=I,Pp=P,Sp=S,Up=1,PCp=7;
+	   PC=6,Ip=I,Pp=P,Sp=S,Up=U,PCp=8;
+	   PC=7,Ip=I,Pp=P,Sp=S,Up=0,PCp=8
+	 )
+	).
+% time ./ctlstar tests/ctlstar-Erics/Industrial/7-AGimpEF-succeed.qarmc -no-extra-insert-pred -use-next-skolem
+% 'program correct' after 4.1 sec,
+% With '-case-split', 'program is correct' after 1.6 sec

@@ -1,0 +1,5 @@
+10: from([6]) by trans(16)
+6: from([3]) by trans(14-106)
+3: from([1]) by trans(6-8)
+1: from([]) by trans(2)
+cex_tids([2,6-8,14-106,16]).

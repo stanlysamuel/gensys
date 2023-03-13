@@ -1,0 +1,88 @@
+% Figure 1 from Vechev-et-al POPL10.
+% V = (X,Y1,Y2,Z,PC1,PC2,PC3) + variable 'Cost' whose value should be minimized
+
+init(X,Y1,Y2,Z,PC1,PC2,PC3,Cost) := X=0, Z=0, PC1=1, PC2=1, PC3=1, Cost=0.
+next1(X,Y1,Y2,Z,PC1,PC2,PC3,Cost,Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp) :=
+  % single transitions
+  PC1=1, PC1p=2, Xp=X+Z, Zp=Z, Costp=Cost, Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3
+  ; PC1=2, PC1p=3, Xp=X+Z, Zp=Z, Costp=Cost, Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3
+  % atomic sections
+  ; PC1=1, PC1p=3, Xp=X+Z+Z, Zp=Z, Costp=Cost+2, Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3.
+next2(X,Y1,Y2,Z,PC1,PC2,PC3,Cost,Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp) :=
+  % single transitions
+  PC2=1, PC2p=2, Zp=Z+1, Xp=X, Costp=Cost, Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3
+  ; PC2=2, PC2p=3, Zp=Z+1, Xp=X, Costp=Cost, Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3
+  % atomic sections
+  ; PC2=1, PC2p=3, Zp=Z+2, Xp=X, Costp=Cost+2, Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3.
+next3(X,Y1,Y2,Z,PC1,PC2,PC3,Cost,Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp) :=
+  % single transitions
+  PC3=1, PC3p=2, X=1, Y1p=3, Xp=X, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=2, X=2, Y1p=6, Xp=X, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=2, (X=<0 ; X>=3), Y1p=5, Xp=X, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+  ; PC3=2, PC3p=3, Y2p=X, Xp=X, Y1p=Y1, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+  ; PC3=3, PC3p=4, (Y1 >= Y2 + 1 ; Y2 >= Y1+1), Xp=X, Y1p=Y1, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+  % atomic sections
+  ; PC3=1, PC3p=3, X=1, Y1p=3, Y2p=X, Xp=X, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=3, X=2, Y1p=6, Y2p=X, Xp=X, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=3, (X=<0 ; X>=3), Y1p=5, Y2p=X, Xp=X, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+  ; PC3=2, PC3p=4, Y2p=X, (Y1 >= X + 1 ; X >= Y1+1), Xp=X, Y1p=Y1, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=4, X=1, Y1p=3, Y2p=X, (3 >= X + 1 ; X >= 3+1), Xp=X, Zp=Z, Costp=Cost+3, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=4, X=2, Y1p=6, Y2p=X, (6 >= X + 1 ; X >= 6+1), Xp=X, Zp=Z, Costp=Cost+3, PC1p=PC1, PC2p=PC2
+  ; PC3=1, PC3p=4, (X=<0 ; X>=3), Y1p=5, Y2p=X, (5 >= X + 1 ; X >= 5+1), Xp=X, Zp=Z, Costp=Cost+3, PC1p=PC1, PC2p=PC2.
+error(X,Y1,Y2,Z,PC1,PC2,PC3,Cost) := PC3=3, Y1=Y2.
+
+inv(X,Y1,Y2,Z,PC1,PC2,PC3,Cost) :- init(X,Y1,Y2,Z,PC1,PC2,PC3,Cost).
+exists([Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp],inv(Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp)) :- inv(X,Y1,Y2,Z,PC1,PC2,PC3,Cost). % for next1
+exists([Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp],inv(Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp)) :- inv(X,Y1,Y2,Z,PC1,PC2,PC3,Cost). % for next2
+exists([Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp],inv(Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp)) :- inv(X,Y1,Y2,Z,PC1,PC2,PC3,Cost). % for next3
+false :- inv(X,Y1,Y2,Z,PC1,PC2,PC3,Cost), error(X,Y1,Y2,Z,PC1,PC2,PC3,Cost).
+
+% for next1
+skolem_template(s3, [X,Y1,Y2,Z,PC1,PC2,PC3,Cost,Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp],
+  		true, true,
+%  		(   PC1>=1, PC1=<2  ),
+  		(   T1=<0, PC1=1, PC1p=2, Xp=X+Z, Zp=Z, Costp=Cost, Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3
+ 		;   PC1=2, PC1p=3, Xp=X+Z, Zp=Z, Costp=Cost, Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3
+ 		;   T1>=1, PC1=1, PC1p=3, Xp=X+Z+Z, Zp=Z, Costp=Cost+2, Y1p=Y1, Y2p=Y2, PC2p=PC2, PC3p=PC3
+  		),
+  		((T1=0;T1=1))
+  	       ).
+
+% for next2
+skolem_template(s5, [X,Y1,Y2,Z,PC1,PC2,PC3,Cost,Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp],
+   		true, true,
+%  		(   PC2>=1, PC2=<2  ),
+   		(   T1=<0, PC2=1, PC2p=2, Zp=Z+1, Xp=X, Costp=Cost, Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3
+  		;   PC2=2, PC2p=3, Zp=Z+1, Xp=X, Costp=Cost, Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3
+  		;   T1>=1, PC2=1, PC2p=3, Zp=Z+2, Xp=X, Costp=Cost+2, Y1p=Y1, Y2p=Y2, PC1p=PC1, PC3p=PC3
+   		),
+   		((T1=0;T1=1))
+   	       ).
+
+% for next3
+skolem_template(s7, [X,Y1,Y2,Z,PC1,PC2,PC3,Cost,Xp,Y1p,Y2p,Zp,PC1p,PC2p,PC3p,Costp],
+   		true, true,
+%   		(   PC3>=1, PC3=<4 ),
+   		(   T1=<0, PC3=1, PC3p=2, X=1, Y1p=3, Xp=X, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+ 		;   T1=<0, PC3=1, PC3p=2, X=2, Y1p=6, Xp=X, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+ 		;   T1=<0, PC3=1, PC3p=2, (X=<0 ; X>=3), Y1p=5, Xp=X, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+ 		;   T2=<0, PC3=2, PC3p=3, Y2p=X, Xp=X, Y1p=Y1, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+ 		;   PC3=3, PC3p=4, (Y1 >= Y2 + 1 ; Y2 >= Y1+1), Xp=X, Y1p=Y1, Y2p=Y2, Zp=Z, Costp=Cost, PC1p=PC1, PC2p=PC2
+ 		;   T1=1, PC3=1, PC3p=3, X=1, Y1p=3, Y2p=X, Xp=X, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+ 		;   T1=1, PC3=1, PC3p=3, X=2, Y1p=6, Y2p=X, Xp=X, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+ 		;   T1=1, PC3=1, PC3p=3, (X=<0 ; X>=3), Y1p=5, Y2p=X, Xp=X, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+ 		;   T2>=1, PC3=2, PC3p=4, Y2p=X, (Y1 >= X + 1 ; X >= Y1+1), Xp=X, Y1p=Y1, Zp=Z, Costp=Cost+2, PC1p=PC1, PC2p=PC2
+ 		;   T1>=2, PC3=1, PC3p=4, X=1, Y1p=3, Y2p=X, (3 >= X + 1 ; X >= 3+1), Xp=X, Zp=Z, Costp=Cost+3, PC1p=PC1, PC2p=PC2
+ 		;   T1>=2, PC3=1, PC3p=4, X=2, Y1p=6, Y2p=X, (6 >= X + 1 ; X >= 6+1), Xp=X, Zp=Z, Costp=Cost+3, PC1p=PC1, PC2p=PC2
+ 		;   T1>=2, PC3=1, PC3p=4, (X=<0 ; X>=3), Y1p=5, Y2p=X, (5 >= X + 1 ; X >= 5+1), Xp=X, Zp=Z, Costp=Cost+3, PC1p=PC1, PC2p=PC2
+   		),
+   		((T1=0;T1=1;T1=2), (T2=0;T2=1))
+   	       ).
+
+query_finite_sorts(inv,[5,6,7]).
+query_finite_sorts(s3,[5,6,7,13,14,15]).
+query_finite_sorts(s5,[5,6,7,13,14,15]).
+query_finite_sorts(s7,[5,6,7,13,14,15]).
+
+% time ctlstar -use-next-skolem -no-extra-insert-pred -case-split -nopreprocess fig1-popl10.qarmc
+% SVN revision 17591: 'program is correct' after 1m38s (last iteration: 9)
