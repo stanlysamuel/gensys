@@ -121,8 +121,8 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode, game_type)
         # Substitute current variables with post variables
         W0_ = substitute(W0, *substList)
         
-        # Game Formulation
-        W1 = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_), guarantee(*s))
+        # Game Formulation for the safety game
+        W1 = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "safety"), guarantee(*s))
         g = Goal()
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
@@ -176,22 +176,43 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode, game_type)
         assert(valid(formula,0))
 
 #Formulation for the game where envrionment plays first
-def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
+def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
+    if(game == "safety"):
+        #1. Create the E Formula in the AE formulation
+        ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+
+        #2. Project E-Formula
+        g =Goal()
+        g.add(ExistsFormula)
+        ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+
+        #3. Use Projected E-Formula in AE formulation
+        return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
+    else:
+        if(game == "reachability"):
+            #1. Create the E Formula in the AE formulation
+            ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+
+            #2. Project E-Formula
+            g =Goal()
+            g.add(ExistsFormula)
+            ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+
+            #3. Use Projected E-Formula in AE formulation
+            return ForAll(s_,Implies(environment_moves ,ExistsFormula))
+        else:
+            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
     
-    #1. Create the E Formula in the AE formulation
-    ExistsFormula = Exists(s__, And(controller_moves, postcondition))
-
-    #2. Project E-Formula
-    g =Goal()
-    g.add(ExistsFormula)
-    ExistsFormula = tactic_qe_fixpoint(g).as_expr()
-
-    #3. Use Projected E-Formula in AE formulation
-    return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
 
 #Formulation for the game where controller plays first
-def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
-    return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))
+def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
+    if(game == "safety"):
+        return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))
+    else:
+        if(game == "reachability"):
+            return Exists(s_, And(controller_moves, ForAll(s__, Implies(environment_moves, postcondition))))
+        else:
+            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
 
 
 # -----------------------------------------------------------------------------------------
