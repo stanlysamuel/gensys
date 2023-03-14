@@ -39,7 +39,7 @@ if spec == "safety":
     def guarantee(b1, b2, b3, b4, b5):
         return And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
 
-    safety_fixedpoint(controller_moves, environment, guarantee, int(mode))
+    safety_fixedpoint(controller_moves, environment, guarantee, int(mode), game_type)
 
     # def guarantee_reach(b1, b2, b3, b4, b5):
     #     return Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))

@@ -33,10 +33,10 @@ from z3 import *
 #-------------------------------------------------------------------#
 #Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
-# Tactics for fixedpoint algorithm
+# Tactics for fixedpoint algorithm (use 1. if you need heavy simplification. 2. Suffices and scales well for most cases, Use some form of simplification if you need to extract the controller well)
 # tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
-# tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
-tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
+tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
+# tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Tactic('qe2')
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
@@ -59,26 +59,26 @@ set_option(max_depth=100000, rational_to_decimal = True, precision =40, max_line
 # 1.1. Safety Fixpoint Procedure
 # -----------------------------------------------------------------------------------------
 
-def safety_fixedpoint(controller_moves, environment, guarantee, mode):
+def safety_fixedpoint(controller_moves, environment, guarantee, mode, game_type):
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
             #Dynamic variable declaration
             #Issue: Can't use variable s in the code because it will get redeclared in this scope.
-            exec(str(var) +"= Real('"+str(var) +"')")
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
             s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
     for var in s:
-        exec(str(var)+"_" +" = Real('"+str(var)+"_" +"')")
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
         s_.append(locals()[str(var)+"_"])
 
     #Declare and define s''
     s__ = []
     for var in s:
-        exec(str(var)+"__" +" = Real('"+str(var)+"__" +"')")
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
         s__.append(locals()[str(var)+"__"])
 
     # Decide formulation based on game mode
@@ -103,60 +103,51 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
     for move in controller_moves:
         controller = Or(move(*contransitionVars), controller)
 
-    #1. Game Formulation
-
-    #Get AE/EA Formula with postcondition guarantee(*s__)
-    wpAssertion = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), guarantee(*s__))
-
     #2. Fixed Point Computation
 
-    #Create list of tuples for substitution pre variables with post
+    # Create list of tuples for substitution pre variables with post
     substList = []
     for (var, var__) in zip(s,s__):
         substList = substList+[(var,var__)]
 
-    g =Goal()
-    g.add(wpAssertion)
-    wp = tactic_qe_fixpoint(g).as_expr()
-    W = And(wp, guarantee(*s))
-    F = guarantee(*s)
-    i = 0
-    print("Iteration", i )
-    while(not valid(Implies(F, W),0)):
-    # while(not valid(F == W)): gives same as above so => holds one way
-        #Backup for F
-        temp = W
-        #Substitute current variables with post variables
-        W = substitute(W, *substList)
+    i = 1
 
-        #Get AE/EA Formula with postcondition W
-        wpAssertion = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W)
+    W0 = guarantee(*s)
+    W1 = guarantee(*s)
 
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        # Substitute current variables with post variables
+        W0_ = substitute(W0, *substList)
+        
+        # Game Formulation
+        W1 = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_), guarantee(*s))
         g = Goal()
-        g.add(wpAssertion)
-        wp = tactic_qe_fixpoint(g).as_expr()
-        W = And(wp, guarantee(*s))
-        F = temp
-        i=i+1
-        print("Iteration ", i )
+        g.add(W1)
+        W1 = tactic_qe_fixpoint(g).as_expr()
+
+        i = i + 1
+        if valid(Implies(W0, W1),0):
+            break
 
     print("")
-    print("Number of times projection is done: ", i+1)
+    print("Number of iterations: ", i-1)
     print("")
     # print("Invariant is")
-    print(F)
+    # print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(F,0):
+    if not satisfiable(W0,0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
         print("EXTRACTING CONTROLLER...")
-        # In the invariant, substitute with post varaibles
+        # In the invariant, substitute with post variables
         #Take backup of invariant to analyse in the end
-        Invariant = F
-        F = substitute(F, *substList)
+        Invariant = W0
+        F = substitute(W0, *substList)
 
         disjunction_of_conditions = False
         i = 0
@@ -164,18 +155,13 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
             i = i + 1
 
             #Get AE/EA Formula with postcondition F
-            condition_move_i = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F)
+            condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F), guarantee(*s))
 
             #Move i condition extraction
             #Eliminate quantifiers and simplify to get the conditions for each move
             g = Goal()
             g.add(condition_move_i)
-            #Eliminate qe and conjunct with guarantee
-            condition_move_i = And(tactic_qe_controller(g).as_expr(), guarantee(*s))
-            g = Goal()
-            g.add(condition_move_i)
-            #Simplify to get final condition
-            condition_move_i = tactic_simplification(g).as_expr()
+            condition_move_i = tactic_qe_controller(g).as_expr()
 
             #Print condition for each python function provided in the controller
             print("\nCondition for the controller action: "+ str(move_i.__name__))
@@ -187,7 +173,7 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
         #Sanity check: Disjunction of controller conditions is equal to Invariant
         formula = disjunction_of_conditions == Invariant
 
-        valid(formula,0)
+        assert(valid(formula,0))
 
 #Formulation for the game where envrionment plays first
 def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
@@ -206,158 +192,6 @@ def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_,
 #Formulation for the game where controller plays first
 def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
     return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))
-
-# -----------------------------------------------------------------------------------------
-# 1.2. Reachability Fixpoint Procedure
-# -----------------------------------------------------------------------------------------
-
-def reachability_fixedpoint(controller_moves, environment, guarantee, mode):
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
-            exec(str(var) +"= Real('"+str(var) +"')")
-            s.append(locals()[var])
-    
-    #Declare and define s'
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = Real('"+str(var)+"_" +"')")
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s''
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = Real('"+str(var)+"__" +"')")
-        s__.append(locals()[str(var)+"__"])
-
-    # Decide formulation based on game mode
-    # Declare and define transition variables list for controller and environment, depending on the mode 
-    if(mode == 1):
-        raise Exception("Reachability Fixed Point Procedure not implemented for AE mode.")
-        getFormulation = getFormulationAE_reach
-        contransitionVars = s_+s__
-        envtransitionVars = s+s_
-    else: 
-        if(mode == 0):
-            getFormulation = getFormulationEA_reach
-            envtransitionVars = s_+s__
-            contransitionVars = s+s_
-        else:
-            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
-            return
-    
-
-    #0. Create Controller
-    # See if List Comprehension (or some better way can make it a single Or formula)
-    controller = False
-    for move in controller_moves:
-        controller = Or(move(*contransitionVars), controller)
-    #1. Game Formulation
-
-    #Get AE/EA Formula with postcondition guarantee(*s__)
-    wpAssertion = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), guarantee(*s__))
-    # print(wpAssertion)
-    exit()
-    #2. Fixed Point Computation
-
-    #Create list of tuples for substitution pre variables with post
-    substList = []
-    for (var, var__) in zip(s,s__):
-        substList = substList+[(var,var__)]
-
-    g =Goal()
-    g.add(wpAssertion)
-    wp = tactic_qe_fixpoint(g).as_expr()
-    W = Or(wp, guarantee(*s))
-    F = guarantee(*s)
-    i = 0
-    print("Iteration", i )
-    while(not valid(Implies(W, F),0)):
-        #Backup for F
-        temp = W
-        #Substitute current variables with post variables
-        W = substitute(W, *substList)
-
-        #Get AE/EA Formula with postcondition W
-        wpAssertion = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W)
-
-        g = Goal()
-        g.add(wpAssertion)
-        wp = tactic_qe_fixpoint(g).as_expr()
-        W = Or(wp, guarantee(*s))
-        F = temp
-        i=i+1
-        print("Iteration ", i )
-
-    print("")
-    print("Number of times projection is done: ", i+1)
-    print("")
-    print("Invariant is")
-    print(F)
-    #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(F,0):
-        print("Invariant is Unsatisifiable i.e. False")
-        print("UNREALIZABLE")
-    else:
-        print("Invariant is Satisfiable")
-        print("REALIZABLE")
-        # print("EXTRACTING CONTROLLER...")
-        # # In the invariant, substitute with post varaibles
-        # #Take backup of invariant to analyse in the end
-        # Invariant = F
-        # F = substitute(F, *substList)
-
-        # disjunction_of_conditions = False
-        # i = 0
-        # for move_i in controller_moves:
-        #     i = i + 1
-
-        #     #Get AE/EA Formula with postcondition F
-        #     condition_move_i = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F)
-
-        #     #Move i condition extraction
-        #     #Eliminate quantifiers and simplify to get the conditions for each move
-        #     g = Goal()
-        #     g.add(condition_move_i)
-        #     #Eliminate qe and conjunct with guarantee
-        #     condition_move_i = And(tactic_qe_controller(g).as_expr(), guarantee(*s))
-        #     g = Goal()
-        #     g.add(condition_move_i)
-        #     #Simplify to get final condition
-        #     condition_move_i = tactic_simplification(g).as_expr()
-
-        #     #Print condition for each python function provided in the controller
-        #     print("\nCondition for the controller action: "+ str(move_i.__name__))
-        #     print(condition_move_i)
-
-        #     #For final sanity check
-        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
-
-        # #Sanity check: Disjunction of controller conditions is equal to Invariant
-        # formula = disjunction_of_conditions == Invariant
-
-        # valid(formula,0)
-
-#Formulation for the game where envrionment plays first
-def getFormulationAE_reach(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
-    
-    #1. Create the E Formula in the AE formulation
-    ExistsFormula = Exists(s__, And(controller_moves, postcondition))
-
-    #2. Project E-Formula
-    g =Goal()
-    g.add(ExistsFormula)
-    ExistsFormula = tactic_qe_fixpoint(g).as_expr()
-
-    #3. Use Projected E-Formula in AE formulation
-    return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
-
-#Formulation for the game where controller plays first
-def getFormulationEA_reach(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition):
-    return Exists(s_, And(controller_moves, ForAll(s__, Implies(environment_moves, postcondition))))
 
 
 # -----------------------------------------------------------------------------------------
@@ -1046,18 +880,6 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
             print("Sub-Iteration", j )
             H0 = H1
             #Substitute current variables with post variables
-
-            # formula = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0))
-            # # formula = ForAll(s__+[q__], Implies(And(q_ == 3, q__ == 1, s_[0] ==1, s_[0] == s__[0] ), W0))
-            # print(formula)
-            # # exit()
-            # g =Goal()
-            # g.add(formula)
-            # H1 = tactic_qe_fixpoint(g).as_expr()
-            # print(H1)
-            # # exit()
-            # print_q_automaton_states(H1, q_, nQ)
-            # exit()
             H0_ = substitute(H0, *substList)
             WPW = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
             WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0_))))
