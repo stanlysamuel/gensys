@@ -1,5 +1,5 @@
 
-#  GenSys v0.1
+#  GenSys v2.0
 
 #  Copyright (C) 2021 Stanly Samuel
 
@@ -8,15 +8,35 @@
 
 #  This file is part of gensys.
 
+#-----------------------------------------------------------------------------------#
+# GenSys: A tool for synthesis of controllers for logical games over infinite state spaces with LTL specifications.
+# Author: Stanly Samuel
+# Date: 14/03/2023
+# Description: This file contains 8 fixpoint procedures for temporal specifications of different types.
+#
+# 1. Fixpoint Procedures for predicate specifications (G(formula), F(formula), GF(formula), and FG(formula))
+# 1.1. Safety Fixpoint Procedure
+# 1.2. Reachability Fixpoint Procedure
+# 1.3. Buchi Fixpoint Procedure
+# 1.4. Co-Buchi Fixpoint Procedure
+# 
+# 2. Fixpoint Procedures for general LTL specifications
+# 2.1. Buchi Fixpoint Procedure (Deterministic Buchi Automaton)
+# 2.2. Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)
+# 2.3. Bounded Fixpoint Procedures (Non deterministic Automaton)
+#   2.3.1. On-The-Fly Determinization based Fixpoint Procedure
+#   2.3.2. Antichain based Fixpoint Procedure
+#-----------------------------------------------------------------------------------#
+
 from  gensys.helper import *
 from z3 import *
 #-------------------------------------------------------------------#
 #Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
 # Tactics for fixedpoint algorithm
-tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
+# tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
-# tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
+tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Tactic('qe2')
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
@@ -123,7 +143,7 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode):
     print("")
     print("Number of times projection is done: ", i+1)
     print("")
-    print("Invariant is")
+    # print("Invariant is")
     print(F)
     #3. Output: Controller Extraction or Unrealizable
     if not satisfiable(F,0):
