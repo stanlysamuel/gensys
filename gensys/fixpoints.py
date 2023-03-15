@@ -302,9 +302,10 @@ def reachability_fixedpoint(controller_moves, environment, guarantee, mode, game
     print("")
     print("Invariant is")
     print(W0)
-    z3.solve(W0)
+    # z3.solve(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ))
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
+    # if not satisfiable(W0,0):
+    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -342,6 +343,208 @@ def reachability_fixedpoint(controller_moves, environment, guarantee, mode, game
 
         # assert(valid(formula,0))
 
+
+# -----------------------------------------------------------------------------------------
+# 1.3. Buchi Fixpoint Procedure
+# -----------------------------------------------------------------------------------------
+
+def buchi_fixedpoint(controller_moves, environment, guarantee, mode, game_type):
+    #Get states from environment
+    s=[]
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            #Dynamic variable declaration
+            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
+            s.append(locals()[var])
+    
+    #Declare and define s'
+    s_ = []
+    for var in s:
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
+        s_.append(locals()[str(var)+"_"])
+
+    #Declare and define s''
+    s__ = []
+    for var in s:
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
+        s__.append(locals()[str(var)+"__"])
+
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode 
+    if(mode == 1):
+        getFormulation = getFormulationAE
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 0):
+            getFormulation = getFormulationEA
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
+        else:
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
+            return
+    
+
+    # 1. Create Controller Constraints
+    # See if List Comprehension (or some better way can make it a single Or formula)
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    # 2. Fixed Point Computation
+
+    # Create list of tuples for substitution pre variables with post
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]
+
+    i = 1
+
+    W0 = And(True)
+    W1 = And(True)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        #Substitute current variables with post variables
+        W0_ = substitute(W0, *substList)
+        j = 1
+
+        H0 = And(False)
+        H1 = And(False)
+
+        while True:
+            print("Sub-Iteration", j )
+            H0 = H1
+            #Substitute current variables with post variables
+            H0_ = substitute(H0, *substList)
+            WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "safety")
+            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "reachability")
+            
+            H1 = Or(WPH, And(WPW, guarantee(*s)))
+            g =Goal()
+            g.add(H1)
+            H1 = tactic_qe_fixpoint(g).as_expr()
+
+            j = j + 1
+            if valid(Implies(H1, H0),0):
+                break
+
+        W1 = H0
+        i = i + 1
+        if valid(Implies(W0, W1),0):
+            break
+
+    #3. Output: Controller Extraction or Unrealizable
+    if not satisfiable(W0,0):
+    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+
+
+# -----------------------------------------------------------------------------------------
+# 1.4. Co-Buchi Fixpoint Procedure
+# -----------------------------------------------------------------------------------------
+
+def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, game_type):
+    #Get states from environment
+    s=[]
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            #Dynamic variable declaration
+            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
+            s.append(locals()[var])
+    
+    #Declare and define s'
+    s_ = []
+    for var in s:
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
+        s_.append(locals()[str(var)+"_"])
+
+    #Declare and define s''
+    s__ = []
+    for var in s:
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
+        s__.append(locals()[str(var)+"__"])
+
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode 
+    if(mode == 1):
+        getFormulation = getFormulationAE
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 0):
+            getFormulation = getFormulationEA
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
+        else:
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
+            return
+    
+
+    # 1. Create Controller Constraints
+    # See if List Comprehension (or some better way can make it a single Or formula)
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    # 2. Fixed Point Computation
+
+    # Create list of tuples for substitution pre variables with post
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]
+
+    i = 1
+
+    W0 = And(True)
+    W1 = And(True)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        #Substitute current variables with post variables
+        W0_ = substitute(W0, *substList)
+        j = 1
+
+        H0 = And(False)
+        H1 = And(False)
+
+        while True:
+            print("Sub-Iteration", j )
+            H0 = H1
+            #Substitute current variables with post variables
+            H0_ = substitute(H0, *substList)
+            WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability")
+            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "safety")
+            
+            H1 = And(WPH, Or(WPW, guarantee(*s)))
+            g =Goal()
+            g.add(H1)
+            H1 = tactic_qe_fixpoint(g).as_expr()
+
+            j = j + 1
+            if valid(Implies(H0, H1),0):
+                break
+
+        W1 = H0
+        i = i + 1
+        if valid(Implies(W1, W0),0):
+            break
+
+    #3. Output: Controller Extraction or Unrealizable
+    if not satisfiable(W0,0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
 
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
