@@ -55,6 +55,49 @@ set_option(max_depth=100000, rational_to_decimal = True, precision =40, max_line
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
+# Formulation for the game where envrionment plays first
+def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
+    if(game == "safety"):
+        #1. Create the E Formula in the AE formulation
+        ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+
+        #2. Project E-Formula
+        g =Goal()
+        g.add(ExistsFormula)
+        ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+
+        #3. Use Projected E-Formula in AE formulation
+        return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
+    else:
+        if(game == "reachability"):
+            #1. Create the E Formula in the AE formulation
+            ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+
+            #2. Project E-Formula
+            g =Goal()
+            g.add(ExistsFormula)
+            ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+
+            #3. Use Projected E-Formula in AE formulation
+            return ForAll(s_,Implies(environment_moves ,Or(guarantee_s_, ExistsFormula)))
+        else:
+            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
+    
+
+# Formulation for the game where controller plays first
+def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
+    if(game == "safety"):
+        return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))
+    else:
+        if(game == "reachability"):
+            ForAllFormula = ForAll(s__, Implies(environment_moves, postcondition))
+            g =Goal()
+            g.add(ForAllFormula)
+            ForAllFormula = tactic_qe_fixpoint(g).as_expr()
+            return Exists(s_, And(controller_moves, Or(guarantee_s_, ForAllFormula) ))
+        else:
+            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
+
 # -----------------------------------------------------------------------------------------
 # 1.1. Safety Fixpoint Procedure
 # -----------------------------------------------------------------------------------------
@@ -97,13 +140,13 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode, game_type)
             return
     
 
-    #0. Create Controller
+    # 1. Create Controller Constraints
     # See if List Comprehension (or some better way can make it a single Or formula)
     controller = False
     for move in controller_moves:
         controller = Or(move(*contransitionVars), controller)
 
-    #2. Fixed Point Computation
+    # 2. Fixed Point Computation
 
     # Create list of tuples for substitution pre variables with post
     substList = []
@@ -175,44 +218,129 @@ def safety_fixedpoint(controller_moves, environment, guarantee, mode, game_type)
 
         assert(valid(formula,0))
 
-#Formulation for the game where envrionment plays first
-def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
-    if(game == "safety"):
-        #1. Create the E Formula in the AE formulation
-        ExistsFormula = Exists(s__, And(controller_moves, postcondition))
 
-        #2. Project E-Formula
-        g =Goal()
-        g.add(ExistsFormula)
-        ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+# -----------------------------------------------------------------------------------------
+# 1.2. Reachability Fixpoint Procedure
+# -----------------------------------------------------------------------------------------
 
-        #3. Use Projected E-Formula in AE formulation
-        return ForAll(s_,Implies(environment_moves ,And(guarantee_s_, ExistsFormula)))
-    else:
-        if(game == "reachability"):
-            #1. Create the E Formula in the AE formulation
-            ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+def reachability_fixedpoint(controller_moves, environment, guarantee, mode, game_type):
+    #Get states from environment
+    s=[]
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            #Dynamic variable declaration
+            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
+            s.append(locals()[var])
+    
+    #Declare and define s'
+    s_ = []
+    for var in s:
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
+        s_.append(locals()[str(var)+"_"])
 
-            #2. Project E-Formula
-            g =Goal()
-            g.add(ExistsFormula)
-            ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+    #Declare and define s''
+    s__ = []
+    for var in s:
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
+        s__.append(locals()[str(var)+"__"])
 
-            #3. Use Projected E-Formula in AE formulation
-            return ForAll(s_,Implies(environment_moves ,ExistsFormula))
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode 
+    if(mode == 1):
+        getFormulation = getFormulationAE
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 0):
+            getFormulation = getFormulationEA
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
         else:
-            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
+            return
     
 
-#Formulation for the game where controller plays first
-def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
-    if(game == "safety"):
-        return Exists(s_, And(controller_moves, guarantee_s_, ForAll(s__, Implies(environment_moves, postcondition))))
+    # 1. Create Controller Constraints
+    # See if List Comprehension (or some better way can make it a single Or formula)
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    # 2. Fixed Point Computation
+
+    # Create list of tuples for substitution pre variables with post
+
+    # Create list of tuples for substitution pre variables with post
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]
+
+    i = 1
+
+    W0 = guarantee(*s)
+    W1 = guarantee(*s)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        # Substitute current variables with post variables
+        W0_ = substitute(W0, *substList)
+        
+        # Game Formulation for the safety game
+        W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability"), guarantee(*s))
+        g = Goal()
+        g.add(W1)
+        W1 = tactic_qe_fixpoint(g).as_expr()
+
+        i = i + 1
+        if valid(Implies(W1, W0),0):
+            break
+
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+    print("Invariant is")
+    print(W0)
+    z3.solve(W0)
+    #3. Output: Controller Extraction or Unrealizable
+    if not satisfiable(W0,0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
     else:
-        if(game == "reachability"):
-            return Exists(s_, And(controller_moves, ForAll(s__, Implies(environment_moves, postcondition))))
-        else:
-            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+        print("EXTRACTING CONTROLLER...")
+        # # In the invariant, substitute with post variables
+        # #Take backup of invariant to analyse in the end
+        # Invariant = W0
+        # F = substitute(W0, *substList)
+
+        # disjunction_of_conditions = False
+        # i = 0
+        # for move_i in controller_moves:
+        #     i = i + 1
+
+        #     #Get AE/EA Formula with postcondition F
+        #     condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F), guarantee(*s))
+
+        #     #Move i condition extraction
+        #     #Eliminate quantifiers and simplify to get the conditions for each move
+        #     g = Goal()
+        #     g.add(condition_move_i)
+        #     condition_move_i = tactic_qe_controller(g).as_expr()
+
+        #     #Print condition for each python function provided in the controller
+        #     print("\nCondition for the controller action: "+ str(move_i.__name__))
+        #     print(condition_move_i)
+
+        #     #For final sanity check
+        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+
+        # #Sanity check: Disjunction of controller conditions is equal to Invariant
+        # formula = disjunction_of_conditions == Invariant
+
+        # assert(valid(formula,0))
 
 
 # -----------------------------------------------------------------------------------------
