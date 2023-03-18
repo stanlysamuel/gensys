@@ -109,7 +109,11 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
             return Exists(s_, And(controller_moves, Or(guarantee_s_, ForAllFormula) ))
         else:
             if(game == "general"):
-                return Exists(s_, And(controller_moves, ForAll(s__, Implies(environment_moves, postcondition))))
+                ForAllFormula = ForAll(s__, Implies(environment_moves, postcondition))
+                g =Goal()
+                g.add(ForAllFormula)
+                ForAllFormula = tactic_qe_fixpoint(g).as_expr()
+                return Exists(s_, And(controller_moves, ForAllFormula))
             else:
                 raise Exception("Wrong game type entered. Please enter 'safety', 'reachability', or 'general' as the third argument.")
 
@@ -192,48 +196,48 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    print("Invariant is")
-    print(W0)
+    # print("Invariant is")
+    # print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    # if not satisfiable(W0,0):
+    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
-        exit()
-        print("EXTRACTING CONTROLLER...")
-        # In the invariant, substitute with post variables
-        #Take backup of invariant to analyse in the end
-        Invariant = W0
-        F = substitute(W0, *substList)
 
-        disjunction_of_conditions = False
-        i = 0
-        for move_i in controller_moves:
-            i = i + 1
+        # print("EXTRACTING CONTROLLER...")
+        # # In the invariant, substitute with post variables
+        # #Take backup of invariant to analyse in the end
+        # Invariant = W0
+        # F = substitute(W0, *substList)
 
-            #Get AE/EA Formula with postcondition F
-            condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F), guarantee(*s))
+        # disjunction_of_conditions = False
+        # i = 0
+        # for move_i in controller_moves:
+        #     i = i + 1
 
-            #Move i condition extraction
-            #Eliminate quantifiers and simplify to get the conditions for each move
-            g = Goal()
-            g.add(condition_move_i)
-            condition_move_i = tactic_qe_controller(g).as_expr()
+        #     #Get AE/EA Formula with postcondition F
+        #     condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F), guarantee(*s))
 
-            #Print condition for each python function provided in the controller
-            print("\nCondition for the controller action: "+ str(move_i.__name__))
-            print(condition_move_i)
+        #     #Move i condition extraction
+        #     #Eliminate quantifiers and simplify to get the conditions for each move
+        #     g = Goal()
+        #     g.add(condition_move_i)
+        #     condition_move_i = tactic_qe_controller(g).as_expr()
 
-            #For final sanity check
-            disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+        #     #Print condition for each python function provided in the controller
+        #     print("\nCondition for the controller action: "+ str(move_i.__name__))
+        #     print(condition_move_i)
 
-        #Sanity check: Disjunction of controller conditions is equal to Invariant
-        formula = disjunction_of_conditions == Invariant
+        #     #For final sanity check
+        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
 
-        assert(valid(formula,0))
+        # #Sanity check: Disjunction of controller conditions is equal to Invariant
+        # formula = disjunction_of_conditions == Invariant
+
+        # assert(valid(formula,0))
 
 
 # -----------------------------------------------------------------------------------------
@@ -317,12 +321,12 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    print("Invariant is")
-    print(W0)
+    # print("Invariant is")
+    # print(W0)
     # z3.solve(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ))
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    # if not satisfiable(W0,0):
+    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -454,11 +458,11 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    print("Invariant is")
-    print(W0)
+    # print("Invariant is")
+    # print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    # if not satisfiable(W0,0):
+    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -561,11 +565,11 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    print("Invariant is")
-    print(W0)
+    # print("Invariant is")
+    # print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    # if not satisfiable(W0,0):
+    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
