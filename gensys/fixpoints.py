@@ -81,7 +81,19 @@ def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_,
             #3. Use Projected E-Formula in AE formulation
             return ForAll(s_,Implies(environment_moves ,Or(guarantee_s_, ExistsFormula)))
         else:
-            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
+            if(game == "general"):
+                #1. Create the E Formula in the AE formulation
+                ExistsFormula = Exists(s__, And(controller_moves, postcondition))
+
+                #2. Project E-Formula
+                g =Goal()
+                g.add(ExistsFormula)
+                ExistsFormula = tactic_qe_fixpoint(g).as_expr()
+
+                #3. Use Projected E-Formula in AE formulation
+                return ForAll(s_,Implies(environment_moves , ExistsFormula))
+            else:
+                raise Exception("Wrong game type entered. Please enter 'safety', 'reachability', or 'general' as the third argument.")
     
 
 # Formulation for the game where controller plays first
@@ -96,7 +108,10 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
             ForAllFormula = tactic_qe_fixpoint(g).as_expr()
             return Exists(s_, And(controller_moves, Or(guarantee_s_, ForAllFormula) ))
         else:
-            raise Exception("Wrong game type entered. Please enter 'safety' or 'reachability' as the third argument.")
+            if(game == "general"):
+                return Exists(s_, And(controller_moves, ForAll(s__, Implies(environment_moves, postcondition))))
+            else:
+                raise Exception("Wrong game type entered. Please enter 'safety', 'reachability', or 'general' as the third argument.")
 
 # -----------------------------------------------------------------------------------------
 # 1.1. Safety Fixpoint Procedure
