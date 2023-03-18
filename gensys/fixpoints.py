@@ -192,11 +192,11 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    # print("Invariant is")
-    # print(W0)
+    print("Invariant is")
+    print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    # if not satisfiable(W0,0):
-    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    if not satisfiable(W0,0):
+    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -321,8 +321,8 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     print(W0)
     # z3.solve(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ))
     #3. Output: Controller Extraction or Unrealizable
-    # if not satisfiable(W0,0):
-    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    if not satisfiable(W0,0):
+    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -436,14 +436,12 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             H0 = H1
             #Substitute current variables with post variables
             H0_ = substitute(H0, *substList)
-            WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "safety")
-            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "reachability")
-            
+            WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general")
+            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "general")
             H1 = Or(WPH, And(WPW, guarantee(*s)))
             g =Goal()
             g.add(H1)
             H1 = tactic_qe_fixpoint(g).as_expr()
-
             j = j + 1
             if valid(Implies(H1, H0),0):
                 break
@@ -453,11 +451,14 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         if valid(Implies(W0, W1),0):
             break
 
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+    print("Invariant is")
     print(W0)
-    solve(W0)
     #3. Output: Controller Extraction or Unrealizable
-    # if not satisfiable(W0,0):
-    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    if not satisfiable(W0,0):
+    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -540,8 +541,8 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
             H0 = H1
             #Substitute current variables with post variables
             H0_ = substitute(H0, *substList)
-            WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability")
-            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "safety")
+            WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general")
+            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "general")
             
             H1 = And(WPH, Or(WPW, guarantee(*s)))
             g =Goal()
@@ -557,11 +558,14 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
         if valid(Implies(W1, W0),0):
             break
 
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+    print("Invariant is")
     print(W0)
-    solve(W0)
     #3. Output: Controller Extraction or Unrealizable
-    # if not satisfiable(W0,0):
-    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    if not satisfiable(W0,0):
+    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
