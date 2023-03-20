@@ -62,6 +62,7 @@ if spec == "safety":
 
     # safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
     buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
+    exit()
 
     # Environment reachability (not correct spec should be G(b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0) and !G(b1<=C , b2<=C , b3<=C , b4<=C , b5<=C )))
     # Dual game must taken into account environment being the first player but playing second! i.e. game mode = 1 and game = reachability

@@ -30,25 +30,46 @@
 
 from  gensys.helper import *
 from z3 import *
+describe_tactics()
+# print(tactics())
+# exit()
 #-------------------------------------------------------------------#
 #Initialize the three tactics required for the tool. Assume user cannot control them now
 #-------------------------------------------------------------------#
 # Tactics for fixedpoint algorithm (use 1. if you need heavy simplification. 2. Suffices and scales well for most cases, Use some form of simplification if you need to extract the controller well)
 # tactic_qe_fixpoint = Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify'))
-tactic_qe_fixpoint = Then(Tactic('qe2'), Tactic('simplify'))
+# tactic_qe_fixpoint = Then(Then(Then(Tactic('collect-statistics'), Tactic('skip')), Tactic('qe2')), With('simplify',  arith_lhs=True, arith_ineq_lhs = True, som = True, som_blowup = 1, sort_sums = True,  cache_all = True, push_to_real = False, elim_to_real = True, local_ctx = True, local_ctx_limit = 10000, flat = False, flat_and_or = False))
+# tactic_qe_fixpoint = Then(Tactic('qe2'), With('simplify',  arith_lhs=True, arith_ineq_lhs = True, som = True, som_blowup = 1, sort_sums = True,  cache_all = True, push_to_real = False, elim_to_real = True, local_ctx = True, local_ctx_limit = 10000, flat = False, flat_and_or = False))
 # tactic_qe_fixpoint = Then(Tactic('qe2'), Repeat('ctx-solver-simplify'))
 # tactic_qe_fixpoint = Tactic('qe2')
+
+#Sort sums gave 4 second improvement.
+# With('simplify' , arith_lhs=True, arith_ineq_lhs = True, som = True, som_blowup = 1, sort_sums = True,  cache_all = True, push_to_real = False, elim_to_real = True, local_ctx = True, local_ctx_limit = 10000, flat = False, flat_and_or = False')
+
+#Parallel Tactic
+tactic_qe_fixpoint = Then(Tactic('collect-statistics') , ParOr(Then(Tactic('qe_rec'), Repeat('ctx-solver-simplify')), Then(Tactic('qe2'), Tactic('simplify'))))
 
 #Controller Extraction: Use same tactic as fixpoint and use ctx-solver-simplify to make the controller readable.
 tactic_qe_controller = tactic_qe_fixpoint
 tactic_simplification = Repeat('ctx-solver-simplify')
 # tactic_simplification = Repeat('simplify')
 
+# t1 = Tactic("qe2")
+# t2 = Tactic("simplify")
+# t3 = Tactic("propagate-ineqs")
+# t4 = Tactic("propagate-values")
+# t5 = Tactic("solve-eqs")
+# t7 = Tactic("split-clause")
+# t8 = Tactic("skip")
+# tactic_qe_fixpoint = Then(t1, Repeat(Then(t2, t3, t4, t5, ParOr(t7, t8)), 10))
+
 #-------------------------------------------------------------------#
 
 #Options for printing in Z3
 set_option(max_depth=100000, rational_to_decimal = True, precision =40, max_lines=10000)
-
+#Options for parallel processing in Z3
+set_param("parallel.enable", True)
+# set_param("parallel.threads.max", 100)
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 # 1. Fixpoint Procedures for non-LTL safety specifications (predicate over game states)
