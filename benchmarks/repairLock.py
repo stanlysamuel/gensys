@@ -4,6 +4,9 @@ from z3 import *
 
 #Repair Lock example: Beyene et. al. POPL 2014
 
+# 0. Define game type (Int/ Real)
+game_type = "Int"
+
 # 1. Define Environment moves
 #Environment move is Skip here
 def environment(pc, l, gl, pc_, l_, gl_):
@@ -43,7 +46,7 @@ if spec == "safety":
     def guarantee(pc, l, gl):
         return Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))
 
-    safety_fixedpoint(controller_moves, environment, guarantee, int(mode))
+    safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
 
 else:
     if spec == "omega":

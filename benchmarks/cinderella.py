@@ -7,7 +7,7 @@ from z3 import *
 # 0. Define game type (Int/ Real)
 game_type = "Real"
 
-# # 1. Define Environment moves
+# 1. Define Environment moves
 # def environment(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
 #     return And(b1_ + b2_ + b3_ + b4_ + b5_ == b1 + b2 + b3 + b4 + b5 + 1, b1_>=b1, b2_>=b2, b3_>=b3, b4_>=b4, b5_>=b5, b1>=0.0, b2>=0.0, b3>=0.0, b4>=0.0, b5>=0.0)
 
@@ -61,8 +61,8 @@ if spec == "safety":
     #     return And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C)
 
     # safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
-    buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
-    exit()
+    # buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
+    # exit()
 
     # Environment reachability (not correct spec should be G(b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0) and !G(b1<=C , b2<=C , b3<=C , b4<=C , b5<=C )))
     # Dual game must taken into account environment being the first player but playing second! i.e. game mode = 1 and game = reachability
@@ -72,8 +72,8 @@ if spec == "safety":
     #     return Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C ))
     def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
         return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
-    # reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type)
-    cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, 1-int(mode), game_type)
+    reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type)
+    # cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, 1-int(mode), game_type)
 
 else:
     if spec == "buchi":
