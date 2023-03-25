@@ -75,9 +75,9 @@ for file in $FILES; do
     echo -n -e "\033[1;33mTIMEOUT\033[0m"
     : $(( ++TIMEOUT ))
 #  TODO: reenable when MCC is in place
-#  elif ( grep -q "Q'ARMC: program is correct" "$TMP" && grep -A1 "verifying fixpoint..." "$TMP" | grep -q "done." ) ; then
-  elif ( ( test $SHOULDPASS == 1 && cat $logfile | grep -q "Q'ARMC: program is correct" ) ||
-	 ( test $SHOULDPASS == 0 && cat $logfile| grep -q "Q'ARMC: program is not correct" ) ) ; then
+ elif ( grep -q "Q'ARMC: program is correct" "$TMP" && grep -A1 "verifying fixpoint..." "$TMP" | grep -q "done." ) ; then
+  # elif ( ( test $SHOULDPASS == 1 && cat $logfile | grep -q "Q'ARMC: program is correct" ) ||
+	#  ( test $SHOULDPASS == 0 && cat $logfile| grep -q "Q'ARMC: program is not correct" ) ) ; then
     echo -n -e "\033[1;32mPASSED\033[0m"
     : $(( ++GOOD ))
   elif ( echo $OUTPUT | grep -q "Resource error: insufficient memory" ) ; then
