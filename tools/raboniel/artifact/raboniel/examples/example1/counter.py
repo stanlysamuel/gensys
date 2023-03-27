@@ -6,31 +6,11 @@ def run(init, inputs):
   counter = init['counter']
   for _input in inputs:
     i = _input['i']
-    if state == 0 and (((i + counter) <= 100 and not (i <= 5))):
-      state_prime = 0
-      counter_prime = (counter - i)
-
-    if state == 0 and (((i + counter) <= 100 and i <= 5 and not (counter <= 100))):
-      state_prime = 0
-      counter_prime = (counter - i)
-
-    if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and ((i * -1) + counter) >= 0 and i >= 0 and not (counter >= 0))):
-      state_prime = 0
-      counter_prime = (counter - i)
-
     if state == 0 and ((not ((i + counter) <= 100) and not (i <= 5))):
       state_prime = 0
       counter_prime = (counter - i)
 
-    if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and ((i * -1) + counter) >= 0 and not (i >= 0))):
-      state_prime = 0
-      counter_prime = (counter - i)
-
-    if state == 0 and (((i + counter) <= 100 and i <= 5 and counter <= 100 and i >= 0 and counter >= 0)):
-      state_prime = 0
-      counter_prime = (counter + i)
-
-    if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and ((i * -1) + counter) >= 0 and i >= 0 and counter >= 0)):
+    if state == 0 and (((i + counter) <= 100 and not (i <= 5))):
       state_prime = 0
       counter_prime = (counter - i)
 
@@ -38,15 +18,35 @@ def run(init, inputs):
       state_prime = 0
       counter_prime = (counter - i)
 
-    if state == 0 and (((i + counter) <= 100 and i <= 5 and counter <= 100 and not (i >= 0))):
-      state_prime = 0
-      counter_prime = (counter - i)
-
     if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and not (counter <= 100))):
       state_prime = 0
       counter_prime = (counter - i)
 
+    if state == 0 and (((i + counter) <= 100 and i <= 5 and counter <= 100 and not (i >= 0))):
+      state_prime = 0
+      counter_prime = (counter - i)
+
     if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and not (((i * -1) + counter) >= 0))):
+      state_prime = 0
+      counter_prime = (counter - i)
+
+    if state == 0 and (((i + counter) <= 100 and i <= 5 and counter <= 100 and i >= 0 and counter >= 0)):
+      state_prime = 0
+      counter_prime = (counter + i)
+
+    if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and ((i * -1) + counter) >= 0 and not (i >= 0))):
+      state_prime = 0
+      counter_prime = (counter - i)
+
+    if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and ((i * -1) + counter) >= 0 and i >= 0 and not (counter >= 0))):
+      state_prime = 0
+      counter_prime = (counter - i)
+
+    if state == 0 and (((i + counter) <= 100 and i <= 5 and not (counter <= 100))):
+      state_prime = 0
+      counter_prime = (counter - i)
+
+    if state == 0 and ((not ((i + counter) <= 100) and i <= 5 and counter <= 100 and ((i * -1) + counter) >= 0 and i >= 0 and counter >= 0)):
       state_prime = 0
       counter_prime = (counter - i)
 

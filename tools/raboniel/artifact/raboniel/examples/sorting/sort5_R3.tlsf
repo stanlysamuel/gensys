@@ -1,0 +1,35 @@
+INFO {
+  TITLE:       "Converted TSL Specification: sort5_R3"
+  DESCRIPTION: "TSL specification, which has been converted to TLSF."
+  SEMANTICS:   Mealy
+  TARGET:      Mealy
+}
+MAIN {
+  INPUTS {
+    p0p0ge0b0c;
+    p0p0ge0a0b;
+    p0p0ge0c0d;
+    p0p0ge0d0e;
+  }
+
+  OUTPUTS {
+    u0b0b;
+    u0b0a;
+    u0b0c;
+    u0a0b;
+    u0a0a;
+    u0c0b;
+    u0c0c;
+    u0c0d;
+    u0d0c;
+    u0d0d;
+    u0d0e;
+    u0e0d;
+    u0e0e;
+  }
+
+  GUARANTEE {
+    (G (((((! (((u0b0a) && (! ((u0b0c) || (u0b0b)))) <-> ((! (((u0b0c) && (! (u0b0b))) <-> ((u0b0b) && (! (u0b0c))))) && (! (u0b0a))))) && (! (((u0a0b) && (! (u0a0a))) <-> ((u0a0a) && (! (u0a0b)))))) && (! (((u0c0c) && (! ((u0c0d) || (u0c0b)))) <-> ((! (((u0c0d) && (! (u0c0b))) <-> ((u0c0b) && (! (u0c0d))))) && (! (u0c0c)))))) && (! (((u0d0d) && (! ((u0d0e) || (u0d0c)))) <-> ((! (((u0d0e) && (! (u0d0c))) <-> ((u0d0c) && (! (u0d0e))))) && (! (u0d0d)))))) && (! (((u0e0d) && (! (u0e0e))) <-> ((u0e0e) && (! (u0e0d))))))) && (((((((((((((((((((((((((((((((((((((((((((((((((((((G ((((! (p0p0ge0a0b)) && (u0a0b)) && (u0b0a)) -> (X (! (! (p0p0ge0a0b)))))) && (G ((((! (p0p0ge0b0c)) && (u0c0b)) && (u0b0c)) -> (X (! (! (p0p0ge0b0c))))))) && (G ((((! (p0p0ge0c0d)) && (u0d0c)) && (u0c0d)) -> (X (! (! (p0p0ge0c0d))))))) && (G ((((! (p0p0ge0d0e)) && (u0e0d)) && (u0d0e)) -> (X (! (! (p0p0ge0d0e))))))) && (G (((u0a0a) && (u0b0a)) -> (X (! (! (p0p0ge0a0b))))))) && (G (((u0a0b) && (u0b0b)) -> (X (! (! (p0p0ge0a0b))))))) && (G (((u0c0b) && (u0a0b)) -> (X (! ((! (p0p0ge0a0b)) && (! (p0p0ge0b0c)))))))) && (G (((u0c0b) && (u0b0b)) -> (X (! (! (p0p0ge0b0c))))))) && (G (((u0c0c) && (u0b0c)) -> (X (! (! (p0p0ge0b0c))))))) && (G (((u0d0c) && (u0b0c)) -> (X (! ((! (p0p0ge0c0d)) && (! (p0p0ge0b0c)))))))) && (G (((u0d0c) && (u0c0c)) -> (X (! (! (p0p0ge0c0d))))))) && (G (((u0d0d) && (u0c0d)) -> (X (! (! (p0p0ge0c0d))))))) && (G (((u0e0d) && (u0c0d)) -> (X (! ((! (p0p0ge0d0e)) && (! (p0p0ge0c0d)))))))) && (G (((u0e0d) && (u0d0d)) -> (X (! (! (p0p0ge0d0e))))))) && (G (((u0e0e) && (u0d0e)) -> (X (! (! (p0p0ge0d0e))))))) && (G (((((! (p0p0ge0a0b)) && (! (p0p0ge0b0c))) && (u0a0a)) && (u0b0c)) -> (X (! (p0p0ge0a0b)))))) && (G (((((! (p0p0ge0a0b)) && (! (p0p0ge0b0c))) && (u0c0c)) && (u0a0a)) -> (X (! ((p0p0ge0a0b) && (p0p0ge0b0c))))))) && (G (((((! (p0p0ge0a0b)) && (! (p0p0ge0b0c))) && (u0d0c)) && (u0a0a)) -> (X (! (((p0p0ge0c0d) && (p0p0ge0a0b)) && (p0p0ge0b0c))))))) && (G ((((! (p0p0ge0a0b)) && (u0a0a)) && (u0b0b)) -> (X (! (p0p0ge0a0b)))))) && (G ((((! (p0p0ge0a0b)) && (u0c0b)) && (u0a0a)) -> (X (! ((p0p0ge0a0b) && (p0p0ge0b0c))))))) && (G ((((! (p0p0ge0b0c)) && (u0a0b)) && (u0b0c)) -> (X (! (p0p0ge0a0b)))))) && (G ((((! (p0p0ge0b0c)) && (u0c0c)) && (u0a0b)) -> (X (! ((p0p0ge0a0b) && (p0p0ge0b0c))))))) && (G ((((! (p0p0ge0b0c)) && (u0d0c)) && (u0a0b)) -> (X (! (((p0p0ge0c0d) && (p0p0ge0a0b)) && (p0p0ge0b0c))))))) && (G ((((p0p0ge0a0b) && (u0a0a)) && (u0b0b)) -> (X (! (! (p0p0ge0a0b))))))) && (G ((((p0p0ge0a0b) && (u0c0b)) && (u0b0a)) -> (X (! (! (p0p0ge0b0c))))))) && (G (((((p0p0ge0a0b) && (p0p0ge0b0c)) && (u0c0c)) && (u0b0a)) -> (X (! (! (p0p0ge0b0c))))))) && (G (((((p0p0ge0a0b) && (p0p0ge0b0c)) && (u0d0c)) && (u0b0a)) -> (X (! ((! (p0p0ge0c0d)) && (! (p0p0ge0b0c)))))))) && (G ((((p0p0ge0b0c) && (u0c0c)) && (u0b0b)) -> (X (! (! (p0p0ge0b0c))))))) && (G ((((p0p0ge0b0c) && (u0d0c)) && (u0b0b)) -> (X (! ((! (p0p0ge0c0d)) && (! (p0p0ge0b0c)))))))) && (G ((((p0p0ge0b0c) && (u0d0c)) && (u0c0b)) -> (X (! (! (p0p0ge0c0d))))))) && (G ((((p0p0ge0c0d) && (u0c0d)) && (u0b0c)) -> (X (! (! (p0p0ge0b0c))))))) && (G ((((p0p0ge0c0d) && (u0d0d)) && (u0c0c)) -> (X (! (! (p0p0ge0c0d))))))) && (G ((((p0p0ge0c0d) && (u0e0d)) && (u0c0c)) -> (X (! ((! (p0p0ge0d0e)) && (! (p0p0ge0c0d)))))))) && (G ((((p0p0ge0c0d) && (u0e0d)) && (u0d0c)) -> (X (! (! (p0p0ge0d0e))))))) && (G ((((((p0p0ge0c0d) && (p0p0ge0a0b)) && (p0p0ge0b0c)) && (u0c0d)) && (u0b0a)) -> (X (! (! (p0p0ge0b0c))))))) && (G (((((p0p0ge0c0d) && (p0p0ge0b0c)) && (u0c0d)) && (u0b0b)) -> (X (! (! (p0p0ge0b0c))))))) && (G (((((p0p0ge0c0d) && (p0p0ge0b0c)) && (u0d0d)) && (u0c0b)) -> (X (! (! (p0p0ge0c0d))))))) && (G ((((p0p0ge0d0e) && (u0d0e)) && (u0c0d)) -> (X (! (! (p0p0ge0c0d))))))) && (G ((((p0p0ge0d0e) && (u0e0e)) && (u0d0d)) -> (X (! (! (p0p0ge0d0e))))))) && (G (((((p0p0ge0d0e) && (p0p0ge0c0d)) && (u0d0e)) && (u0c0c)) -> (X (! (! (p0p0ge0c0d))))))) && (G (((((p0p0ge0d0e) && (p0p0ge0c0d)) && (u0e0e)) && (u0d0c)) -> (X (! (! (p0p0ge0d0e))))))) && (G ((((! (p0p0ge0c0d)) && (u0e0d)) && (u0c0c)) -> (X (! ((p0p0ge0d0e) && (p0p0ge0c0d))))))) && (G ((((! (p0p0ge0c0d)) && (u0e0d)) && (u0d0c)) -> (X (! (p0p0ge0d0e)))))) && (G (((((! (p0p0ge0d0e)) && (! (p0p0ge0c0d))) && (u0e0e)) && (u0c0c)) -> (X (! ((p0p0ge0d0e) && (p0p0ge0c0d))))))) && (G (((((! (p0p0ge0d0e)) && (! (p0p0ge0c0d))) && (u0e0e)) && (u0d0c)) -> (X (! (p0p0ge0d0e)))))) && (G ((((! (p0p0ge0d0e)) && (u0d0e)) && (u0c0d)) -> (X (! (p0p0ge0c0d)))))) && (G ((((! (p0p0ge0d0e)) && (u0e0e)) && (u0c0d)) -> (X (! ((p0p0ge0d0e) && (p0p0ge0c0d))))))) && (G ((((! (p0p0ge0d0e)) && (u0e0e)) && (u0d0d)) -> (X (! (p0p0ge0d0e)))))) && (G (((((p0p0ge0a0b) && (p0p0ge0b0c)) && (u0a0a)) && (u0b0c)) -> (X (! (! (p0p0ge0a0b))))))) && (G ((((p0p0ge0b0c) && (u0a0b)) && (u0b0c)) -> (X (! (! (p0p0ge0a0b))))))) && (G (((((p0p0ge0c0d) && (p0p0ge0b0c)) && (u0e0d)) && (u0c0b)) -> (X (! ((! (p0p0ge0d0e)) && (! (p0p0ge0c0d)))))))) && (G ((((((p0p0ge0d0e) && (p0p0ge0c0d)) && (p0p0ge0b0c)) && (u0d0e)) && (u0c0b)) -> (X (! (! (p0p0ge0c0d))))))) -> ((G (((((((((u0a0b) && (u0b0a)) && (u0c0c)) && (u0d0d)) && (u0e0e)) || (((((u0b0c) && (u0c0b)) && (u0a0a)) && (u0d0d)) && (u0e0e))) || (((((u0c0d) && (u0d0c)) && (u0a0a)) && (u0b0b)) && (u0e0e))) || (((((u0d0e) && (u0e0d)) && (u0a0a)) && (u0b0b)) && (u0c0c))) || (((((u0a0a) && (u0b0b)) && (u0c0c)) && (u0d0d)) && (u0e0e)))) && (F (G ((((p0p0ge0a0b) && (p0p0ge0b0c)) && (p0p0ge0c0d)) && (p0p0ge0d0e))))));
+  }
+}
+

@@ -30,7 +30,7 @@
 
 from  gensys.helper import *
 from z3 import *
-describe_tactics()
+# describe_tactics()
 # print(tactics())
 # exit()
 #-------------------------------------------------------------------#
@@ -228,8 +228,8 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    # print("Invariant is")
-    # print(W0)
+    print("Invariant is")
+    print(W0)
     #3. Output: Controller Extraction or Unrealizable
     if not satisfiable(W0,0):
     # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
