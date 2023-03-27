@@ -534,6 +534,75 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     print("")
     print("Number of iterations: ", i-1)
     print("")
+
+
+    #i = 1
+
+    # # turn = Bool("turn")
+    # # turn_ = Bool("turn_")
+    # turn = Int("turn")
+    # turn_ = Int("turn_")
+
+    # W0 = And(True)
+    # W1 = And(True)
+
+    # while True:
+    #     print("Iteration", i )
+    #     W0 = W1
+    #     #Substitute current variables with post variables
+    #     W0_ = substitute(W0, *substList_)
+
+    #     WPC = And(turn == 1, Exists(s_+[turn_], And(controller, turn_ == 0, W0_)))
+
+    #     WPE = And(turn == 0, ForAll(s_+[turn_], Implies(And(environment(*envtransitionVars), turn_ == 1), W0_)))
+
+    #     W0 = And(Or(WPC, WPE), And(guarantee(*s), turn>=0, turn<=1))
+
+    #     g =Goal()
+    #     g.add(W0)
+    #     W0 = tactic_qe_fixpoint(g).as_expr()
+    #     print(W0)
+    #     W0_ = substitute(W0, *substList_)
+
+    #     j = 1
+
+    #     H0 = And(False)
+    #     H1 = And(False)
+
+    #     while True:
+    #         print("Sub-Iteration", j )
+    #         H0 = H1
+    #         #Substitute current variables with post variables
+    #         H0_ = substitute(H0, *substList_)
+    #         # WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general")
+    #         # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "general")
+
+
+    #         WPC = And(turn == 1, Exists(s_+[turn_], And(controller, turn_ == 0, H0_)))
+
+    #         WPE = And(turn == 0, ForAll(s_+[turn_], Implies(And(environment(*envtransitionVars), turn_ == 1), H0_)))
+
+    #         H1 = Or(WPC, WPE, W0)
+            
+
+    #         # H1 = Or(WPH, And(WPW, guarantee(*s)))
+    #         g =Goal()
+    #         g.add(H1)
+    #         H1 = tactic_qe_fixpoint(g).as_expr()
+    #         print(H1)
+    #         j = j + 1
+    #         if valid(Implies(H1, H0),0):
+    #             break
+
+    #     W1 = H0
+    #     i = i + 1
+    #     if valid(Implies(W0, W1),0):
+    #         break
+
+    # print("")
+    # print("Number of iterations: ", i-1)
+    # print("")
+
     # print("Invariant is")
     # print(W0)
     #3. Output: Controller Extraction or Unrealizable
@@ -1572,24 +1641,24 @@ def otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, aut
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
-        g = Goal()
-        g.add(F)
-        F = tactic_qe_fixpoint(g).as_expr()
+        # g = Goal()
+        # g.add(F)
+        # F = tactic_qe_fixpoint(g).as_expr()
         # print("Invariant is: ")
         # print(F)
         # print("Maximal states are: ")
         # m =  maximal(F,s, s_, c, c_, nQ)
         # print_automaton_states(m,c,nQ)
-        print_automaton_states(F,c,nQ)
-        g = Goal()
+        # print_automaton_states(F,c,nQ)
+        # g = Goal()
         
-        g.add(Exists(c, F))
-        PF = tactic_qe_fixpoint(g).as_expr()
+        # g.add(Exists(c, F))
+        # PF = tactic_qe_fixpoint(g).as_expr()
         # print("Projected invariant is: ")
         # print(PF)
 
-        g.add(Exists(c, And(F, init)))
-        PF = tactic_qe_fixpoint(g).as_expr()
+        # g.add(Exists(c, And(F, init)))
+        # PF = tactic_qe_fixpoint(g).as_expr()
         # print("Projected invariant for initial state is: ")
         # print(PF)
 
@@ -1795,9 +1864,9 @@ def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode
         i = i + 1
         # exit()
 
-    print("Invariant is")
-    wp = maximal(wp, s, s_, c, c_, nQ)
-    print_automaton_states(wp, c, nQ)
+    # print("Invariant is")
+    # wp = maximal(wp, s, s_, c, c_, nQ)
+    # print_automaton_states(wp, c, nQ)
 
     start_val = Int('start_val')
     init = Exists(start_val, c[0]!=-1)
@@ -1817,8 +1886,8 @@ def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode
         
         g.add(Exists(c, F))
         PF = tactic_qe_fixpoint(g).as_expr()
-        print("Projected invariant is: ")
-        print(PF)
+        # print("Projected invariant is: ")
+        # print(PF)
 
         g.add(Exists(c, And(F, init)))
         PF = tactic_qe_fixpoint(g).as_expr()

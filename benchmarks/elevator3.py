@@ -4,6 +4,9 @@ from z3 import *
 
 # Three floor elevator example.
 
+# 0. Define game type (Int/ Real)
+game_type = "Int"
+
 # 1. Define Environment moves
 def environment(x,x_):
     return And(x_ == x)
@@ -71,8 +74,13 @@ else:
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6)
-        # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6)
+        # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6, game_type)
+        # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6, game_type)
+        # otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6, game_type)
+        # antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 6, game_type)
+
+        for i in range(7):
+            antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, i, game_type)
 
     else:
         print("Not a valid input: Please enter \"safety\" or \"omega\" as the third argument")
