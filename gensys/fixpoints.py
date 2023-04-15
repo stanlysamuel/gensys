@@ -323,32 +323,11 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     # 2. Fixed Point Computation
 
     # Create list of tuples for substitution pre variables with post
-
-    # Create list of tuples for substitution pre variables with post
     substList = []
     for (var, var__) in zip(s,s__):
         substList = substList+[(var,var__)]
 
     i = 1
-
-    # W0 = guarantee(*s)
-    # W1 = guarantee(*s)
-
-    # while True:
-    #     print("Iteration", i )
-    #     W0 = W1
-    #     # Substitute current variables with post variables
-    #     W0_ = substitute(W0, *substList)
-        
-    #     # Game Formulation for the safety game
-    #     W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability"), guarantee(*s))
-    #     g = Goal()
-    #     g.add(W1)
-    #     W1 = tactic_qe_fixpoint(g).as_expr()
-
-    #     i = i + 1
-    #     if valid(Implies(W1, W0),0):
-    #         break
 
     W0 = guarantee(*s)
     W1 = guarantee(*s)
@@ -372,9 +351,8 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    print("Invariant is")
-    print(W0)
-    # z3.solve(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ))
+    # print("Invariant is")
+    # print(W0)
     #3. Output: Controller Extraction or Unrealizable
     if not satisfiable(W0,0):
     # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
@@ -445,11 +423,13 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode 
     if(mode == 1):
+        print("Warning: No mode (0 or 1) supported in Buchi games.")
         getFormulation = getFormulationAE
         contransitionVars = s_+s__
         envtransitionVars = s+s_
     else: 
         if(mode == 0):
+            print("Warning: No mode (0 or 1) supported in Buchi games.")
             getFormulation = getFormulationEA
             envtransitionVars = s_+s__
             contransitionVars = s+s_
@@ -470,18 +450,11 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     substList = []
     for (var, var__) in zip(s,s__):
         substList = substList+[(var,var__)]
-    # print(substList)
-    substList_ = []
-    for (var, var_) in zip(s,s_):
-        substList_ = substList_+[(var,var_)]
-    # print(substList_)
-    
     
     # Start with controller move
     getFormulation = getFormulationEA
     envtransitionVars = s_+s__
     contransitionVars = s+s_
-
 
     i = 1
 
@@ -493,15 +466,12 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         W0 = W1
         #Substitute current variables with post variables
         W0__ = substitute(W0, *substList)
-        W0_ = substitute(W0, *substList_)
 
-        WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "general"), guarantee(*s))
-        # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
+        WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), And(False), W0__, "general"), guarantee(*s))
         g =Goal()
         g.add(WPW)
         # print("Projecting H1")
         WPW = tactic_qe_fixpoint(g).as_expr()
-        # exit()
         j = 1
 
         H0 = And(False)
@@ -512,12 +482,10 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             H0 = H1
             #Substitute current variables with post variables
             H0__ = substitute(H0, *substList)
-            H0_ = substitute(H0, *substList_)
             # print("Getting projection of WPW")
-            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0__, "general")
-            # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
-            # H1 = Not(And(Not(WPH), Not(WPW)))
-            H1 = Or(WPH, WPW)
+            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), And(False), H0__, "general")
+            H1 = Not(And(Not(WPH), Not(WPW)))
+            # H1 = Or(WPH, WPW)
             g =Goal()
             g.add(H1)
             # print("Projecting H1")
@@ -529,7 +497,6 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
                 break
 
         W1 = H0
-        # W1 = And(H0, W1)
         i = i + 1
         # print("Checking validity of W1")
         print()
@@ -540,8 +507,7 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     print("Number of iterations: ", i-1)
     print("")
 
-    Winning_region = W0
-    print(Winning_region)
+    WC1 = W0
 
     # Start with environment move
     getFormulation = getFormulationAE
@@ -562,10 +528,8 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         W0 = W1
         #Substitute current variables with post variables
         W0__ = substitute(W0, *substList)
-        W0_ = substitute(W0, *substList_)
 
-        WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "general"), guarantee(*s))
-        # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
+        WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), And(False), W0__, "general"), guarantee(*s))
         g =Goal()
         g.add(WPW)
         # print("Projecting H1")
@@ -581,12 +545,10 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             H0 = H1
             #Substitute current variables with post variables
             H0__ = substitute(H0, *substList)
-            H0_ = substitute(H0, *substList_)
             # print("Getting projection of WPW")
-            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0__, "general")
-            # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
-            # H1 = Not(And(Not(WPH), Not(WPW)))
-            H1 = Or(WPH, WPW)
+            WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), And(False), H0__, "general")
+            H1 = Not(And(Not(WPH), Not(WPW)))
+            # H1 = Or(WPH, WPW)
             g =Goal()
             g.add(H1)
             # print("Projecting H1")
@@ -598,7 +560,6 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
                 break
 
         W1 = H0
-        # W1 = And(H0, W1)
         i = i + 1
         # print("Checking validity of W1")
         print()
@@ -611,7 +572,6 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     print(W0)
 
     W0__ = substitute(W0, *substList)
-    print(W0_)
     W0 = Exists(s__, And(controller, W0__))
     g =Goal()
     g.add(W0)
@@ -623,159 +583,7 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
 
     W0 = substitute(W0, *substList_reset)
     
-    
-    W0 = Or(W0, Winning_region)
-    print(W0)
-
-    # With turn variables
-
-    # i = 1
-
-    # # turn = Bool("turn")
-    # # turn_ = Bool("turn_")
-    # turn = Int("turn")
-    # turn_ = Int("turn_")
-
-    # substList_ = substList_+[(turn, turn_)]
-
-    # W0 = And(True)
-    # W1 = And(True)
-
-    # while True:
-    #     print("Iteration", i )
-    #     W0 = W1
-    #     #Substitute current variables with post variables
-    #     W0_ = substitute(W0, *substList_)
-
-    #     WPC = And(turn == 1, Exists(s_+[turn_], And(controller, turn == 1, turn_ == 0, W0_)))
-
-    #     WPE = And(turn == 0, ForAll(s_+[turn_], Implies(And(environment(*envtransitionVars),turn == 0, turn_ == 1), W0_)))
-
-    #     W0 = And(Or(WPC, WPE), And(guarantee(*s), turn>=0, turn<=1))
-
-    #     g =Goal()
-    #     g.add(W0)
-    #     W0 = tactic_qe_fixpoint(g).as_expr()
-    #     print(W0)
-    #     W0_ = substitute(W0, *substList_)
-
-    #     j = 1
-
-    #     H0 = And(False)
-    #     H1 = And(False)
-
-    #     while True:
-    #         print("Sub-Iteration", j )
-    #         H0 = H1
-    #         #Substitute current variables with post variables
-    #         H0_ = substitute(H0, *substList_)
-    #         # WPW = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general")
-    #         # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "general")
-
-
-    #         WPC = And(turn == 1, Exists(s_+[turn_], And(controller, turn == 1, turn_ == 0, H0_)))
-
-    #         WPE = And(turn == 0, ForAll(s_+[turn_], Implies(And(environment(*envtransitionVars), turn == 0,  turn_ == 1), H0_)))
-
-    #         # print(WPC)
-    #         # print(WPE)
-    #         # exit()
-    #         H1 = Or(WPC, WPE, W0)
-            
-
-    #         # H1 = Or(WPH, And(WPW, guarantee(*s)))
-    #         g =Goal()
-    #         g.add(H1)
-    #         H1 = tactic_qe_fixpoint(g).as_expr()
-    #         print(H1)
-    #         exit()
-    #         j = j + 1
-    #         if valid(Implies(H1, H0),0):
-    #             break
-
-    #     W1 = H0
-    #     i = i + 1
-    #     if valid(Implies(W0, W1),0):
-    #         break
-
-    # print("")
-    # print("Number of iterations: ", i-1)
-    # print("")
-
-    # Wolfgang GF
-
-    # i = 1
-
-    # W0_E = And(True)
-    # W1_E = And(True)
-
-    # W0_C = And(True)
-    # W1_C = And(True)
-
-    # # W0 = guarantee(*s)
-    # # W1 = guarantee(*s)
-
-    # while True:
-    #     print("Iteration", i )
-    #     W0_E = W1_E
-    #     W0_C = W1_C
-
-    #     #Substitute current variables with post variables
-    #     W0_E_ = substitute(W0_E, *substList_)
-    #     W0_C_ = substitute(W0_C, *substList_)
-
-    #     W1_E = And(ForAll(s_, Implies(environment(*envtransitionVars), W0_C_)), guarantee(*s))
-    #     W1_C = And(Exists(s_, And(controller, W0_E_)), guarantee(*s))
-
-    #     j = 1
-
-    #     H0_E = And(False)
-    #     H1_E = And(False)
-
-    #     H0_C = And(False)
-    #     H1_C = And(False)
-
-    #     while True:
-    #         print("Sub-Iteration", j )
-    #         H0_E = H1_E
-    #         H0_C = H1_C
-    #         #Substitute current variables with post variables
-    #         H0_E_ = substitute(H0_E, *substList_)
-    #         H0_C_ = substitute(H0_C, *substList_)
-            
-    #         H1_E = Or(ForAll(s_, Implies(environment(*envtransitionVars), H0_C_)), W1_E)
-    #         H1_C = Or(Exists(s_, And(controller, H0_E_)), W1_C)
-
-    #         g =Goal()
-    #         g.add(H1_E)
-    #         print("Projecting H1_E")
-    #         H1_E = tactic_qe_fixpoint(g).as_expr()
-
-    #         g =Goal()
-    #         g.add(H1_C)
-    #         print("Projecting H1_C")
-    #         H1_C = tactic_qe_fixpoint(g).as_expr()
-
-    #         j = j + 1
-    #         print("Checking validity of H1")
-    #         # if valid(Implies(H1_E, H0_E),0) and valid(Implies(H1_C, H0_C),0):
-    #         if valid(Implies(H1_E, H0_E),0) and valid(Implies(H1_C, H0_C),0):
-    #             break
-
-    #     W1_E = H0_E
-    #     W1_C = H0_C
-    #     # W1 = And(H0, W1)
-    #     i = i + 1
-    #     print("Checking validity of W1")
-    #     # if valid(Implies(W0_C, W1_C),0) and valid(Implies(W0_E, W1_E),0):
-    #     if valid(Implies(W0_C, W1_C),0) and valid(Implies(W0_E, W1_E),0):
-    #         break
-
-    # print("")
-    # print("Number of iterations: ", i-1)
-    # print("")
-
-
+    W0 = Or(W0, WC1)
     print("Invariant is")
     print(W0)
     #3. Output: Controller Extraction or Unrealizable
@@ -842,45 +650,6 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
     substList = []
     for (var, var__) in zip(s,s__):
         substList = substList+[(var,var__)]
-
-    # Nested
-    # i = 1
-
-    # W0 = And(False)
-    # W1 = And(False)
-
-    # while True:
-    #     print("Iteration", i )
-    #     W0 = W1
-    #     #Substitute current variables with post variables
-    #     W0_ = substitute(W0, *substList)
-    #     WPW = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general"), guarantee(*s))
-        
-    #     j = 1
-
-    #     H0 = And(True)
-    #     H1 = And(True)
-
-    #     while True:
-    #         print("Sub-Iteration", j )
-    #         H0 = H1
-    #         #Substitute current variables with post variables
-    #         H0_ = substitute(H0, *substList)
-    #         WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), H0_, "general")
-            
-    #         H1 = And(WPH, WPW)
-    #         g =Goal()
-    #         g.add(H1)
-    #         H1 = tactic_qe_fixpoint(g).as_expr()
-
-    #         j = j + 1
-    #         if valid(Implies(H0, H1),0):
-    #             break
-
-    #     W1 = H0
-    #     i = i + 1
-    #     if valid(Implies(W1, W0),0):
-    #         break
 
     # Safety followed by Reachability
     i = 1
