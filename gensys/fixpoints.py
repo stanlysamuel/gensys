@@ -239,37 +239,37 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
         print("Invariant is Satisfiable")
         print("REALIZABLE")
 
-        # print("EXTRACTING CONTROLLER...")
-        # # In the invariant, substitute with post variables
-        # #Take backup of invariant to analyse in the end
-        # Invariant = W0
-        # F = substitute(W0, *substList)
+        print("EXTRACTING CONTROLLER...")
+        # In the invariant, substitute with post variables
+        #Take backup of invariant to analyse in the end
+        Invariant = W0
+        F = substitute(W0, *substList)
 
-        # disjunction_of_conditions = False
-        # i = 0
-        # for move_i in controller_moves:
-        #     i = i + 1
+        disjunction_of_conditions = False
+        i = 0
+        for move_i in controller_moves:
+            i = i + 1
 
-        #     #Get AE/EA Formula with postcondition F
-        #     condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F, "safety"), guarantee(*s))
+            #Get AE/EA Formula with postcondition F
+            condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F, "safety"), guarantee(*s))
 
-        #     #Move i condition extraction
-        #     #Eliminate quantifiers and simplify to get the conditions for each move
-        #     g = Goal()
-        #     g.add(condition_move_i)
-        #     condition_move_i = tactic_qe_controller(g).as_expr()
+            #Move i condition extraction
+            #Eliminate quantifiers and simplify to get the conditions for each move
+            g = Goal()
+            g.add(condition_move_i)
+            condition_move_i = tactic_qe_controller(g).as_expr()
 
-        #     #Print condition for each python function provided in the controller
-        #     print("\nCondition for the controller action: "+ str(move_i.__name__))
-        #     print(condition_move_i)
+            #Print condition for each python function provided in the controller
+            print("\nCondition for the controller action: "+ str(move_i.__name__))
+            print(condition_move_i)
 
-        #     #For final sanity check
-        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+            #For final sanity check
+            disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
 
-        # #Sanity check: Disjunction of controller conditions is equal to Invariant
-        # formula = disjunction_of_conditions == Invariant
+        #Sanity check: Disjunction of controller conditions is equal to Invariant
+        formula = disjunction_of_conditions == Invariant
 
-        # assert(valid(formula,0))
+        assert(valid(formula,0))
 
 
 # -----------------------------------------------------------------------------------------
@@ -331,6 +331,12 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
 
     W0 = guarantee(*s)
     W1 = guarantee(*s)
+    
+    # Map for controller states
+    C = []
+    C.append(W0)
+    # print(C)
+    # exit()
 
     while True:
         print("Iteration", i )
@@ -343,14 +349,18 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
         g = Goal()
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
+        C.append(And(W1, Not(W0)))
 
         i = i + 1
         if valid(Implies(W1, W0),0):
             break
 
     print("")
-    print("Number of iterations: ", i-1)
+    iterations = i - 1
+    print("Number of iterations: ", iterations)
     print("")
+    # print(len(C))
+    # print(C)
     # print("Invariant is")
     # print(W0)
     #3. Output: Controller Extraction or Unrealizable
@@ -362,36 +372,43 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
         print("Invariant is Satisfiable")
         print("REALIZABLE")
         print("EXTRACTING CONTROLLER...")
-        # # In the invariant, substitute with post variables
-        # #Take backup of invariant to analyse in the end
-        # Invariant = W0
-        # F = substitute(W0, *substList)
+        # In the invariant, substitute with post variables
+        #Take backup of invariant to analyse in the end
+        Invariant = W0
 
-        # disjunction_of_conditions = False
-        # i = 0
-        # for move_i in controller_moves:
-        #     i = i + 1
+        disjunction_of_conditions = False
+        i = 0
+        for move_i in controller_moves:
+            i = i + 1
 
-        #     #Get AE/EA Formula with postcondition F
-        #     condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F), guarantee(*s))
+            assert (len(C) == iterations+1)
+            
+            condition_move_i = False
+            for j in range(1, iterations+1):
+                #Get AE/EA Formula with postcondition C[j-1]
+                c_ = substitute(C[j-1], *substList)
+                wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), c_ , "reachability")
 
-        #     #Move i condition extraction
-        #     #Eliminate quantifiers and simplify to get the conditions for each move
-        #     g = Goal()
-        #     g.add(condition_move_i)
-        #     condition_move_i = tactic_qe_controller(g).as_expr()
+                if satisfiable(And(wp, C[j]),0):
+                    condition_move_i = Or(condition_move_i, And(wp, C[j]))
+                    #Move i condition extraction
+                    #Eliminate quantifiers and simplify to get the conditions for each move
+                    g = Goal()
+                    g.add(condition_move_i)
+                    condition_move_i = tactic_qe_fixpoint(g).as_expr()
 
-        #     #Print condition for each python function provided in the controller
-        #     print("\nCondition for the controller action: "+ str(move_i.__name__))
-        #     print(condition_move_i)
+            #Print condition for each python function provided in the controller
+            print("\nCondition for the controller action: "+ str(move_i.__name__))
+            print(condition_move_i)
 
-        #     #For final sanity check
-        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+            #For final sanity check
+            disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
 
-        # #Sanity check: Disjunction of controller conditions is equal to Invariant
-        # formula = disjunction_of_conditions == Invariant
+        #Sanity check: Disjunction of controller conditions is equal to Invariant without guarantee
+        print(disjunction_of_conditions)
+        formula = disjunction_of_conditions == And(Invariant, Not(guarantee(*s)))
 
-        # assert(valid(formula,0))
+        assert(valid(formula,0))
 
 
 # -----------------------------------------------------------------------------------------
