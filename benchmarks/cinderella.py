@@ -72,7 +72,7 @@ if spec == "safety":
     #     return Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C ))
     def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
         return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
-    reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type)
+    # reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type)
     # exit()
     # cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, 1-int(mode), game_type)
 

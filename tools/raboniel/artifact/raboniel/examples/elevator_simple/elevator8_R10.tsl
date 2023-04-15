@@ -1,0 +1,181 @@
+//-- State: c_floor
+
+assume {
+
+}
+
+always guarantee {
+  ge c_floor i1();
+  ge i8() c_floor;
+  [c_floor <- sub c_floor i1()] || [c_floor <- add c_floor i1()] || [c_floor <- c_floor];
+  F (eq c_floor i1());
+  F (eq c_floor i2());
+  F (eq c_floor i3());
+  F (eq c_floor i4());
+  F (eq c_floor i5());
+  F (eq c_floor i6());
+  F (eq c_floor i7());
+  F (eq c_floor i8());
+}
+
+always assume {
+  !(!(ge i8() c_floor) && !(ge c_floor i1()));
+}
+
+always assume {
+  !(!(eq c_floor i7()) && !(eq c_floor i6()) && !(eq c_floor i5()) && !(eq c_floor i4()) && !(eq c_floor i3()) && !(eq c_floor i2()) && !(eq c_floor i8()) && !(eq c_floor i1()) && ge i8() c_floor && ge c_floor i1());
+}
+
+always assume {
+  !(eq c_floor i2() && eq c_floor i1());
+  !(eq c_floor i2() && eq c_floor i8());
+  !(eq c_floor i3() && eq c_floor i1());
+  !(eq c_floor i3() && eq c_floor i2());
+  !(eq c_floor i3() && eq c_floor i8());
+  !(eq c_floor i4() && eq c_floor i1());
+  !(eq c_floor i4() && eq c_floor i2());
+  !(eq c_floor i4() && eq c_floor i3());
+  !(eq c_floor i4() && eq c_floor i8());
+  !(eq c_floor i5() && eq c_floor i1());
+  !(eq c_floor i5() && eq c_floor i2());
+  !(eq c_floor i5() && eq c_floor i3());
+  !(eq c_floor i5() && eq c_floor i4());
+  !(eq c_floor i5() && eq c_floor i8());
+  !(eq c_floor i6() && eq c_floor i1());
+  !(eq c_floor i6() && eq c_floor i2());
+  !(eq c_floor i6() && eq c_floor i3());
+  !(eq c_floor i6() && eq c_floor i4());
+  !(eq c_floor i6() && eq c_floor i5());
+  !(eq c_floor i6() && eq c_floor i8());
+  !(eq c_floor i8() && eq c_floor i1());
+}
+
+always assume {
+  !(eq c_floor i1()) && ge c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i2());
+  !(eq c_floor i2()) && !(eq c_floor i1()) && ge c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i3());
+  !(eq c_floor i2()) && !(eq c_floor i1()) && ge c_floor i1() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i1());
+  eq c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(eq c_floor i2()) && !(eq c_floor i1()) && ge c_floor i1());
+  eq c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i8());
+  eq c_floor i1() && [ c_floor <- (sub c_floor i1()) ] -> X !(ge c_floor i1());
+  eq c_floor i1() && [ c_floor <- c_floor ] -> X !(eq c_floor i2());
+  eq c_floor i1() && [ c_floor <- c_floor ] -> X !(eq c_floor i3());
+  eq c_floor i1() && [ c_floor <- c_floor ] -> X !(eq c_floor i4());
+  eq c_floor i1() && [ c_floor <- c_floor ] -> X !(eq c_floor i5());
+  eq c_floor i1() && [ c_floor <- c_floor ] -> X !(eq c_floor i6());
+  eq c_floor i1() && [ c_floor <- c_floor ] -> X !(eq c_floor i8());
+  eq c_floor i2() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i2() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i2() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i2() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i8());
+  eq c_floor i2() && [ c_floor <- (sub c_floor i1()) ] -> X !(!(eq c_floor i1()) && ge c_floor i1());
+  eq c_floor i2() && [ c_floor <- c_floor ] -> X !(eq c_floor i1());
+  eq c_floor i2() && [ c_floor <- c_floor ] -> X !(eq c_floor i3());
+  eq c_floor i2() && [ c_floor <- c_floor ] -> X !(eq c_floor i4());
+  eq c_floor i2() && [ c_floor <- c_floor ] -> X !(eq c_floor i5());
+  eq c_floor i2() && [ c_floor <- c_floor ] -> X !(eq c_floor i6());
+  eq c_floor i2() && [ c_floor <- c_floor ] -> X !(eq c_floor i8());
+  eq c_floor i3() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i3() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i3() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i3() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i8());
+  eq c_floor i3() && [ c_floor <- (sub c_floor i1()) ] -> X !(!(eq c_floor i2()) && !(eq c_floor i1()) && ge c_floor i1());
+  eq c_floor i3() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i1());
+  eq c_floor i3() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i3() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i3() && [ c_floor <- c_floor ] -> X !(eq c_floor i1());
+  eq c_floor i3() && [ c_floor <- c_floor ] -> X !(eq c_floor i2());
+  eq c_floor i3() && [ c_floor <- c_floor ] -> X !(eq c_floor i4());
+  eq c_floor i3() && [ c_floor <- c_floor ] -> X !(eq c_floor i5());
+  eq c_floor i3() && [ c_floor <- c_floor ] -> X !(eq c_floor i6());
+  eq c_floor i3() && [ c_floor <- c_floor ] -> X !(eq c_floor i8());
+  eq c_floor i4() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i4() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i4() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i4() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i8());
+  eq c_floor i4() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i1());
+  eq c_floor i4() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i2());
+  eq c_floor i4() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i4() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i4() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i4() && [ c_floor <- c_floor ] -> X !(eq c_floor i1());
+  eq c_floor i4() && [ c_floor <- c_floor ] -> X !(eq c_floor i2());
+  eq c_floor i4() && [ c_floor <- c_floor ] -> X !(eq c_floor i3());
+  eq c_floor i4() && [ c_floor <- c_floor ] -> X !(eq c_floor i5());
+  eq c_floor i4() && [ c_floor <- c_floor ] -> X !(eq c_floor i6());
+  eq c_floor i4() && [ c_floor <- c_floor ] -> X !(eq c_floor i8());
+  eq c_floor i5() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i5() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i5() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i5() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i8());
+  eq c_floor i5() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i1());
+  eq c_floor i5() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i2());
+  eq c_floor i5() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i5() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i5() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i5() && [ c_floor <- c_floor ] -> X !(eq c_floor i1());
+  eq c_floor i5() && [ c_floor <- c_floor ] -> X !(eq c_floor i2());
+  eq c_floor i5() && [ c_floor <- c_floor ] -> X !(eq c_floor i3());
+  eq c_floor i5() && [ c_floor <- c_floor ] -> X !(eq c_floor i4());
+  eq c_floor i5() && [ c_floor <- c_floor ] -> X !(eq c_floor i6());
+  eq c_floor i5() && [ c_floor <- c_floor ] -> X !(eq c_floor i8());
+  eq c_floor i6() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i6() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i6() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i6() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i8());
+  eq c_floor i6() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i2());
+  eq c_floor i6() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i6() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i6() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i6() && [ c_floor <- c_floor ] -> X !(eq c_floor i1());
+  eq c_floor i6() && [ c_floor <- c_floor ] -> X !(eq c_floor i2());
+  eq c_floor i6() && [ c_floor <- c_floor ] -> X !(eq c_floor i3());
+  eq c_floor i6() && [ c_floor <- c_floor ] -> X !(eq c_floor i4());
+  eq c_floor i6() && [ c_floor <- c_floor ] -> X !(eq c_floor i5());
+  eq c_floor i6() && [ c_floor <- c_floor ] -> X !(eq c_floor i8());
+  eq c_floor i8() && [ c_floor <- (add c_floor i1()) ] -> X !(ge i8() c_floor);
+  eq c_floor i8() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i1());
+  eq c_floor i8() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i2());
+  eq c_floor i8() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i3());
+  eq c_floor i8() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i4());
+  eq c_floor i8() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i5());
+  eq c_floor i8() && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i6());
+  eq c_floor i8() && [ c_floor <- c_floor ] -> X !(eq c_floor i1());
+  eq c_floor i8() && [ c_floor <- c_floor ] -> X !(eq c_floor i2());
+  eq c_floor i8() && [ c_floor <- c_floor ] -> X !(eq c_floor i3());
+  eq c_floor i8() && [ c_floor <- c_floor ] -> X !(eq c_floor i4());
+  eq c_floor i8() && [ c_floor <- c_floor ] -> X !(eq c_floor i5());
+  eq c_floor i8() && [ c_floor <- c_floor ] -> X !(eq c_floor i6());
+  ge c_floor i1() && [ c_floor <- (add c_floor i1()) ] -> X !(eq c_floor i1());
+  ge i8() c_floor && [ c_floor <- (sub c_floor i1()) ] -> X !(eq c_floor i8());
+}
+
+always assume {
+  !(eq c_floor i7() && !(ge c_floor i1()));
+}
+
+always assume {
+  eq (add c_floor i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge c_floor i1()));
+  ge (add c_floor i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge c_floor i1()));
+}
+
+always assume {
+  eq (add (add c_floor i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add c_floor i1()) i1()));
+  ge (add (add c_floor i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add c_floor i1()) i1()));
+}
+
+always assume {
+  eq (add (add (add c_floor i1()) i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add (add c_floor i1()) i1()) i1()));
+  ge (add (add (add c_floor i1()) i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add (add c_floor i1()) i1()) i1()));
+}
+
+always assume {
+  eq (add (add (add (add c_floor i1()) i1()) i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add (add (add c_floor i1()) i1()) i1()) i1()));
+  ge (add (add (add (add c_floor i1()) i1()) i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add (add (add c_floor i1()) i1()) i1()) i1()));
+}
+
+always assume {
+  eq (add (add (add (add (add c_floor i1()) i1()) i1()) i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add (add (add (add c_floor i1()) i1()) i1()) i1()) i1()));
+  ge (add (add (add (add (add c_floor i1()) i1()) i1()) i1()) i1()) i1() && [ c_floor <- (add c_floor i1()) ] -> X !(!(ge (add (add (add (add c_floor i1()) i1()) i1()) i1()) i1()));
+}
