@@ -19,6 +19,7 @@ def valid(formula, verbose):
     else:
         if(verbose):
             print("Not Valid")
+            print(s.model())
         return False
 
 #Function to check satisfiability of a formula
