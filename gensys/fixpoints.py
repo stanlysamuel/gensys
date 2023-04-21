@@ -752,14 +752,14 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         #Take backup of invariant to analyse in the end
         Invariant = W0
 
-        print(C[0])
+        # print(C[0])
         # print(C[1])
         # print(C[2])
-        print(len(C))
+        # print(len(C))
         # print(C[4])
         # print(C[1])
-        print(j)
-        print(iterations)
+        # print(j)
+        # print(iterations)
         # exit()
 
         disjunction_of_conditions = False
@@ -768,12 +768,112 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             assert (len(C) == iterations+1)
             
             condition_move_i = False
+
+            # C1_E = And(C[1], guarantee(*s))
+            # C1_O = And(C[1], Exists(s_, And(controller, guarantee(*s_))))
+                
+            # W_E = C1_E
+            # W_O = C1_O
+
+            # C_E0 = C1_E
+            # C_E1 = C1_E
+
+            # C_O0 = C1_O
+            # C_O1 = C1_O
+
+            # # Compute odd even strategies for Reach
+
+            # C_Union_E = False
+            # C_Union_O = False
+            # for j in range(2, iterations+1):
+            #     print(C[j])
+            #     print("!!11")
+            #     # Even iterations strategy computation
+            #     C_E0 = C_E1
+
+            #     print("CE0")
+            #     print(C_E0)
+            #     #Get AE/EA Formula with postcondition C[j-1]
+            #     C_Union_E = Or(C_Union_E, C_E0)
+            #     post = substitute(C_Union_E, *substList)
+            #     C_E1 = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), post , "general"), C[j])
+                
+            #     if satisfiable(C_E1,0):
+            #         print("!!11")
+            #         condition_move_i = Or(condition_move_i, C_E1)
+            #         #Move i condition extraction
+            #         #Eliminate quantifiers and simplify to get the conditions for each move
+            #         g = Goal()
+            #         g.add(condition_move_i)
+            #         condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+            #         #Project C_E1 separately if needed
+            #         W_E = Or(W_E, C_E1)
+
+            #     # Odd iterations strategy computation
+            #     C_O0 = C_O1
+
+            #     #Get AE/EA Formula with postcondition C[j-1]
+            #     C_Union_O = Or(C_Union_O, C_O0)
+            #     post = substitute(C_O0, *substList)
+            #     C_O1 = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), post , "general"), C[j])
+                
+            #     if satisfiable(C_O1,0):
+            #         print("!!11")
+            #         condition_move_i = Or(condition_move_i, C_O1)
+            #         #Move i condition extraction
+            #         #Eliminate quantifiers and simplify to get the conditions for each move
+            #         g = Goal()
+            #         g.add(condition_move_i)
+            #         condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+            #         #Project C_O1 separately if needed
+            #         W_O = Or(W_O, C_O1)
+
+            # formula = Or(W_E, W_O) == W0
+            # assert(valid(formula,1))
+            # # Recur strategy computation for even
+            # post = substitute(W_E, *substList)
+            # C_E1 = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), post , "general"), C1_E)
+            
+            # if satisfiable(C_E1,0):
+            #     print("!!11")
+            #     condition_move_i = Or(condition_move_i, C_E1)
+            #     #Move i condition extraction
+            #     #Eliminate quantifiers and simplify to get the conditions for each move
+            #     g = Goal()
+            #     g.add(condition_move_i)
+            #     condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+            # # Recur strategy computation for even
+            # post = substitute(W_O, *substList)
+            # C_E1 = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), post , "safety"), C1_O)
+            
+            # if satisfiable(C_E1,0):
+            #     print("!!22")
+            #     condition_move_i = Or(condition_move_i, C_E1)
+            #     #Move i condition extraction
+            #     #Eliminate quantifiers and simplify to get the conditions for each move
+            #     g = Goal()
+            #     g.add(condition_move_i)
+            #     condition_move_i = tactic_qe_fixpoint(g).as_expr()
+            
+            # assert(valid(C[1]== Or(s[0]<=-1, s[0]>=2),1))
+            # assert(valid(C[2]== Or(s[0]==1),1))
+            # assert(valid(C[3]== Or(s[0]==0),1))
+            # assert(valid(C[4]== False,1))
+            # exit()
+
+            C_Union = False
             for j in range(2, iterations+1):
+                # Must reach union of all previous states
+                C_Union = Or(C_Union, C[j-1])
+                print("Iteration:", j)
                 #Get AE/EA Formula with postcondition C[j-1]
-                c_ = substitute(C[j-1], *substList)
+                c_ = substitute(C_Union, *substList)
                 wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), c_ , "general")
                 if satisfiable(And(wp, C[j]),0):
-                    print("eneterd jere")
+                    print("Entered")
                     condition_move_i = Or(condition_move_i, And(wp, C[j]))
                     #Move i condition extraction
                     #Eliminate quantifiers and simplify to get the conditions for each move
@@ -784,9 +884,11 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             # Add the last move condition, specific to Buchi: WP(G, W0) and C[1]
             W0__ = substitute(W0, *substList)
             wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), W0__ , "general")
-            if satisfiable(And(wp, C[1]),0):
+            # print(wp)
+            # exit()
+            if satisfiable(And(wp, And(C[1], guarantee(*s))),0):
                 print("eneterd")
-                condition_move_i = Or(condition_move_i, And(wp, C[1]))
+                condition_move_i = Or(condition_move_i, And(wp, And(C[1], guarantee(*s))))
                 g = Goal()
                 g.add(condition_move_i)
                 condition_move_i = tactic_qe_fixpoint(g).as_expr()
@@ -795,7 +897,8 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             substList_ = []
             for (var, var_) in zip(s,s_):
                 substList_ = substList_+[(var,var_)]
-            W0_ = substitute(W0, *substList_)
+            # W0_ = substitute(W0, *substList_)
+            W0_ = substitute(And(C[1], guarantee(*s)), *substList_)
 
             wp = Exists(s_, And(move_i(*contransitionVars), W0_))
             if satisfiable(And(wp, W0),0):
@@ -807,7 +910,7 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
 
             #Print condition for each python function provided in the controller
             print("\nCondition for the controller action: "+ str(move_i.__name__))
-            # print(condition_move_i)
+            print(condition_move_i)
 
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
@@ -815,6 +918,10 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         #Sanity check: Disjunction of controller conditions is equal to Invariant without guarantee
         # print(disjunction_of_conditions)
         formula = Invariant == disjunction_of_conditions
+        formula = Implies(Invariant,disjunction_of_conditions)
+
+        solve(And(Invariant, Not(disjunction_of_conditions), s[0] == 2))
+        # formula = Implies(disjunction_of_conditions, Invariant) # Valid
 
 
         # formula = Implies(And(Invariant, Not(disjunction_of_conditions)) , W0) 
