@@ -334,8 +334,6 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     # Map for controller states
     C = []
     C.append(W0)
-    # print(C)
-    # exit()
 
     while True:
         print("Iteration", i )
@@ -358,10 +356,8 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     iterations = i - 1
     print("Number of iterations: ", iterations)
     print("")
-    # print(len(C))
-    # print(C)
-    # print("Invariant is")
-    # print(W0)
+    print("Invariant is")
+    print(W0)
     #3. Output: Controller Extraction or Unrealizable
     if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
@@ -375,14 +371,16 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
         Invariant = W0
 
         disjunction_of_conditions = False
-        for move_i in controller_moves:
+        assert (len(C) == iterations+1)
 
-            assert (len(C) == iterations+1)
+        for move_i in controller_moves:
             
             condition_move_i = False
+            C_Union = False
             for j in range(1, iterations+1):
                 #Get AE/EA Formula with postcondition C[j-1]
-                c_ = substitute(C[j-1], *substList)
+                C_Union = Or(C[j-1], C_Union)
+                c_ = substitute(C_Union, *substList)
                 wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), c_ , "reachability")
 
                 if satisfiable(And(wp, C[j]),0):
@@ -1002,8 +1000,20 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
         if valid(Implies(W0, W1),0):
             break
 
+    if not satisfiable(W0,0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+        return
+
+    W_Safety = W0
     W0 = W0
     W1 = W0
+    
+    # Map for controller states
+    C = []
+    C.append(W0)
+
+    reach_count = 1
 
     while True:
         print("Iteration", i )
@@ -1012,12 +1022,15 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
         W0_ = substitute(W0, *substList)
         
         # Game Formulation for the safety game
-        W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability"), guarantee(*s))
+        W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general"), guarantee(*s))
         g = Goal()
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
+        C.append(And(W1, Not(W0)))
 
         i = i + 1
+        reach_count = reach_count + 1
+
         if valid(Implies(W1, W0),0):
             break
 
@@ -1028,13 +1041,65 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
     print("Invariant is")
     print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    
+    print(*s)
     if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
+
+        print("EXTRACTING CONTROLLER...")
+        # In the invariant, substitute with post variables
+        #Take backup of invariant to analyse in the end
+        Invariant = W0
+        F = substitute(W_Safety, *substList)
+
+        disjunction_of_conditions = False
+        assert (len(C) == reach_count)
+
+        for move_i in controller_moves:
+
+            #1. Add Safety constraints for controller move i
+            #Get AE/EA Formula with postcondition F
+            condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F, "safety"), guarantee(*s))
+
+            #Move i condition extraction
+            #Eliminate quantifiers and simplify to get the conditions for each move
+            g = Goal()
+            g.add(condition_move_i)
+            condition_move_i = tactic_qe_controller(g).as_expr()
+
+            #2. Add Reachability constraints for controller move i
+            C_Union = False
+            for j in range(1, reach_count):
+                #Get AE/EA Formula with postcondition C[j-1]
+                C_Union = Or(C[j-1], C_Union)
+                C_Union_ = substitute(C_Union, *substList)
+                wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), C_Union_ , "general")
+
+                if satisfiable(And(wp, C[j]),0):
+                    condition_move_i = Or(condition_move_i, And(wp, C[j]))
+                    #Move i condition extraction
+                    #Eliminate quantifiers and simplify to get the conditions for each move
+                    g = Goal()
+                    g.add(condition_move_i)
+                    condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+            #Print condition for each python function provided in the controller
+            print("\nCondition for the controller action: "+ str(move_i.__name__))
+            print(condition_move_i)
+
+            #For final sanity check
+            disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+
+        #Sanity check: Disjunction of controller conditions is equal to Invariant
+        formula = disjunction_of_conditions == Invariant
+        formula = Implies(Invariant, disjunction_of_conditions)
+
+        assert(valid(formula,1))
+
+
 
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
