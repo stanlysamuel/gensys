@@ -255,13 +255,12 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
                 print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
                 print(condition_move_i, file=text_file)
 
-            # close the file
-            text_file.close()
-            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
-
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
 
+        # close the file
+        text_file.close()
+        print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
         #Sanity check: Disjunction of controller conditions is equal to Invariant
         formula = disjunction_of_conditions == Invariant
 
@@ -395,12 +394,12 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
                 print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
                 print(condition_move_i, file=text_file)
 
-            # close the file
-            text_file.close()
-            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
-
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+
+        # close the file
+        text_file.close()
+        print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
         #Sanity check: Disjunction of controller conditions is equal to Invariant without guarantee
         formula = disjunction_of_conditions == And(Invariant, Not(guarantee(*s)))
@@ -535,6 +534,8 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         print("Invariant is Satisfiable")
         print("REALIZABLE")
 
+        print("Extracting Controller...")
+
         # In the invariant, substitute with post variables
         # Take backup of invariant to analyse in the end
         Invariant = W0
@@ -553,12 +554,10 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             for j in range(2, iterations+1):
                 # Must reach union of all previous states
                 C_Union = Or(C_Union, C[j-1])
-                print("Iteration:", j)
                 #Get AE/EA Formula with postcondition C[j-1]
                 c_ = substitute(C_Union, *substList)
                 wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), c_ , "general")
                 if satisfiable(And(wp, C[j]),0):
-                    print("Entered")
                     condition_move_i = Or(condition_move_i, And(wp, C[j]))
                     #Move i condition extraction
                     #Eliminate quantifiers and simplify to get the conditions for each move
@@ -570,7 +569,6 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             W0__ = substitute(W0, *substList)
             wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), W0__ , "general")
             if satisfiable(And(wp, And(C[1], guarantee(*s))),0):
-                print("eneterd")
                 condition_move_i = Or(condition_move_i, And(wp, And(C[1], guarantee(*s))))
                 g = Goal()
                 g.add(condition_move_i)
@@ -584,7 +582,6 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
 
             wp = Exists(s_, And(move_i(*contransitionVars), W0_))
             if satisfiable(And(wp, W0),0):
-                print("eneterd")
                 condition_move_i = Or(condition_move_i, And(wp, W0))
                 g = Goal()
                 g.add(condition_move_i)
@@ -594,12 +591,12 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
                 print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
                 print(condition_move_i, file=text_file)
 
-            # close the file
-            text_file.close()
-            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
-
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+
+        # close the file
+        text_file.close()
+        print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
         #Sanity check: Disjunction of controller conditions is equal to Invariant without guarantee
         formula = Invariant == disjunction_of_conditions
@@ -717,7 +714,6 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
 
         if valid(Implies(W1, W0),0):
             break
-
     
     print("")
     print("Number of iterations: ", i-1)
@@ -776,12 +772,12 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
                 print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
                 print(condition_move_i, file=text_file)
 
-            # close the file
-            text_file.close()
-            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
-
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+
+        # close the file
+        text_file.close()
+        print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
         #Sanity check: Disjunction of controller conditions is equal to Invariant
         formula = disjunction_of_conditions == Invariant
