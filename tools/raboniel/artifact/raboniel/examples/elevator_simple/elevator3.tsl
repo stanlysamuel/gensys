@@ -1,8 +1,7 @@
 //-- State: c_floor
 
 assume {
-  ge c_floor i1();
-  ge i3() c_floor;
+  eq i1() i1();
 }
 
 always guarantee {

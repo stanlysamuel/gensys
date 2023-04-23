@@ -48,6 +48,14 @@ def move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
 
 controller_moves = [move1, move2, move3, move4, move5]
 
+#3. Define Init Region (True, by default. False is not a valid input)
+
+# def init(b1, b2, b3, b4, b5):
+#     return And(b1 == 0.0, b2 == 0.0, b3 == 0.0, b4 == 0.0, b5 == 0.0)
+
+def init(b1, b2, b3, b4, b5):
+    return True
+
 C = sys.argv[1]
 mode = sys.argv[2]
 spec = sys.argv[3]
@@ -60,9 +68,9 @@ if spec == "safety":
     # def guarantee(b1, b2, b3, b4, b5):
     #     return And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C)
 
-    # safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
-    buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
-    exit()
+    # safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
+    # buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
+    # exit()
 
     # Environment reachability (not correct spec should be G(b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0) and !G(b1<=C , b2<=C , b3<=C , b4<=C , b5<=C )))
     # Dual game must taken into account environment being the first player but playing second! i.e. game mode = 1 and game = reachability
@@ -72,9 +80,9 @@ if spec == "safety":
     #     return Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C ))
     def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
         return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
-    # reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type)
+    # reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
     # exit()
-    # cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, 1-int(mode), game_type)
+    cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, 1-int(mode), game_type, init)
 
 else:
     if spec == "buchi":

@@ -153,7 +153,7 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 # 1.1. Safety Fixpoint Procedure
 # -----------------------------------------------------------------------------------------
 
-def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type):
+def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
@@ -231,8 +231,7 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
     print("Invariant is")
     print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -276,7 +275,7 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
 # 1.2. Reachability Fixpoint Procedure
 # -----------------------------------------------------------------------------------------
 
-def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type):
+def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
@@ -364,8 +363,7 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     # print("Invariant is")
     # print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0  ),0):
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -412,7 +410,7 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
 # # 1.3. Buchi Fixpoint Procedure
 # # -----------------------------------------------------------------------------------------
 
-# def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type):
+# def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
 #     #Get states from environment
 #     s=[]
 #     for var in environment.__code__.co_varnames:
@@ -604,8 +602,7 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
 #     print("Invariant is")
 #     print(W0)
 #     #3. Output: Controller Extraction or Unrealizable
-#     # if not satisfiable(W0,0):
-#     if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0),0):
+#     if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
 #         print("Invariant is Unsatisifiable i.e. False")
 #         print("UNREALIZABLE")
 #     else:
@@ -616,7 +613,7 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
 # 1.3. Buchi Fixpoint Procedure
 # -----------------------------------------------------------------------------------------
 
-def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type):
+def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
@@ -740,8 +737,7 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     print(W0)
 
     #3. Output: Controller Extraction or Unrealizable
-    if not satisfiable(W0,0):
-    # if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0),0):
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -933,7 +929,7 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
 # 1.4. Co-Buchi Fixpoint Procedure
 # -----------------------------------------------------------------------------------------
 
-def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type):
+def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
@@ -1032,8 +1028,8 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
     print("Invariant is")
     print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    # if not satisfiable(W0,0):
-    if not satisfiable(And(W0, s[0] == 0.0, s[1] == 0.0, s[2] == 0.0, s[3] == 0.0, s[4] == 0.0 ),0):
+    
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
