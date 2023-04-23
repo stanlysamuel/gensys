@@ -32,7 +32,7 @@ def move4(a, b, c, d, e, a_, b_, c_, d_, e_):
 
 # skip
 def move5(a, b, c, d, e, a_, b_, c_, d_, e_):
-    return And(a_ == a, b_ == b, c_ == d, d_ == c, e_ == e)
+    return And(a_ == a, b_ == b, c_ == c, d_ == d, e_ == e)
 
 controller_moves = [move1, move2, move3, move4, move5]
 
@@ -40,5 +40,9 @@ controller_moves = [move1, move2, move3, move4, move5]
 def guarantee(a, b, c, d, e):
     return And(a>=b, b>=c, c>=d, d>=e)
 
+# 4. Define Initial States
+def init(a, b, c, d, e):
+    return False
+
 # Spec: FG (a>=b, b>=c, c>=d)
-cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, 0, game_type)
+cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, 0, game_type, init)

@@ -32,5 +32,9 @@ controller_moves = [move1, move2, move3]
 def guarantee(a, b, c):
     return And(a>=b, b>=c)
 
+# 4. Define Initial States
+def init(a, b, c):
+    return False
+
 # Spec: FG (a>=b, b>=c)
-cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, 0, game_type)
+cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, 0, game_type, init)
