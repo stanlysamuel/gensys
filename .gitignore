@@ -4,6 +4,7 @@
 tools/raboniel/artifact/raboniel/examples/*.tsl
 tools/raboniel/artifact/raboniel/examples/*.tlsf
 tools/raboniel/artifact/raboniel/examples/*.kiss
+controller.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

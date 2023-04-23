@@ -237,10 +237,11 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
         F = substitute(W0, *substList)
 
         disjunction_of_conditions = False
-        i = 0
-        for move_i in controller_moves:
-            i = i + 1
 
+        with open("controller.txt", "w") as text_file:
+            print("Controller Logic", file=text_file)
+
+        for move_i in controller_moves:
             #Get AE/EA Formula with postcondition F
             condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F, "safety"), guarantee(*s))
 
@@ -250,9 +251,13 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
             g.add(condition_move_i)
             condition_move_i = tactic_qe_controller(g).as_expr()
 
-            #Print condition for each python function provided in the controller
-            print("\nCondition for the controller action: "+ str(move_i.__name__))
-            print(condition_move_i)
+            with open("controller.txt", "a") as text_file:
+                print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
+                print(condition_move_i, file=text_file)
+
+            # close the file
+            text_file.close()
+            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
@@ -365,6 +370,9 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
         disjunction_of_conditions = False
         assert (len(C) == iterations+1)
 
+        with open("controller.txt", "w") as text_file:
+            print("Controller Logic", file=text_file)
+
         for move_i in controller_moves:
             
             condition_move_i = False
@@ -383,9 +391,13 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
                     g.add(condition_move_i)
                     condition_move_i = tactic_qe_fixpoint(g).as_expr()
 
-            #Print condition for each python function provided in the controller
-            print("\nCondition for the controller action: "+ str(move_i.__name__))
-            print(condition_move_i)
+            with open("controller.txt", "a") as text_file:
+                print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
+                print(condition_move_i, file=text_file)
+
+            # close the file
+            text_file.close()
+            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
@@ -524,13 +536,16 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
         print("REALIZABLE")
 
         # In the invariant, substitute with post variables
-        #Take backup of invariant to analyse in the end
+        # Take backup of invariant to analyse in the end
         Invariant = W0
+
+        with open("controller.txt", "w") as text_file:
+            print("Controller Logic", file=text_file)
+
+        assert (len(C) == iterations+1)
 
         disjunction_of_conditions = False
         for move_i in controller_moves:
-
-            assert (len(C) == iterations+1)
             
             condition_move_i = False
 
@@ -575,9 +590,13 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
                 g.add(condition_move_i)
                 condition_move_i = tactic_qe_fixpoint(g).as_expr()
 
-            #Print condition for each python function provided in the controller
-            print("\nCondition for the controller action: "+ str(move_i.__name__))
-            print(condition_move_i)
+            with open("controller.txt", "a") as text_file:
+                print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
+                print(condition_move_i, file=text_file)
+
+            # close the file
+            text_file.close()
+            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
@@ -706,7 +725,6 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
     print("Invariant is")
     print(W0)
     #3. Output: Controller Extraction or Unrealizable
-    print(*s)
     if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
@@ -722,6 +740,9 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
 
         disjunction_of_conditions = False
         assert (len(C) == reach_count)
+
+        with open("controller.txt", "w") as text_file:
+            print("Controller Logic", file=text_file)
 
         for move_i in controller_moves:
 
@@ -751,9 +772,13 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
                     g.add(condition_move_i)
                     condition_move_i = tactic_qe_fixpoint(g).as_expr()
 
-            #Print condition for each python function provided in the controller
-            print("\nCondition for the controller action: "+ str(move_i.__name__))
-            print(condition_move_i)
+            with open("controller.txt", "a") as text_file:
+                print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
+                print(condition_move_i, file=text_file)
+
+            # close the file
+            text_file.close()
+            print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
 
             #For final sanity check
             disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
