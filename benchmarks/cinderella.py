@@ -49,7 +49,7 @@ if spec == "safety":
         return And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C, b1>=0.0, b2>=0.0, b3>=0.0, b4>=0.0, b5>=0.0)
 
     # safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
-    # buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
+    buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
     # exit()
 
     # Dual game must taken into account environment being the first player but playing second! i.e. game mode = 1 and game = reachability
@@ -60,7 +60,7 @@ if spec == "safety":
         return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
     
     # reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
-    cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
+    # cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
 
 else:
     if spec == "buchi":
