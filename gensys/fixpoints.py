@@ -810,7 +810,7 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
         W0_ = substitute(W0, *substList)
         
         # Game Formulation for the safety game
-        W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general"), guarantee(*s))
+        W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "general"), W_Safety)
         g = Goal()
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
@@ -966,17 +966,11 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
 
     # Define the guarantee that we will use
 
-    # # Guarantee over the deterministic automaton states for a given k
+    # Guarantee over the deterministic automaton states for a given k
     def guarantee_automaton(q):
         #Hard coded for now
         return isFinal(q)
 
-    # Combine above constraint with the optional safety guarantee, if any
-    # def guarantee_(s, q):
-    #     return And(guarantee(*s), guarantee_automaton(q))
-    # def guarantee_(s, q):
-    #     return And(True, guarantee(q))
-    
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode
     if(mode == 1):
@@ -1109,96 +1103,6 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         print("Invariant is Satisfiable")
         print("REALIZABLE")
 
-
-    # i = 1
-
-    # W0 = And(True)
-    # W1 = And(True)
-
-    # while True:
-    #     print("Iteration", i )
-    #     W0 = W1
-    #     #Substitute current variables with post variables
-    #     W0__ = substitute(W0, *substList)
-    #     W0_ = substitute(W0, *substList_)
-    #     WPW = And(Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__)))), guarantee_automaton(q))
-    #     # WPW = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__))
-    #     # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
-    #     g =Goal()
-    #     g.add(And(WPW, q>=0, q<=2))
-    #     print("Projecting H1")
-    #     WPW = tactic_qe_fixpoint(g).as_expr()
-    #     print(WPW)
-    #     # print(W0_)
-    #     # print(W0__)
-    #     # exit()
-    #     j = 1
-
-    #     H0 = And(False)
-    #     H1 = And(False)
-
-    #     while True:
-    #         print("Sub-Iteration", j )
-    #         H0 = H1
-    #         #Substitute current variables with post variables
-    #         H0__ = substitute(H0, *substList)
-    #         H0_ = substitute(H0, *substList_)
-    #         print("Getting projection of WPW")
-    #         # WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), And(q_==2, s_[0]==1) ))
-    #         WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s),ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0__)) ))
-    #         # WPH = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), q__ == 0))
-    #         # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
-    #         # H1 = Not(And(Not(WPH), Not(WPW)))
-    #         g =Goal()
-    #         # g.add(Exists(q, And(WPH, q ==2)))
-    #         g.add(And(WPH))
-    #         # print("Projecting H1")
-    #         WPH = tactic_qe_fixpoint(g).as_expr()
-    #         # print(WPH)
-    #         # exit()
-
-    #         H1 = And(Or(WPH, WPW))
-
-    #         g =Goal()
-    #         g.add(Exists(q, And(H1, q ==2)))
-    #         # print("Projecting H1")
-    #         # print(tactic_qe_fixpoint(g).as_expr())
-
-    #         j = j + 1
-    #         print("Checking validity of H1")
-    #         if valid(Implies(H1, H0),0):
-    #         # if j == 3:
-    #             break
-    #     # exit()
-    #     W1 = H0
-    #     # W1 = And(H0, W1)
-    #     i = i + 1
-    #     print("Checking validity of W1")
-    #     if valid(Implies(W0, W1),0):
-    #         break
-
-    # print("")
-    # print("Number of iterations: ", i-1)
-    # print("")
-
-    # g =Goal()
-    # g.add(Exists(q, And(W0, q ==1)))
-    # W0 = tactic_qe_fixpoint(g).as_expr()
-
-    # print("Invariant: ", W0)
-    # #3. Output: Controller Extraction or Unrealizable
-
-    # if not satisfiable(W0,0):
-    #     print("Invariant is Unsatisifiable i.e. False")
-    #     print("UNREALIZABLE")
-    # else:
-    #     print("Invariant is Satisfiable")
-    #     print("REALIZABLE")
-
-    # print("")
-    # print("Number of iterations: ", i-1)
-    # print("")
-
 # -----------------------------------------------------------------------------------------
 # 2.1.2 Product Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)
 # -----------------------------------------------------------------------------------------
@@ -1237,18 +1141,10 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
         g.add(formula)
         return tactic_qe_fixpoint(g).as_expr()
 
-    # Define the guarantee that we will use
-
-    # # Guarantee over the deterministic automaton states for a given k
-    # def guarantee_automaton(q):
-    #     #Hard coded for now
-    #     return q==0 
-
-    # Combine above constraint with the optional safety guarantee, if any
-    # def guarantee_(s, q):
-    #     return And(guarantee(*s), guarantee_automaton(q))
-    def guarantee_(s, q):
-        return And(True, guarantee(q))
+    # Guarantee over the deterministic automaton states for a given k
+    def guarantee_automaton(q):
+        #Hard coded for now
+        return isFinal(q)
     
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode
@@ -1278,10 +1174,11 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
         substList = substList+[(var,var__)]  
     substList = substList+[(q, q__)]  
     
+    # Safety followed by Reachability
     i = 1
 
-    W0 = guarantee_(*s, q)
-    W1 = guarantee_(*s, q)
+    W0 = guarantee_automaton(q)
+    W1 = guarantee_automaton(q)
 
     while True:
         print("Iteration", i )
@@ -1289,9 +1186,9 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
         # Substitute current variables with post variables
         W0_ = substitute(W0, *substList)
         
+        
         # Game Formulation for the safety game
-        # W1 = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "safety"), guarantee(*s))
-        W1 = Exists(s_+[q_], And(controller, automaton(q,q_,*s), guarantee_(*s_, q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
+        W1 = And(Exists(s_+[q_], And(controller, automaton(q,q_,*s), guarantee_automaton(q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_)))), guarantee_automaton(q))
         g = Goal()
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
@@ -1300,8 +1197,20 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
         if valid(Implies(W0, W1),0):
             break
 
+    if not satisfiable(W0,0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+        return
+
+    W_Safety = W0
     W0 = W0
     W1 = W0
+    
+    # Map for controller states
+    # C = []
+    # C.append(W0)
+
+    reach_count = 1
 
     while True:
         print("Iteration", i )
@@ -1310,34 +1219,32 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
         W0_ = substitute(W0, *substList)
         
         # Game Formulation for the safety game
-        # W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability"), guarantee(*s))
-        W1 = Exists(s_+[q_], And(controller, automaton(q,q_,*s), Or(guarantee_(*s_, q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))) ))
+        W1 = Or(Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_)))), W_Safety)
         g = Goal()
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
+        # C.append(And(W1, Not(W0)))
 
         i = i + 1
+        reach_count = reach_count + 1
+
         if valid(Implies(W1, W0),0):
             break
+    
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+
+    # Extract the winning region from the initial automaton state
+    W0 = Exists(q, And(W0, q == 0))
 
     #3. Output: Controller Extraction or Unrealizable
-
-    if not satisfiable(W0,0):
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
-
-    print("")
-    print("Number of iterations: ", i-1)
-    print("")
-
-    # print("Invariant: ")
-    # g = Goal()
-    # g.add(Exists(q, And(W0, q == 1)))
-    # W1 = tactic_qe_fixpoint(g).as_expr()
-    # print(W1)
 
 
 # -----------------------------------------------------------------------------------------
