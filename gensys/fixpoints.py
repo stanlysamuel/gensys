@@ -21,11 +21,15 @@
 # 1.4. Co-Buchi Fixpoint Procedure
 # 
 # 2. Fixpoint Procedures for general LTL specifications
-# 2.1. Buchi Fixpoint Procedure (Deterministic Buchi Automaton)
-# 2.2. Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)
-# 2.3. Bounded Fixpoint Procedures (Non deterministic Automaton)
-#   2.3.1. On-The-Fly Determinization based Fixpoint Procedure
-#   2.3.2. Antichain based Fixpoint Procedure
+# 2.1. Deterministic Product Game 
+#   2.1.1 Product Buchi Fixpoint Procedure (Deterministic Buchi Automaton)
+#   2.1.2 Product Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)
+# 2.2. Bounded Fixpoint Procedures (Non deterministic Automatons)
+#   2.2.1. On-The-Fly Determinization (OTFD) based Fixpoint Procedure
+#   2.2.2. Antichain based (AC) Fixpoint Procedure
+# 2.3. Bounded Fixpoint Procedures (Optimized)
+#   2.3.1. On-The-Fly Determinization (OTFD) based Fixpoint Procedure
+#   2.3.2. Antichain based (AC) Fixpoint Procedure
 #-----------------------------------------------------------------------------------#
 
 from  gensys.helper import *
@@ -71,11 +75,11 @@ set_option(max_depth=100000, rational_to_decimal = True, precision =40, max_line
 #Options for parallel processing in Z3
 set_param("parallel.enable", True)
 # set_param("parallel.threads.max", 5)
-# -----------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------
-# 1. Fixpoint Procedures for non-LTL safety specifications (predicate over game states)
-# -----------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
+# 1. Fixpoint Procedures for predicate specifications (G(formula), F(formula), GF(formula), and FG(formula))
+# -------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
 
 # Formulation for the game where envrionment plays first
 def getFormulationAE(s_, s__, controller_moves, environment_moves, guarantee_s_, postcondition, game):
@@ -887,9 +891,404 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
 
         assert(valid(formula,0))
 
+
+# -------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
+# 2. Fixpoint Procedures for general LTL specifications
+# -------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
+
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
-# 2. LTL Fixed-Point Procedures (On The Fly Determinization, Antichain):
+# 2.1 Deterministic Product Games (Buchi, Co-Buchi)
+# -----------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------
+
+# Utility function to check number of determinized automaton states in a given formula F(s,c)
+def print_q_automaton_states(formula, q, nQ):
+    print("Printing determinized automaton states")
+    #Function to check models
+    s = Solver()
+    s.add(formula)
+    count = 0
+    while s.check() == sat:
+        count+=1
+        # Print readable model
+        m = s.model()
+        aut_state = (q, m[q])
+        model_formula = (q == m.evaluate(q))
+        g =Goal()
+        g.add(Exists(q, And(formula, model_formula)))
+        s_pred = tactic_qe_fixpoint(g).as_expr()
+
+        print(aut_state, s_pred)
+        s.add(q != m.evaluate(q))
+    # Print total number of states
+    print("Number of states:", count)
+
+# -----------------------------------------------------------------------------------------
+# 2.1.1 Product Buchi Fixpoint Procedure (Deterministic Buchi Automaton)
+# -----------------------------------------------------------------------------------------
+
+def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
+    print("Buchi Fixed Point Computation")
+
+    #Get states from environment
+    s=[]
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            #Dynamic variable declaration
+            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
+            s.append(locals()[var])
+    
+    #Declare and define s' of type game_type
+    s_ = []
+    for var in s:
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
+        s_.append(locals()[str(var)+"_"])
+
+    #Declare and define s'' of type game_type
+    s__ = []
+    for var in s:
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
+        s__.append(locals()[str(var)+"__"])
+
+    # Create automaton state variables
+    q = Int("q")
+    q_ = Int("q_")
+    q__ = Int("q__")
+
+    def project(formula):
+        g =Goal()
+        g.add(formula)
+        return tactic_qe_fixpoint(g).as_expr()
+
+    # Define the guarantee that we will use
+
+    # # Guarantee over the deterministic automaton states for a given k
+    def guarantee_automaton(q):
+        #Hard coded for now
+        return q==0 
+
+    # Combine above constraint with the optional safety guarantee, if any
+    # def guarantee_(s, q):
+    #     return And(guarantee(*s), guarantee_automaton(q))
+    # def guarantee_(s, q):
+    #     return And(True, guarantee(q))
+    
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode
+    if(mode == 1):
+        raise Exception("AE mode not supported for Buchi games")
+        getFormulation = getFormulationAE_otfd
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 0):
+            getFormulation = getFormulationEA_otfd
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
+        else:
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
+            return
+    
+    #0. Create Controller
+    # See if List Comprehension (or some better way can make it a single Or formula)
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    #Create list of tuples for substitution pre variables with post
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]  
+    substList = substList+[(q, q__)]  
+
+    substList_ = []
+    for (var, var_) in zip(s,s_):
+        substList_ = substList_+[(var,var_)]  
+    substList_ = substList_+[(q, q_)]  
+
+    # i = 1
+
+    # W0 = And(True)
+    # W1 = And(True)
+
+    # while True:
+    #     print("Iteration", i )
+    #     W0 = W1
+    #     #Substitute current variables with post variables
+    #     W0_ = substitute(W0, *substList)
+    #     j = 1
+
+    #     H0 = And(False)
+    #     H1 = And(False)
+
+    #     while True:
+    #         print("Sub-Iteration", j )
+    #         H0 = H1
+    #         #Substitute current variables with post variables
+    #         H0_ = substitute(H0, *substList)
+    #         WPW = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
+    #         WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0_))))
+            
+    #         H1 = Or(WPH, And(WPW, guarantee_(s, q)))
+    #         g =Goal()
+    #         g.add(H1)
+    #         H1 = tactic_qe_fixpoint(g).as_expr()
+    #         # print(H1)
+    #         # print_q_automaton_states(H1, q, nQ)
+    #         # exit()
+        
+    #         j = j + 1
+    #         # print_q_automaton_states(WPW, q, nQ)
+    #         if valid(Implies(H1, H0),0):
+    #         # if j == 6:
+    #             break
+    #     # exit()
+    #     W1 = H0
+    #     i = i + 1
+    #     if valid(Implies(W0, W1),0):
+    #         break
+
+
+    i = 1
+
+    W0 = And(True)
+    W1 = And(True)
+
+    # W0 = guarantee(*s)
+    # W1 = guarantee(*s)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        #Substitute current variables with post variables
+        W0__ = substitute(W0, *substList)
+        W0_ = substitute(W0, *substList_)
+        WPW = And(Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__)))), guarantee_automaton(q))
+        # WPW = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__))
+        # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
+        g =Goal()
+        g.add(And(WPW, q>=0, q<=2))
+        print("Projecting H1")
+        WPW = tactic_qe_fixpoint(g).as_expr()
+        print(WPW)
+        # print(W0_)
+        # print(W0__)
+        # exit()
+        j = 1
+
+        H0 = And(False)
+        H1 = And(False)
+
+        while True:
+            print("Sub-Iteration", j )
+            H0 = H1
+            #Substitute current variables with post variables
+            H0__ = substitute(H0, *substList)
+            H0_ = substitute(H0, *substList_)
+            print("Getting projection of WPW")
+            # WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), And(q_==2, s_[0]==1) ))
+            WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s),ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0__)) ))
+            # WPH = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), q__ == 0))
+            # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
+            # H1 = Not(And(Not(WPH), Not(WPW)))
+            g =Goal()
+            # g.add(Exists(q, And(WPH, q ==2)))
+            g.add(And(WPH))
+            # print("Projecting H1")
+            WPH = tactic_qe_fixpoint(g).as_expr()
+            # print(WPH)
+            # exit()
+
+            H1 = And(Or(WPH, WPW))
+
+            g =Goal()
+            g.add(Exists(q, And(H1, q ==2)))
+            # print("Projecting H1")
+            # print(tactic_qe_fixpoint(g).as_expr())
+
+            j = j + 1
+            print("Checking validity of H1")
+            if valid(Implies(H1, H0),0):
+            # if j == 3:
+                break
+        # exit()
+        W1 = H0
+        # W1 = And(H0, W1)
+        i = i + 1
+        print("Checking validity of W1")
+        if valid(Implies(W0, W1),0):
+            break
+
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+
+    g =Goal()
+    g.add(Exists(q, And(W0, q ==1)))
+    W0 = tactic_qe_fixpoint(g).as_expr()
+
+    print("Invariant: ", W0)
+    #3. Output: Controller Extraction or Unrealizable
+
+    if not satisfiable(W0,0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+
+# -----------------------------------------------------------------------------------------
+# 2.1.2 Product Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)
+# -----------------------------------------------------------------------------------------
+
+def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
+    print("Co-Buchi Fixed Point Computation")
+
+    #Get states from environment
+    s=[]
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            #Dynamic variable declaration
+            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
+            s.append(locals()[var])
+    
+    #Declare and define s' of type game_type
+    s_ = []
+    for var in s:
+        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
+        s_.append(locals()[str(var)+"_"])
+
+    #Declare and define s'' of type game_type
+    s__ = []
+    for var in s:
+        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
+        s__.append(locals()[str(var)+"__"])
+
+    # Create automaton state variables
+    q = Int("q")
+    q_ = Int("q_")
+    q__ = Int("q__")
+
+    def project(formula):
+        g =Goal()
+        g.add(formula)
+        return tactic_qe_fixpoint(g).as_expr()
+
+    # Define the guarantee that we will use
+
+    # # Guarantee over the deterministic automaton states for a given k
+    # def guarantee_automaton(q):
+    #     #Hard coded for now
+    #     return q==0 
+
+    # Combine above constraint with the optional safety guarantee, if any
+    # def guarantee_(s, q):
+    #     return And(guarantee(*s), guarantee_automaton(q))
+    def guarantee_(s, q):
+        return And(True, guarantee(q))
+    
+    # Decide formulation based on game mode
+    # Declare and define transition variables list for controller and environment, depending on the mode
+    if(mode == 1):
+        raise Exception("AE mode not supported for CoBuchi games")
+        getFormulation = getFormulationAE_otfd
+        contransitionVars = s_+s__
+        envtransitionVars = s+s_
+    else: 
+        if(mode == 0):
+            getFormulation = getFormulationEA_otfd
+            envtransitionVars = s_+s__
+            contransitionVars = s+s_
+        else:
+            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
+            return
+    
+    #0. Create Controller
+    # See if List Comprehension (or some better way can make it a single Or formula)
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    #Create list of tuples for substitution pre variables with post
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]  
+    substList = substList+[(q, q__)]  
+    
+    i = 1
+
+    W0 = guarantee_(*s, q)
+    W1 = guarantee_(*s, q)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        # Substitute current variables with post variables
+        W0_ = substitute(W0, *substList)
+        
+        # Game Formulation for the safety game
+        # W1 = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "safety"), guarantee(*s))
+        W1 = Exists(s_+[q_], And(controller, automaton(q,q_,*s), guarantee_(*s_, q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
+        g = Goal()
+        g.add(W1)
+        W1 = tactic_qe_fixpoint(g).as_expr()
+
+        i = i + 1
+        if valid(Implies(W0, W1),0):
+            break
+
+    W0 = W0
+    W1 = W0
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        # Substitute current variables with post variables
+        W0_ = substitute(W0, *substList)
+        
+        # Game Formulation for the safety game
+        # W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability"), guarantee(*s))
+        W1 = Exists(s_+[q_], And(controller, automaton(q,q_,*s), Or(guarantee_(*s_, q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))) ))
+        g = Goal()
+        g.add(W1)
+        W1 = tactic_qe_fixpoint(g).as_expr()
+
+        i = i + 1
+        if valid(Implies(W1, W0),0):
+            break
+
+    #3. Output: Controller Extraction or Unrealizable
+
+    if not satisfiable(W0,0):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+
+    # print("Invariant: ")
+    # g = Goal()
+    # g.add(Exists(q, And(W0, q == 1)))
+    # W1 = tactic_qe_fixpoint(g).as_expr()
+    # print(W1)
+
+
+# -----------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------
+# 2.2. Bounded Fixpoint Procedures (Non deterministic Automatons)
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
@@ -929,20 +1328,10 @@ def print_automaton_states(formula, c, nQ):
     # Print total number of states
     print("Number of states:", count)
 
-# def gensys_ltl(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, game_type, approach):
-    
-#     if approach == "otfd":
-#         function = otfd_fixedpoint
-#     elif approach == "antichain":
-#         function = antichain_fixedpoint
-#     else:
-#         print("Invalid approach")
-#         return
 
-
-# ---------------------------------------------------------
-# 2.1. On The Fly Determinization Approach (OTFD) for LTL specs
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------------------
+# 2.2.1. On-The-Fly Determinization (OTFD) based Fixpoint Procedure
+# -----------------------------------------------------------------------------------------
 
 def min(x,y):
     return If(x < y, x, y)
@@ -1194,9 +1583,9 @@ def getFormulationEA_otfd(s, s_, s__, controller_moves, environment_moves, guara
     return Exists(s_+c_, And(controller_moves, Succ(c,s,c_), guarantee_s_c_, ForAll(s__+c__, Implies(And(environment_moves, Succ(c_,s_,c__)), postcondition))))
 
 
-# --------------------------------------------
-# 2.2. Antichain Approach for LTL specs
-# --------------------------------------------
+# ------------------------------------------------
+# 2.2.2. Antichain based (AC) Fixpoint Procedure
+# ------------------------------------------------
 
 def max(x,y):
         return If(x > y, x, y)
@@ -1456,384 +1845,9 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
     print("Number of iterations: ", i-1)
     print("")
 
-
-# Utility function to check number of determinized automaton states in a given formula F(s,c)
-def print_q_automaton_states(formula, q, nQ):
-    print("Printing determinized automaton states")
-    #Function to check models
-    s = Solver()
-    s.add(formula)
-    count = 0
-    while s.check() == sat:
-        count+=1
-        # Print readable model
-        m = s.model()
-        aut_state = (q, m[q])
-        model_formula = (q == m.evaluate(q))
-        g =Goal()
-        g.add(Exists(q, And(formula, model_formula)))
-        s_pred = tactic_qe_fixpoint(g).as_expr()
-
-        print(aut_state, s_pred)
-        s.add(q != m.evaluate(q))
-    # Print total number of states
-    print("Number of states:", count)
-
-def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
-    print("Buchi Fixed Point Computation")
-
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
-    
-    #Declare and define s' of type game_type
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s'' of type game_type
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
-        s__.append(locals()[str(var)+"__"])
-
-    # Create automaton state variables
-    q = Int("q")
-    q_ = Int("q_")
-    q__ = Int("q__")
-
-    def project(formula):
-        g =Goal()
-        g.add(formula)
-        return tactic_qe_fixpoint(g).as_expr()
-
-    # Define the guarantee that we will use
-
-    # # Guarantee over the deterministic automaton states for a given k
-    def guarantee_automaton(q):
-        #Hard coded for now
-        return q==0 
-
-    # Combine above constraint with the optional safety guarantee, if any
-    # def guarantee_(s, q):
-    #     return And(guarantee(*s), guarantee_automaton(q))
-    # def guarantee_(s, q):
-    #     return And(True, guarantee(q))
-    
-    # Decide formulation based on game mode
-    # Declare and define transition variables list for controller and environment, depending on the mode
-    if(mode == 1):
-        raise Exception("AE mode not supported for Buchi games")
-        getFormulation = getFormulationAE_otfd
-        contransitionVars = s_+s__
-        envtransitionVars = s+s_
-    else: 
-        if(mode == 0):
-            getFormulation = getFormulationEA_otfd
-            envtransitionVars = s_+s__
-            contransitionVars = s+s_
-        else:
-            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
-            return
-    
-    #0. Create Controller
-    # See if List Comprehension (or some better way can make it a single Or formula)
-    controller = False
-    for move in controller_moves:
-        controller = Or(move(*contransitionVars), controller)
-
-    #Create list of tuples for substitution pre variables with post
-    substList = []
-    for (var, var__) in zip(s,s__):
-        substList = substList+[(var,var__)]  
-    substList = substList+[(q, q__)]  
-
-    substList_ = []
-    for (var, var_) in zip(s,s_):
-        substList_ = substList_+[(var,var_)]  
-    substList_ = substList_+[(q, q_)]  
-
-    # i = 1
-
-    # W0 = And(True)
-    # W1 = And(True)
-
-    # while True:
-    #     print("Iteration", i )
-    #     W0 = W1
-    #     #Substitute current variables with post variables
-    #     W0_ = substitute(W0, *substList)
-    #     j = 1
-
-    #     H0 = And(False)
-    #     H1 = And(False)
-
-    #     while True:
-    #         print("Sub-Iteration", j )
-    #         H0 = H1
-    #         #Substitute current variables with post variables
-    #         H0_ = substitute(H0, *substList)
-    #         WPW = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
-    #         WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0_))))
-            
-    #         H1 = Or(WPH, And(WPW, guarantee_(s, q)))
-    #         g =Goal()
-    #         g.add(H1)
-    #         H1 = tactic_qe_fixpoint(g).as_expr()
-    #         # print(H1)
-    #         # print_q_automaton_states(H1, q, nQ)
-    #         # exit()
-        
-    #         j = j + 1
-    #         # print_q_automaton_states(WPW, q, nQ)
-    #         if valid(Implies(H1, H0),0):
-    #         # if j == 6:
-    #             break
-    #     # exit()
-    #     W1 = H0
-    #     i = i + 1
-    #     if valid(Implies(W0, W1),0):
-    #         break
-
-
-    i = 1
-
-    W0 = And(True)
-    W1 = And(True)
-
-    # W0 = guarantee(*s)
-    # W1 = guarantee(*s)
-
-    while True:
-        print("Iteration", i )
-        W0 = W1
-        #Substitute current variables with post variables
-        W0__ = substitute(W0, *substList)
-        W0_ = substitute(W0, *substList_)
-        WPW = And(Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__)))), guarantee_automaton(q))
-        # WPW = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__))
-        # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
-        g =Goal()
-        g.add(And(WPW, q>=0, q<=2))
-        print("Projecting H1")
-        WPW = tactic_qe_fixpoint(g).as_expr()
-        print(WPW)
-        # print(W0_)
-        # print(W0__)
-        # exit()
-        j = 1
-
-        H0 = And(False)
-        H1 = And(False)
-
-        while True:
-            print("Sub-Iteration", j )
-            H0 = H1
-            #Substitute current variables with post variables
-            H0__ = substitute(H0, *substList)
-            H0_ = substitute(H0, *substList_)
-            print("Getting projection of WPW")
-            # WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), And(q_==2, s_[0]==1) ))
-            WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s),ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0__)) ))
-            # WPH = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), q__ == 0))
-            # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
-            # H1 = Not(And(Not(WPH), Not(WPW)))
-            g =Goal()
-            # g.add(Exists(q, And(WPH, q ==2)))
-            g.add(And(WPH))
-            # print("Projecting H1")
-            WPH = tactic_qe_fixpoint(g).as_expr()
-            # print(WPH)
-            # exit()
-
-            H1 = And(Or(WPH, WPW))
-
-            g =Goal()
-            g.add(Exists(q, And(H1, q ==2)))
-            # print("Projecting H1")
-            # print(tactic_qe_fixpoint(g).as_expr())
-
-            j = j + 1
-            print("Checking validity of H1")
-            if valid(Implies(H1, H0),0):
-            # if j == 3:
-                break
-        # exit()
-        W1 = H0
-        # W1 = And(H0, W1)
-        i = i + 1
-        print("Checking validity of W1")
-        if valid(Implies(W0, W1),0):
-            break
-
-    print("")
-    print("Number of iterations: ", i-1)
-    print("")
-
-    g =Goal()
-    g.add(Exists(q, And(W0, q ==1)))
-    W0 = tactic_qe_fixpoint(g).as_expr()
-
-    print("Invariant: ", W0)
-    #3. Output: Controller Extraction or Unrealizable
-
-    if not satisfiable(W0,0):
-        print("Invariant is Unsatisifiable i.e. False")
-        print("UNREALIZABLE")
-    else:
-        print("Invariant is Satisfiable")
-        print("REALIZABLE")
-
-    print("")
-    print("Number of iterations: ", i-1)
-    print("")
-
-def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
-    print("Co-Buchi Fixed Point Computation")
-
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
-    
-    #Declare and define s' of type game_type
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s'' of type game_type
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
-        s__.append(locals()[str(var)+"__"])
-
-    # Create automaton state variables
-    q = Int("q")
-    q_ = Int("q_")
-    q__ = Int("q__")
-
-    def project(formula):
-        g =Goal()
-        g.add(formula)
-        return tactic_qe_fixpoint(g).as_expr()
-
-    # Define the guarantee that we will use
-
-    # # Guarantee over the deterministic automaton states for a given k
-    # def guarantee_automaton(q):
-    #     #Hard coded for now
-    #     return q==0 
-
-    # Combine above constraint with the optional safety guarantee, if any
-    # def guarantee_(s, q):
-    #     return And(guarantee(*s), guarantee_automaton(q))
-    def guarantee_(s, q):
-        return And(True, guarantee(q))
-    
-    # Decide formulation based on game mode
-    # Declare and define transition variables list for controller and environment, depending on the mode
-    if(mode == 1):
-        raise Exception("AE mode not supported for CoBuchi games")
-        getFormulation = getFormulationAE_otfd
-        contransitionVars = s_+s__
-        envtransitionVars = s+s_
-    else: 
-        if(mode == 0):
-            getFormulation = getFormulationEA_otfd
-            envtransitionVars = s_+s__
-            contransitionVars = s+s_
-        else:
-            print("Wrong mode entered. Please enter 1 (for AE mode) and 0 (for EA mode) as the second argument.")
-            return
-    
-    #0. Create Controller
-    # See if List Comprehension (or some better way can make it a single Or formula)
-    controller = False
-    for move in controller_moves:
-        controller = Or(move(*contransitionVars), controller)
-
-    #Create list of tuples for substitution pre variables with post
-    substList = []
-    for (var, var__) in zip(s,s__):
-        substList = substList+[(var,var__)]  
-    substList = substList+[(q, q__)]  
-    
-    i = 1
-
-    W0 = guarantee_(*s, q)
-    W1 = guarantee_(*s, q)
-
-    while True:
-        print("Iteration", i )
-        W0 = W1
-        # Substitute current variables with post variables
-        W0_ = substitute(W0, *substList)
-        
-        # Game Formulation for the safety game
-        # W1 = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "safety"), guarantee(*s))
-        W1 = Exists(s_+[q_], And(controller, automaton(q,q_,*s), guarantee_(*s_, q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
-        g = Goal()
-        g.add(W1)
-        W1 = tactic_qe_fixpoint(g).as_expr()
-
-        i = i + 1
-        if valid(Implies(W0, W1),0):
-            break
-
-    W0 = W0
-    W1 = W0
-
-    while True:
-        print("Iteration", i )
-        W0 = W1
-        # Substitute current variables with post variables
-        W0_ = substitute(W0, *substList)
-        
-        # Game Formulation for the safety game
-        # W1 = Or(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0_, "reachability"), guarantee(*s))
-        W1 = Exists(s_+[q_], And(controller, automaton(q,q_,*s), Or(guarantee_(*s_, q_), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))) ))
-        g = Goal()
-        g.add(W1)
-        W1 = tactic_qe_fixpoint(g).as_expr()
-
-        i = i + 1
-        if valid(Implies(W1, W0),0):
-            break
-
-    #3. Output: Controller Extraction or Unrealizable
-
-    if not satisfiable(W0,0):
-        print("Invariant is Unsatisifiable i.e. False")
-        print("UNREALIZABLE")
-    else:
-        print("Invariant is Satisfiable")
-        print("REALIZABLE")
-
-    print("")
-    print("Number of iterations: ", i-1)
-    print("")
-
-    # print("Invariant: ")
-    # g = Goal()
-    # g.add(Exists(q, And(W0, q == 1)))
-    # W1 = tactic_qe_fixpoint(g).as_expr()
-    # print(W1)
-
-
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
-# 2. LTL Fixed-Point Procedures without Sigma (On The Fly Determinization, Antichain):
+# 2.3. Bounded Fixpoint Procedures (Optimized) (Without sigma)
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
@@ -1874,7 +1888,7 @@ def print_automaton_states(formula, c, nQ):
     print("Number of states:", count)
 
 # -----------------------------------------------------------------------------------------
-# 2.1. On The Fly Determinization Approach (OTFD) for LTL specs: Non-sigma version
+# 2.3.1. On-The-Fly Determinization (OTFD) based Fixpoint Procedure: Non-sigma version
 # -----------------------------------------------------------------------------------------
 
 def succ_nonsigma(c, s, c_, automaton, isFinal, k):
@@ -2054,7 +2068,7 @@ def otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, aut
     print("")
 
 # --------------------------------------------
-# 2.2. Antichain Approach for LTL specs: non sigma
+# 2.3.2. Antichain based (AC) Fixpoint Procedure: Non-sigma version
 # --------------------------------------------
         
 def omega_nonsigma(c_, s, c, automaton, isFinal):
