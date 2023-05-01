@@ -930,7 +930,7 @@ def print_q_automaton_states(formula, q, nQ):
 # 2.1.1 Product Buchi Fixpoint Procedure (Deterministic Buchi Automaton)
 # -----------------------------------------------------------------------------------------
 
-def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
+def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type, init):
     print("Buchi Fixed Point Computation")
 
     #Get states from environment
@@ -969,7 +969,7 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     # # Guarantee over the deterministic automaton states for a given k
     def guarantee_automaton(q):
         #Hard coded for now
-        return q==0 
+        return isFinal(q)
 
     # Combine above constraint with the optional safety guarantee, if any
     # def guarantee_(s, q):
@@ -1000,15 +1000,115 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         controller = Or(move(*contransitionVars), controller)
 
     #Create list of tuples for substitution pre variables with post
-    substList = []
-    for (var, var__) in zip(s,s__):
-        substList = substList+[(var,var__)]  
-    substList = substList+[(q, q__)]  
+    # substList = []
+    # for (var, var__) in zip(s,s__):
+    #     substList = substList+[(var,var__)]  
+    # substList = substList+[(q, q__)]  
 
     substList_ = []
     for (var, var_) in zip(s,s_):
         substList_ = substList_+[(var,var_)]  
     substList_ = substList_+[(q, q_)]  
+
+    # Raghavan Sir' version
+
+    envtransitionVars = s+s_
+    contransitionVars = s+s_
+
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    i = 1
+
+    W0e = And(True)
+    W1e = And(True)
+
+    W0c = And(True)
+    W1c = And(True)
+
+    while True:
+        print("Iteration", i )
+        W0e = W1e
+        W0c = W1c
+        
+        #Substitute current variables with post variables
+        W0e_ = substitute(W0e, *substList_)
+        W0c_ = substitute(W0c, *substList_)
+
+        W1e = And( ForAll(s_+[q_], Implies(And(environment(*envtransitionVars), automaton(q,q_,*s)) , W0c_)) , guarantee_automaton(q))
+        W1c = And( Exists(s_+[q_], And(And(controller, automaton(q,q_,*s)), W0e_)), guarantee_automaton(q))
+
+        g =Goal()
+        g.add(W1e)
+        W1e = tactic_qe_fixpoint(g).as_expr()
+
+        g =Goal()
+        g.add(W1c)
+        W1c = tactic_qe_fixpoint(g).as_expr()
+
+        j = 1
+
+        H0e = And(False)
+        H1e = And(False)
+
+        H0c = And(False)
+        H1c = And(False)
+
+        # # Map for controller states
+        # C = []
+        # C.append(H0)
+
+        while True:
+            print("Sub-Iteration", j )
+            H0e = H1e
+            H0c = H1c
+
+            #Substitute current variables with post variables
+            H0e_ = substitute(H0e, *substList_)
+            H0c_ = substitute(H0c, *substList_)
+
+            H1e = Or( ForAll(s_+[q_], Implies(And(environment(*envtransitionVars), automaton(q,q_,*s)) , H0c_)) , W1e)
+            H1c = Or( Exists(s_+[q_], And(controller, automaton(q,q_,*s),  H0e_)), W1c)
+            
+            g =Goal()
+            g.add(H1e)
+            H1e = tactic_qe_fixpoint(g).as_expr()
+
+            g =Goal()
+            g.add(H1c)
+            H1c = tactic_qe_fixpoint(g).as_expr()
+
+            # C.append(And(H1, Not(H0)))
+            
+            j = j + 1
+            iterations = j-1
+
+            if valid(And(Implies(H1e, H0e), Implies(H1c, H0c)),0):
+                break
+
+        W1e = H0e
+        W1c = H0c
+
+        i = i + 1
+        print()
+        if valid(And(Implies(W0e, W1e), Implies(W0c, W1c)),0):
+            break
+
+    W0e_ = substitute(W0e, *substList_)
+    # W = Or(W0c, Exists(s_, And(controller, W0e_)))
+    W = W0c
+
+    # Extract the winning region from the initial automaton state
+    W = Exists(q, And(W, q == 0))
+
+    if not (valid(Implies(init(*s), W),0) and satisfiable(W,0)):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+
 
     # i = 1
 
@@ -1019,7 +1119,19 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     #     print("Iteration", i )
     #     W0 = W1
     #     #Substitute current variables with post variables
-    #     W0_ = substitute(W0, *substList)
+    #     W0__ = substitute(W0, *substList)
+    #     W0_ = substitute(W0, *substList_)
+    #     WPW = And(Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__)))), guarantee_automaton(q))
+    #     # WPW = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__))
+    #     # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
+    #     g =Goal()
+    #     g.add(And(WPW, q>=0, q<=2))
+    #     print("Projecting H1")
+    #     WPW = tactic_qe_fixpoint(g).as_expr()
+    #     print(WPW)
+    #     # print(W0_)
+    #     # print(W0__)
+    #     # exit()
     #     j = 1
 
     #     H0 = And(False)
@@ -1029,127 +1141,69 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     #         print("Sub-Iteration", j )
     #         H0 = H1
     #         #Substitute current variables with post variables
-    #         H0_ = substitute(H0, *substList)
-    #         WPW = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0_))))
-    #         WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0_))))
-            
-    #         H1 = Or(WPH, And(WPW, guarantee_(s, q)))
+    #         H0__ = substitute(H0, *substList)
+    #         H0_ = substitute(H0, *substList_)
+    #         print("Getting projection of WPW")
+    #         # WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), And(q_==2, s_[0]==1) ))
+    #         WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s),ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0__)) ))
+    #         # WPH = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), q__ == 0))
+    #         # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
+    #         # H1 = Not(And(Not(WPH), Not(WPW)))
     #         g =Goal()
-    #         g.add(H1)
-    #         H1 = tactic_qe_fixpoint(g).as_expr()
-    #         # print(H1)
-    #         # print_q_automaton_states(H1, q, nQ)
+    #         # g.add(Exists(q, And(WPH, q ==2)))
+    #         g.add(And(WPH))
+    #         # print("Projecting H1")
+    #         WPH = tactic_qe_fixpoint(g).as_expr()
+    #         # print(WPH)
     #         # exit()
-        
+
+    #         H1 = And(Or(WPH, WPW))
+
+    #         g =Goal()
+    #         g.add(Exists(q, And(H1, q ==2)))
+    #         # print("Projecting H1")
+    #         # print(tactic_qe_fixpoint(g).as_expr())
+
     #         j = j + 1
-    #         # print_q_automaton_states(WPW, q, nQ)
+    #         print("Checking validity of H1")
     #         if valid(Implies(H1, H0),0):
-    #         # if j == 6:
+    #         # if j == 3:
     #             break
     #     # exit()
     #     W1 = H0
+    #     # W1 = And(H0, W1)
     #     i = i + 1
+    #     print("Checking validity of W1")
     #     if valid(Implies(W0, W1),0):
     #         break
 
+    # print("")
+    # print("Number of iterations: ", i-1)
+    # print("")
 
-    i = 1
+    # g =Goal()
+    # g.add(Exists(q, And(W0, q ==1)))
+    # W0 = tactic_qe_fixpoint(g).as_expr()
 
-    W0 = And(True)
-    W1 = And(True)
+    # print("Invariant: ", W0)
+    # #3. Output: Controller Extraction or Unrealizable
 
-    # W0 = guarantee(*s)
-    # W1 = guarantee(*s)
+    # if not satisfiable(W0,0):
+    #     print("Invariant is Unsatisifiable i.e. False")
+    #     print("UNREALIZABLE")
+    # else:
+    #     print("Invariant is Satisfiable")
+    #     print("REALIZABLE")
 
-    while True:
-        print("Iteration", i )
-        W0 = W1
-        #Substitute current variables with post variables
-        W0__ = substitute(W0, *substList)
-        W0_ = substitute(W0, *substList_)
-        WPW = And(Exists(s_+[q_], And(controller, automaton(q,q_,*s), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__)))), guarantee_automaton(q))
-        # WPW = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), W0__))
-        # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), guarantee(*s_), W0__, "reachability"), guarantee(*s))
-        g =Goal()
-        g.add(And(WPW, q>=0, q<=2))
-        print("Projecting H1")
-        WPW = tactic_qe_fixpoint(g).as_expr()
-        print(WPW)
-        # print(W0_)
-        # print(W0__)
-        # exit()
-        j = 1
-
-        H0 = And(False)
-        H1 = And(False)
-
-        while True:
-            print("Sub-Iteration", j )
-            H0 = H1
-            #Substitute current variables with post variables
-            H0__ = substitute(H0, *substList)
-            H0_ = substitute(H0, *substList_)
-            print("Getting projection of WPW")
-            # WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s), And(q_==2, s_[0]==1) ))
-            WPH = Exists(s_+[q_], And(controller, automaton(q,q_,*s),ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), H0__)) ))
-            # WPH = ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)), q__ == 0))
-            # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), H0_, H0__, "reachability")
-            # H1 = Not(And(Not(WPH), Not(WPW)))
-            g =Goal()
-            # g.add(Exists(q, And(WPH, q ==2)))
-            g.add(And(WPH))
-            # print("Projecting H1")
-            WPH = tactic_qe_fixpoint(g).as_expr()
-            # print(WPH)
-            # exit()
-
-            H1 = And(Or(WPH, WPW))
-
-            g =Goal()
-            g.add(Exists(q, And(H1, q ==2)))
-            # print("Projecting H1")
-            # print(tactic_qe_fixpoint(g).as_expr())
-
-            j = j + 1
-            print("Checking validity of H1")
-            if valid(Implies(H1, H0),0):
-            # if j == 3:
-                break
-        # exit()
-        W1 = H0
-        # W1 = And(H0, W1)
-        i = i + 1
-        print("Checking validity of W1")
-        if valid(Implies(W0, W1),0):
-            break
-
-    print("")
-    print("Number of iterations: ", i-1)
-    print("")
-
-    g =Goal()
-    g.add(Exists(q, And(W0, q ==1)))
-    W0 = tactic_qe_fixpoint(g).as_expr()
-
-    print("Invariant: ", W0)
-    #3. Output: Controller Extraction or Unrealizable
-
-    if not satisfiable(W0,0):
-        print("Invariant is Unsatisifiable i.e. False")
-        print("UNREALIZABLE")
-    else:
-        print("Invariant is Satisfiable")
-        print("REALIZABLE")
-
-    print("")
-    print("Number of iterations: ", i-1)
-    print("")
+    # print("")
+    # print("Number of iterations: ", i-1)
+    # print("")
 
 # -----------------------------------------------------------------------------------------
 # 2.1.2 Product Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)
 # -----------------------------------------------------------------------------------------
 
-def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type):
+def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type, init):
     print("Co-Buchi Fixed Point Computation")
 
     #Get states from environment
