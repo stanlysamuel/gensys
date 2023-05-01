@@ -551,7 +551,8 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
             break
 
     W0e_ = substitute(W0e, *substList_)
-    W = Or(W0c, Exists(s_, And(controller, W0e_)))
+    # W = Or(W0c, Exists(s_, And(controller, W0e_)))
+    W = W0c
 
     if not (valid(Implies(init(*s), W),0) and satisfiable(W,0)):
         print("Invariant is Unsatisifiable i.e. False")
