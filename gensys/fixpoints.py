@@ -154,10 +154,14 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            # Dynamic variable declaration 
             exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
@@ -280,10 +284,14 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
@@ -419,10 +427,14 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
@@ -720,10 +732,14 @@ def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, ga
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s'
     s_ = []
@@ -937,10 +953,14 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s' of type game_type
     s_ = []
@@ -1114,11 +1134,15 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
-    
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
+
     #Declare and define s' of type game_type
     s_ = []
     for var in s:
@@ -1143,7 +1167,6 @@ def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton
 
     # Guarantee over the deterministic automaton states for a given k
     def guarantee_automaton(q):
-        #Hard coded for now
         return isFinal(q)
     
     # Decide formulation based on game mode
@@ -1346,16 +1369,20 @@ def is_downward_closed(W, v, c, nQ, game_type):
         # print_automaton_states(L,c,nQ)
         return False
 
-def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type):
+def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type, init):
 
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s' of type game_type
     s_ = []
@@ -1479,9 +1506,12 @@ def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, i
     # For example,
     # init = And(c[0]==0, c[1]==-1) for 2 states 
     # init = And(c[0]==0, c[1]==-1, c[2]==-1, c[3]==-1, c[4]==-1, c[5]==-1) for 6 states 
-    init = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
-    init = c[0]!=-1
-    if not satisfiable(And(F, init),0):
+    init_aut = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
+
+    W0 = Exists(c, And(F, init_aut))
+
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
+    # if not satisfiable(And(F, init),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -1642,7 +1672,7 @@ def glb(W1, W2, v, c, nQ, game_type):
         # return G
         return L
 
-def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type):
+def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type, init):
 
     # Define Omega function for determinization (depends on omega (depends on max))
     
@@ -1650,10 +1680,14 @@ def antichain_fixedpoint(controller_moves, environment, guarantee, mode, automat
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s' of type game_type
     s_ = []
@@ -1871,16 +1905,20 @@ def succ_nonsigma(c, s, c_, automaton, isFinal, k):
 
     return And(range_c, range_c_, det,  reach)
 
-def otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type):
+def otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type, init):
 
     #Get states from environment
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variables s,g in the code because it will get redeclared in this scope. This is a problem.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s' of type game_type
     s_ = []
@@ -1995,9 +2033,12 @@ def otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, aut
     # For example,
     # init = And(c[0]==0, c[1]==-1) for 2 states 
     # init = And(c[0]==0, c[1]==-1, c[2]==-1, c[3]==-1, c[4]==-1, c[5]==-1) for 6 states 
-    init = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
+    init_aut = And(c[0] == 0, And([c[q] == -1 for q in range(1,nQ)]))
 
-    if not satisfiable(And(F, init),0):
+    W0 = Exists(c, And(F, init_aut))
+
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
+    # if not satisfiable(And(F, init),0):
         print("Invariant is Unsatisifiable i.e. False")
         print("UNREALIZABLE")
     else:
@@ -2046,7 +2087,7 @@ def omega_nonsigma(c_, s, c, automaton, isFinal):
 
     return And(det, reach)
 
-def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type):
+def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type, init):
 
     # Define Omega function for determinization (depends on omega (depends on max))
     
@@ -2054,10 +2095,14 @@ def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode
     s=[]
     for var in environment.__code__.co_varnames:
         if not str(var).__contains__("_"):
-            #Dynamic variable declaration
-            #Issue: Can't use variable s in the code because it will get redeclared in this scope.
+            # Dynamic variable declaration
             exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            s.append(locals()[var])
+            if var not in locals(): 
+                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
+                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
+                s.append(locals()[str(var)+"new123"])
+            else:
+                s.append(locals()[var])
     
     #Declare and define s' of type game_type
     s_ = []

@@ -37,10 +37,18 @@ def move7(pc, l, gl, pc_, l_, gl_):
 
 controller_moves = [move1, move2, move3, move4, move5, move6, move7]
 
+#3. Define Init Region (False by default => Maximal winning region will be returned)
+
+def init(pc, l, gl):
+    return And(gl == 0, l == 0, pc == 0)
+
+# def init(pc, l, gl):
+#     return False
+
 mode = sys.argv[1]
 spec = sys.argv[2]
 
-if spec == "safety":
+if spec == "simple":
 
     # 3. Define Guarantee
     def guarantee(pc, l, gl):
@@ -49,7 +57,7 @@ if spec == "safety":
     safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type)
 
 else:
-    if spec == "omega":
+    if spec == "product":
 
         # Spec: Safety, G(formula) where formula = Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))
         # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
@@ -59,24 +67,56 @@ else:
         def automaton(q, q_, pc, l, gl):
             return Or(
                     And(q == 0, q_==1, Not(Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0))))),
-                    And(q == 0, q_==0),
+                    And(q == 0, q_==0, Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))),
                     And(q == 1, q_==1),
                     )
         # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
         def isFinal(p):
-            return If(p==1, 1, 0)
-
-        #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
-        def sigma(pc, l, gl):
-            return [Not(Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))), Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))]
+            return p == 0
 
         # (Optional): Explicit safety guarantee that complements the omega-regular formula
         # Default: Returns the True formula in Z3
-        def guarantee(pc, l, gl):
+        def guarantee(q):
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        omega_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ)
+        # buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
 
     else:
-        print("Not a valid input: Please enter \"safety\" or \"omega\" as the third argument")
+        if spec == "bounded":
+            # Only UCW's used in this section (i.e., from the negation of the specification)
+
+            # Spec: Safety, G(formula) where formula = Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))
+            # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+            # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+
+            nQ = 2
+            def automaton(q, q_, pc, l, gl):
+                return Or(
+                    And(q == 0, q_==1, Not(Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0))))),
+                    And(q == 0, q_==0, Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))),
+                    And(q == 1, q_==1),
+                    )
+            # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+            def isFinal(p):
+                return If(p==1, 1, 0)
+
+            #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
+            def sigma(pc, l, gl):
+                return [Not(Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))), Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))]
+
+            # (Optional): Explicit safety guarantee that complements the omega-regular formula
+            # Default: Returns the True formula in Z3
+            def guarantee(pc, l, gl):
+                return And(True)
+
+            # Call the fixpoint engine for omega regular specifications.
+            # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+            # otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+
+            # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+            antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+
+        else:
+            print("Invalid specification. Please choose from simple, product or bounded")
