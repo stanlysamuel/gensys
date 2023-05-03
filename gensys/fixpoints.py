@@ -2287,7 +2287,7 @@ def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode
         g = Goal()
         g.add(F)
         F = tactic_qe_fixpoint(g).as_expr()
-        print("Invariant is: ")
+        # print("Invariant is: ")
         # print(F)
         g = Goal()
         
@@ -2298,8 +2298,8 @@ def antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode
 
         g.add(Exists(c, And(F, init)))
         PF = tactic_qe_fixpoint(g).as_expr()
-        print("Projected invariant for initial state is: ")
-        print(PF)
+        # print("Projected invariant for initial state is: ")
+        # print(PF)
 
     print("")
     print("Number of iterations: ", i-1)
