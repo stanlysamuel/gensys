@@ -174,71 +174,72 @@ else:
     else:
         if spec == "bounded":
             # Only UCW's used in this section (i.e., from the negation of the specification)
-            # Spec: Safety, G(formula) where formula == And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))
-            # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-            nQ = 2
-            def automaton(q, q_, f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
-                return Or(
-                        And(q == 0, q_==1, Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))),
-                        And(q == 0, q_==0, And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))),
-                        And(q == 1, q_==1),
-                        )
+            # # Spec: Safety, G(formula) where formula == And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))
+            # # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-            # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
-            def isFinal(p):
-                return If(p==1, 1, 0)
-
-            #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
-            def sigma(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
-                return [And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))), Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))]
-
-            # (Optional): Explicit safety guarantee that complements the omega-regular formula
-            # Default: Returns the True formula in Z3
-            def guarantee(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
-                return And(True)
-
-            # Spec: Safety, G(formula) where formula == Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))
-            # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
-            # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
-
-            # nQ = 6
+            # nQ = 2
             # def automaton(q, q_, f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
             #     return Or(
-            #             And(q == 0, q_==0),
-            #             And(q == 0, q_==1, And(pc1 == 3, pc1 !=4)),
-            #             And(q == 0, q_==2, And(pc1 == 7, pc1 !=8)),
-            #             And(q == 0, q_==3, And(pc2 == 3, pc2 !=4)),
-            #             And(q == 0, q_==4, And(pc2 == 6, pc2 !=7)),
-            #             And(q == 1, q_==1, pc1 !=4),
-            #             And(q == 1, q_==5, pc1 == 4),
-            #             And(q == 2, q_==2, pc1 !=8),
-            #             And(q == 2, q_==5, pc1 == 8),
-            #             And(q == 3, q_==3, pc2 !=4),
-            #             And(q == 3, q_==5, pc2 == 4),
-            #             And(q == 4, q_==4, pc2 !=7),
-            #             And(q == 4, q_==5, pc2 == 7),
-            #             And(q == 5, q_==5)
+            #             And(q == 0, q_==1, Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))),
+            #             And(q == 0, q_==0, And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))),
+            #             And(q == 1, q_==1),
             #             )
+
             # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
             # def isFinal(p):
-            #     return If(And(p>=1, p<=4), 1, 0)
+            #     return If(p==1, 1, 0)
 
             # #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
             # def sigma(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
-            #     return []
+            #     return [And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))), Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))]
 
             # # (Optional): Explicit safety guarantee that complements the omega-regular formula
             # # Default: Returns the True formula in Z3
             # def guarantee(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
             #     return And(True)
 
+            # Spec 2: G(pc1 = 3 -> F pc1 = 4) and G(pc1 = 7 -> F pc1 = 8) and G(pc2 = 3 -> F pc2 = 4) and G(pc2 = 6 -> F pc2 = 7)
+            # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+            # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+
+            nQ = 6
+            def automaton(q, q_, f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
+                return Or(
+                        And(q == 0, q_==0),
+                        And(q == 0, q_==1, And(pc1 == 3, pc1 !=4)),
+                        And(q == 0, q_==2, And(pc1 == 7, pc1 !=8)),
+                        And(q == 0, q_==3, And(pc2 == 3, pc2 !=4)),
+                        And(q == 0, q_==4, And(pc2 == 6, pc2 !=7)),
+                        And(q == 1, q_==1, pc1 !=4),
+                        And(q == 1, q_==5, pc1 == 4),
+                        And(q == 2, q_==2, pc1 !=8),
+                        And(q == 2, q_==5, pc1 == 8),
+                        And(q == 3, q_==3, pc2 !=4),
+                        And(q == 3, q_==5, pc2 == 4),
+                        And(q == 4, q_==4, pc2 !=7),
+                        And(q == 4, q_==5, pc2 == 7),
+                        And(q == 5, q_==5)
+                        )
+            # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+            def isFinal(p):
+                return If(And(p>=1, p<=4), 1, 0)
+
+            #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
+            def sigma(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
+                return []
+
+            # (Optional): Explicit safety guarantee that complements the omega-regular formula
+            # Default: Returns the True formula in Z3
+            def guarantee(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
+                return And(True)
+
             # Call the fixpoint engine for omega regular specifications.
             # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
-            # otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+            otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
 
             # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
-            antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+            # antichain_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
 
         else:
             print("Not a valid input: Please enter \"simple\" \"product\" or \"bounded\" as the third argument")

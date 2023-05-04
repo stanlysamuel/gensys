@@ -8,6 +8,9 @@ from z3 import *
 # direction by one cell. Player 0 wins if the robot stays
 # within a horizontal stripe of width three.
 
+# 0. Define game type (Int/ Real)
+game_type = "Int"
+
 # 1. Define Environment moves
 def environment(x,y,x_,y_):
     return And(Or(x_ == x + 1, x_ == x - 1, x_ == x), Or(y_ == y + 1, y_ == y - 1, y_ == y))
@@ -43,6 +46,14 @@ def move9(x,y,x_,y_):
 
 controller_moves = [move1, move2, move3, move4, move5, move6, move7, move8, move9]
 
+# 3. Define Initial Condition
+
+# def init(x,y):
+#     return And(x == 0, y == 0)
+
+def init(x,y):
+    return False
+
 mode = sys.argv[1]
 spec = sys.argv[2]
 
@@ -52,7 +63,7 @@ if spec == "safety":
     def guarantee(x, y):
         return And(x<=3, x>=0)
 
-    safety_fixedpoint(controller_moves, environment, guarantee, int(mode))
+    safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
 
 else:
     if spec == "omega":

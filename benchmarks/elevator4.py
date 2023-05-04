@@ -24,26 +24,25 @@ def move3(x,x_):
 
 # Define initial state
 def init(x):
-    return And(x>=1, x<=3)
+    return And(x>=1, x<=4)
 
 # def init(x):
 #     return False
 
 controller_moves = [move1, move2, move3]
-# controller_moves = [move2, move3]
 
 mode = sys.argv[1]
 spec = sys.argv[2]
 
 if spec == "product":
-    # Spec: Liveness, G(1<=x<=3) and G(F(x==1) and F(x==2) and F(x==3))
+    # Spec: Liveness, G(1<=x<=3) and G(F(x==1) and F(x==2) and F(x==3) and F(x==4))
     # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
     # Deterministic Buchi Automaton
-    nQ = 5
+    nQ = 6
     def automaton(q, q_, x):
-      return Or(And(q == 0, q_ == 0, And(And(x>=1, x<=3), x ==1, x ==2, x ==3)), And(q == 0, q_ == 1, And(And(x>=1, x<=3), Not(x ==3))), And(q == 0, q_ == 2, And(And(x>=1, x<=3), Not(x ==2), x ==3)), And(q == 0, q_ == 3, And(And(x>=1, x<=3), Not(x ==1), x ==2, x ==3)), And(q == 0, q_ == 4, Not(And(x>=1, x<=3))), And(q == 1, q_ == 0, And(And(x>=1, x<=3), x ==1, x ==2, x ==3)), And(q == 1, q_ == 1, And(And(x>=1, x<=3), Not(x ==3))), And(q == 1, q_ == 2, And(And(x>=1, x<=3), Not(x ==2), x ==3)), And(q == 1, q_ == 3, And(And(x>=1, x<=3), Not(x ==1), x ==2, x ==3)), And(q == 1, q_ == 4, Not(And(x>=1, x<=3))), And(q == 2, q_ == 0, And(And(x>=1, x<=3), x ==1, x ==2)), And(q == 2, q_ == 2, And(And(x>=1, x<=3), Not(x ==2))), And(q == 2, q_ == 3, And(And(x>=1, x<=3), Not(x ==1), x ==2)), And(q == 2, q_ == 4, Not(And(x>=1, x<=3))), And(q == 3, q_ == 0, And(And(x>=1, x<=3), x ==1)), And(q == 3, q_ == 3, And(And(x>=1, x<=3), Not(x ==1))), And(q == 3, q_ == 4, Not(And(x>=1, x<=3))), And(q == 4, q_ == 4))
-    
+        return Or(And(q == 0, q_ == 0, And(And(x>=1, x<=4), x == 1, x == 2, x == 3, x == 4)), And(q == 0, q_ == 1, And(And(x>=1, x<=4), Not(x == 4))), And(q == 0, q_ == 2, And(And(x>=1, x<=4), Not(x == 3), x == 4)), And(q == 0, q_ == 3, And(And(x>=1, x<=4), Not(x == 2), x == 3, x == 4)), And(q == 0, q_ == 4, And(And(x>=1, x<=4), Not(x == 1), x == 2, x == 3, x == 4)), And(q == 0, q_ == 5, Not(And(x>=1, x<=4))), And(q == 1, q_ == 0, And(And(x>=1, x<=4), x == 1, x == 2, x == 3, x == 4)), And(q == 1, q_ == 1, And(And(x>=1, x<=4), Not(x == 4))), And(q == 1, q_ == 2, And(And(x>=1, x<=4), Not(x == 3), x == 4)), And(q == 1, q_ == 3, And(And(x>=1, x<=4), Not(x == 2), x == 3, x == 4)), And(q == 1, q_ == 4, And(And(x>=1, x<=4), Not(x == 1), x == 2, x == 3, x == 4)), And(q == 1, q_ == 5, Not(And(x>=1, x<=4))), And(q == 2, q_ == 0, And(And(x>=1, x<=4), x == 1, x == 2, x == 3)), And(q == 2, q_ == 2, And(And(x>=1, x<=4), Not(x == 3))), And(q == 2, q_ == 3, And(And(x>=1, x<=4), Not(x == 2), x == 3)), And(q == 2, q_ == 4, And(And(x>=1, x<=4), Not(x == 1), x == 2, x == 3)), And(q == 2, q_ == 5, Not(And(x>=1, x<=4))), And(q == 3, q_ == 0, And(And(x>=1, x<=4), x == 1, x == 2)), And(q == 3, q_ == 3, And(And(x>=1, x<=4), Not(x == 2))), And(q == 3, q_ == 4, And(And(x>=1, x<=4), Not(x == 1), x == 2)), And(q == 3, q_ == 5, Not(And(x>=1, x<=4))), And(q == 4, q_ == 0, And(And(x>=1, x<=4), x == 1)), And(q == 4, q_ == 4, And(And(x>=1, x<=4), Not(x == 1))), And(q == 4, q_ == 5, Not(And(x>=1, x<=4))), And(q == 5, q_ == 5))
+
     def isFinal(p):
         return p == 0
 

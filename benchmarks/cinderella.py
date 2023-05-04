@@ -33,11 +33,11 @@ controller_moves = [move1, move2, move3, move4, move5]
 
 #3. Define Init Region (False by default => Maximal winning region will be returned)
 
-def init(b1, b2, b3, b4, b5):
-    return And(b1 == 0.0, b2 == 0.0, b3 == 0.0, b4 == 0.0, b5 == 0.0)
-
 # def init(b1, b2, b3, b4, b5):
-#     return False
+#     return And(b1 == 0.0, b2 == 0.0, b3 == 0.0, b4 == 0.0, b5 == 0.0)
+
+def init(b1, b2, b3, b4, b5):
+    return False
 
 C = sys.argv[1]
 mode = sys.argv[2]
@@ -59,8 +59,8 @@ if spec == "simple":
     def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
         return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
     
-    # reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
-    cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
+    reachability_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
+    # cobuchi_fixedpoint_gensys([environment], controller, guarantee_reach, int(mode), game_type, init)
 
 else:
     if spec == "product":
@@ -87,52 +87,75 @@ else:
         # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
         # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
+        # nQ = 2
+        # def automaton(q, q_, b1, b2, b3, b4, b5):
+        #     return Or(
+        #             And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+        #             And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
+        #             And(q == 1, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+        #             And(q == 1, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))
+        #             )
+        # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+        # def isFinal(p):
+        #     return p == 0
+
+
+        # def guarantee(q):
+        #     return True
+        # buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        # cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+
+        # Spec 3: Environment Reach F(Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))))
+        # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+        # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+
         nQ = 2
         def automaton(q, q_, b1, b2, b3, b4, b5):
             return Or(
                     And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
                     And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
-                    And(q == 1, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-                    And(q == 1, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))
+                    And(q == 1, q_==1),
                     )
         # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
         def isFinal(p):
-            return p == 0
-
+            return p == 1
 
         def guarantee(q):
             return True
-
-        buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
-        # cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        
+        def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
+            return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
+    
+        # buchi_fixedpoint([environment], controller , guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        cobuchi_fixedpoint([environment], controller , guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
 
     else:
         if spec == "bounded":
             # Only UCW's used in this section (i.e., from the negation of the specification)
 
-            # Spec 1: Safety, G(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
-            # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
-            # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+            # # Spec 1: Safety, G(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
+            # # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+            # # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-            nQ = 2
-            def automaton(q, q_, b1, b2, b3, b4, b5):
-                return Or(
-                        And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-                        And(q == 0, q_==0),
-                        And(q == 1, q_==1),
-                        )
-            # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
-            def isFinal(p):
-                return If(p==1, 1, 0)
+            # nQ = 2
+            # def automaton(q, q_, b1, b2, b3, b4, b5):
+            #     return Or(
+            #             And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+            #             And(q == 0, q_==0),
+            #             And(q == 1, q_==1),
+            #             )
+            # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+            # def isFinal(p):
+            #     return If(p==1, 1, 0)
 
-            #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
-            def sigma(b1, b2, b3, b4, b5):
-                return [Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)), And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)]
+            # #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
+            # def sigma(b1, b2, b3, b4, b5):
+            #     return [Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)), And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)]
 
-            # (Optional): Explicit safety guarantee that complements the omega-regular formula
-            # Default: Returns the True formula in Z3
-            def guarantee(b1, b2, b3, b4, b5):
-                return And(True)
+            # # (Optional): Explicit safety guarantee that complements the omega-regular formula
+            # # Default: Returns the True formula in Z3
+            # def guarantee(b1, b2, b3, b4, b5):
+            #     return And(True)
 
             # import cProfile
             # describe_tactics()
@@ -140,7 +163,7 @@ else:
             # cProfile.run('otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)')
             # cProfile.run('antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)')
 
-            # # --------------------------------------------------------------------------------------------------------------------------------
+            # --------------------------------------------------------------------------------------------------------------------------------
 
             # # Spec 2: Buchi, GF(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
             # # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
@@ -169,7 +192,7 @@ else:
             #     return And(True)
 
             # # Call the fixpoint engine for omega regular specifications.
-            # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 1, game_type, init)
+            # # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 1, game_type, init)
             # otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 1, game_type, init)
 
             # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)
@@ -177,48 +200,80 @@ else:
 
             # --------------------------------------------------------------------------------------------------------------------------------
 
-            # # Spec 3: LTL, 
+            # # Spec 3: Environment Reach F(Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))))
             # # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
             # # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-            # nQ = 5
+            # nQ = 2
             # def automaton(q, q_, b1, b2, b3, b4, b5):
-            #     p0 = And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
-            #     p1 = b1 > C
-            #     p2 = And(b1 <= C, b2 > C)
             #     return Or(
-            #             And(q == 0, q_==0),
-            #             And(q == 0, q_==1, And(Not(p0), p1)),
-            #             And(q == 0, q_==2, And(Not(p0), Not(p2))),
-            #             And(q == 1, q_==1, And(Not(p0), p1)),
-            #             And(q == 1, q_==3, And(Not(p0), Not(p1))),
-            #             And(q == 1, q_==4, p0),
-            #             And(q == 2, q_==2, And(Not(p0), Not(p2))),
-            #             And(q == 2, q_==4, Or(p0, p2)),
-            #             And(q == 3, q_==1, And(Not(p0), p1)),
-            #             And(q == 3, q_==3, And(Not(p0), Not(p1))),
-            #             And(q == 3, q_==4, p0),
-            #             And(q == 4, q_==4)
+            #             And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+            #             And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
+            #             And(q == 1, q_==1),
             #             )
             # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
             # def isFinal(p):
-            #     return If(Or(p==1, p==2), 1, 0)
+            #     return If(p==0, 1, 0)
 
             # #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
             # def sigma(b1, b2, b3, b4, b5):
-            #     p0 = And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
-            #     p1 = b1 > C
-            #     p2 = And(b1 <= C, b2 > C)
-            #     return [And(p0, Not(p1), Not(p2)), And(Not(p0), p1, Not(p2)), And(Not(p0), Not(p1), p2), And(Not(p0), Not(p1), Not(p2)) ]
+            #     return [Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)), And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)]
+
+            # def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
+            #     return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
 
             # # (Optional): Explicit safety guarantee that complements the omega-regular formula
             # # Default: Returns the True formula in Z3
             # def guarantee(b1, b2, b3, b4, b5):
             #     return And(True)
 
-            # # Call the fixpoint engine for omega regular specifications.
-            # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)
-            # antichain_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type)
+            # for i in range(0, 4):
+            #     # otfd_fixedpoint([environment], controller, guarantee, int(mode), automaton, isFinal, sigma, nQ, i, game_type, init)
+            #     otfd_fixedpoint_nonsigma([environment], controller, guarantee, int(mode), automaton, isFinal, sigma, nQ, i, game_type, init)
+            # # antichain_fixedpoint([environment], controller, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
+
+            # Spec 4: LTL, 'GF p0 | (GF p2 & !GF p0 & !GF p1)'
+            # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+            # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+
+            nQ = 5
+            def automaton(q, q_, b1, b2, b3, b4, b5):
+                p0 = And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
+                p1 = b1 > C
+                p2 = And(b1 <= C, b2 > C)
+                return Or(
+                        And(q == 0, q_==0),
+                        And(q == 0, q_==1, And(Not(p0), p1)),
+                        And(q == 0, q_==2, And(Not(p0), Not(p2))),
+                        And(q == 1, q_==1, And(Not(p0), p1)),
+                        And(q == 1, q_==3, And(Not(p0), Not(p1))),
+                        And(q == 1, q_==4, p0),
+                        And(q == 2, q_==2, And(Not(p0), Not(p2))),
+                        And(q == 2, q_==4, Or(p0, p2)),
+                        And(q == 3, q_==1, And(Not(p0), p1)),
+                        And(q == 3, q_==3, And(Not(p0), Not(p1))),
+                        And(q == 3, q_==4, p0),
+                        And(q == 4, q_==4)
+                        )
+            # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+            def isFinal(p):
+                return If(Or(p==1, p==2), 1, 0)
+
+            #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
+            def sigma(b1, b2, b3, b4, b5):
+                p0 = And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)
+                p1 = b1 > C
+                p2 = And(b1 <= C, b2 > C)
+                return [And(p0, Not(p1), Not(p2)), And(Not(p0), p1, Not(p2)), And(Not(p0), Not(p1), p2), And(Not(p0), Not(p1), Not(p2)) ]
+
+            # (Optional): Explicit safety guarantee that complements the omega-regular formula
+            # Default: Returns the True formula in Z3
+            def guarantee(b1, b2, b3, b4, b5):
+                return And(True)
+
+            # Call the fixpoint engine for omega regular specifications.
+            # otfd_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 1, game_type, init)
+            otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, int(mode), automaton, isFinal, sigma, nQ, 0, game_type, init)
 
         else:
             print("Not a valid input: Please enter \"simple\", \"product\"  or \"bounded\" as the third argument")

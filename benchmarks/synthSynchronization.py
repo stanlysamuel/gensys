@@ -63,8 +63,8 @@ controller_moves = [move1, move2, move3]
 
 #3. Define Init Region (False by default => Maximal winning region will be returned)
 
-def init(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
-    return And(pc1==1,pc2==1, f1a==0, f1b==0, t1b==0, f2a==0, f2b==0, t2b==0)
+def init(x, y1, y2, z, pc1, pc2, pc3):
+    return And(x == 0, y1 == 0, y2 == 0, z == 0, pc1 == 1, pc2 == 1, pc3 == 1)
 
 # def init(pc, l, gl):
 #     return False
@@ -83,15 +83,15 @@ if spec == "simple":
 else:
     if spec == "product":
 
-        # Spec: Safety, G(formula) where formula == And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))
+        # Spec: Safety, G(formula) where formula == Not(And(pc3 == 3, y1 == y2))
         # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
         nQ = 2
-        def automaton(q, q_, f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
+        def automaton(q, q_, x, y1, y2, z, pc1, pc2, pc3):
             return Or(
-                    And(q == 0, q_==1, Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))),
-                    And(q == 0, q_==0, And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))),
-                    And(q == 1, q_==1),
+                    And(q == 0, q_==1, And(pc3 == 3, y1 == y2)),
+                    And(q == 0, q_==0, Not(And(pc3 == 3, y1 == y2))),
+                    And(q == 1, q_==1)
                     )
         
         def isFinal(p):
@@ -99,26 +99,26 @@ else:
 
         # (Optional): Explicit safety guarantee that complements the omega-regular formula
         # Default: Returns the True formula in Z3
-        def guarantee(q):
+        def guarantee(x, y1, y2, z, pc1, pc2, pc3):
             return And(True)
 
         # Call the fixpoint engine for omega regular specifications.
-        # buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
-        cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        # cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
 
 
     else:
         if spec == "bounded":
             # Only UCW's used in this section (i.e., from the negation of the specification)
-            # Spec: Safety, G(formula) where formula == And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))
+            # Spec: Safety, G(formula) where formula == Not(And(pc3 == 3, y1 == y2))
             # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
             nQ = 2
-            def automaton(q, q_, f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
+            def automaton(q, q_, x, y1, y2, z, pc1, pc2, pc3):
                 return Or(
-                        And(q == 0, q_==1, Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))),
-                        And(q == 0, q_==0, And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7)))),
-                        And(q == 1, q_==1),
+                        And(q == 0, q_==1, And(pc3 == 3, y1 == y2)),
+                        And(q == 0, q_==0, Not(And(pc3 == 3, y1 == y2))),
+                        And(q == 1, q_==1)
                         )
 
             # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
@@ -126,12 +126,12 @@ else:
                 return If(p==1, 1, 0)
 
             #Partition of predicates obtained by finding all combinations of predicates present in the automaton (manual).
-            def sigma(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
-                return [And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))), Not(And(Not(And(pc1 == 4, pc2 == 4)), Not(And(pc1 == 8, pc2==7))))]
+            def sigma(x, y1, y2, z, pc1, pc2, pc3):
+                return [Not(And(pc3 == 3, y1 == y2)), And(pc3 == 3, y1 == y2)]
 
             # (Optional): Explicit safety guarantee that complements the omega-regular formula
             # Default: Returns the True formula in Z3
-            def guarantee(f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
+            def guarantee(x, y1, y2, z, pc1, pc2, pc3):
                 return And(True)
 
             # Spec: Safety, G(formula) where formula == Not(Or(And(pc==2, l == 1),And(pc == 5, l == 0)))
