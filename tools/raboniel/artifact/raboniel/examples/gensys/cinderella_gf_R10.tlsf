@@ -1,0 +1,54 @@
+INFO {
+  TITLE:       "Converted TSL Specification: cinderella_gf_R10"
+  DESCRIPTION: "TSL specification, which has been converted to TLSF."
+  SEMANTICS:   Mealy
+  TARGET:      Mealy
+}
+MAIN {
+  INPUTS {
+    p0p0eq0b240f1dr2329231b;
+    p0p0eq0b240f1dr329231b;
+    p0p0eq0b250f1dr2329231b;
+    p0p0eq0b250f1dr329231b;
+    p0p0eq0b30f1dr2329231b;
+    p0p0eq0b30f1dr329231b;
+    p0p0eq0b40f1dr2329231b;
+    p0p0eq0b40f1dr329231b;
+    p0p0eq0b50f1dr2329231b;
+    p0p0eq0b50f1dr329231b;
+    p0p0eq0f1dadd0f1dadd0f1dadd0f1dadd0i240i251b0i31b0i41b0i51b0f1dr2429231b;
+    p0p0ge0b240f1dr2329231b;
+    p0p0ge0b250f1dr2329231b;
+    p0p0ge0b30f1dr2329231b;
+    p0p0ge0b40f1dr2329231b;
+    p0p0ge0b50f1dr2329231b;
+    p0p0lt0b240f1dr329231b;
+    p0p0lt0b250f1dr329231b;
+    p0p0lt0b30f1dr329231b;
+    p0p0lt0b40f1dr329231b;
+    p0p0lt0b50f1dr329231b;
+  }
+
+  OUTPUTS {
+    u0b240b24;
+    u0b240f1dr2329231b;
+    u0b240f1dadd0b240i241b;
+    u0b250b25;
+    u0b250f1dr2329231b;
+    u0b250f1dadd0b250i251b;
+    u0b30b3;
+    u0b30f1dr2329231b;
+    u0b30f1dadd0b30i31b;
+    u0b40b4;
+    u0b40f1dr2329231b;
+    u0b40f1dadd0b40i41b;
+    u0b50b5;
+    u0b50f1dr2329231b;
+    u0b50f1dadd0b50i51b;
+  }
+
+  GUARANTEE {
+    (G (((((! (((u0b240f1dr2329231b) && (! ((u0b240f1dadd0b240i241b) || (u0b240b24)))) <-> ((! (((u0b240f1dadd0b240i241b) && (! (u0b240b24))) <-> ((u0b240b24) && (! (u0b240f1dadd0b240i241b))))) && (! (u0b240f1dr2329231b))))) && (! (((u0b250f1dr2329231b) && (! ((u0b250f1dadd0b250i251b) || (u0b250b25)))) <-> ((! (((u0b250f1dadd0b250i251b) && (! (u0b250b25))) <-> ((u0b250b25) && (! (u0b250f1dadd0b250i251b))))) && (! (u0b250f1dr2329231b)))))) && (! (((u0b30f1dr2329231b) && (! ((u0b30f1dadd0b30i31b) || (u0b30b3)))) <-> ((! (((u0b30f1dadd0b30i31b) && (! (u0b30b3))) <-> ((u0b30b3) && (! (u0b30f1dadd0b30i31b))))) && (! (u0b30f1dr2329231b)))))) && (! (((u0b40f1dr2329231b) && (! ((u0b40f1dadd0b40i41b) || (u0b40b4)))) <-> ((! (((u0b40f1dadd0b40i41b) && (! (u0b40b4))) <-> ((u0b40b4) && (! (u0b40f1dadd0b40i41b))))) && (! (u0b40f1dr2329231b)))))) && (! (((u0b50f1dr2329231b) && (! ((u0b50f1dadd0b50i51b) || (u0b50b5)))) <-> ((! (((u0b50f1dadd0b50i51b) && (! (u0b50b5))) <-> ((u0b50b5) && (! (u0b50f1dadd0b50i51b))))) && (! (u0b50f1dr2329231b))))))) && (((((((((((((((((p0p0eq0b240f1dr2329231b) && (p0p0eq0b250f1dr2329231b)) && (p0p0eq0b30f1dr2329231b)) && (p0p0eq0b40f1dr2329231b)) && (p0p0eq0b50f1dr2329231b)) && (p0p0eq0f1dadd0f1dadd0f1dadd0f1dadd0i240i251b0i31b0i41b0i51b0f1dr2429231b)) && (G (! ((! (p0p0ge0b50f1dr2329231b)) && (p0p0eq0b50f1dr2329231b))))) && (G (! ((! (p0p0ge0b40f1dr2329231b)) && (p0p0eq0b40f1dr2329231b))))) && (G (! ((! (p0p0ge0b30f1dr2329231b)) && (p0p0eq0b30f1dr2329231b))))) && (G (! ((! (p0p0ge0b250f1dr2329231b)) && (p0p0eq0b250f1dr2329231b))))) && (G (! ((! (p0p0ge0b240f1dr2329231b)) && (p0p0eq0b240f1dr2329231b))))) && (G (! ((! (p0p0lt0b240f1dr329231b)) && (p0p0eq0b240f1dr2329231b))))) && (G (! ((! (p0p0lt0b30f1dr329231b)) && (p0p0eq0b30f1dr2329231b))))) && (G (! ((! (p0p0lt0b50f1dr329231b)) && (p0p0eq0b50f1dr2329231b))))) && (G (! ((! (p0p0lt0b250f1dr329231b)) && (p0p0eq0b250f1dr2329231b))))) && (G (! ((! (p0p0lt0b40f1dr329231b)) && (p0p0eq0b40f1dr2329231b))))) -> (((G (((((((((u0b240f1dr2329231b) && (u0b250f1dr2329231b)) && (u0b30f1dadd0b30i31b)) && (u0b40f1dadd0b40i41b)) && (u0b50f1dadd0b50i51b)) || (((((u0b250f1dr2329231b) && (u0b30f1dr2329231b)) && (u0b40f1dadd0b40i41b)) && (u0b50f1dadd0b50i51b)) && (u0b240f1dadd0b240i241b))) || (((((u0b30f1dr2329231b) && (u0b40f1dr2329231b)) && (u0b50f1dadd0b50i51b)) && (u0b240f1dadd0b240i241b)) && (u0b250f1dadd0b250i251b))) || (((((u0b40f1dr2329231b) && (u0b50f1dr2329231b)) && (u0b240f1dadd0b240i241b)) && (u0b250f1dadd0b250i251b)) && (u0b30f1dadd0b30i31b))) || (((((u0b50f1dr2329231b) && (u0b240f1dr2329231b)) && (u0b250f1dadd0b250i251b)) && (u0b30f1dadd0b30i31b)) && (u0b40f1dadd0b40i41b)))) && (G (G (F (((((p0p0ge0b240f1dr2329231b) && (p0p0ge0b250f1dr2329231b)) && (p0p0ge0b30f1dr2329231b)) && (p0p0ge0b40f1dr2329231b)) && (p0p0ge0b50f1dr2329231b)))))) && (G (((((G (F ((p0p0lt0b240f1dr329231b) || (p0p0eq0b240f1dr329231b)))) && ((p0p0lt0b250f1dr329231b) || (p0p0eq0b250f1dr329231b))) && ((p0p0lt0b30f1dr329231b) || (p0p0eq0b30f1dr329231b))) && ((p0p0lt0b40f1dr329231b) || (p0p0eq0b40f1dr329231b))) && ((p0p0lt0b50f1dr329231b) || (p0p0eq0b50f1dr329231b))))));
+  }
+}
+

@@ -58,7 +58,7 @@ if spec == "product":
 
 else:
     if spec == "bounded":
-        # Spec: Safety, G(formula) where formula = And(x<=3, x>=0)
+        # Spec: Liveness, G(1<=x<=3) and G(F(x==1) and F(x==2) and F(x==3))
         # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
         # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 

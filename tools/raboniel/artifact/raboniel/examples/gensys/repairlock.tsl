@@ -1,0 +1,18 @@
+//-- State: pc, l, gl
+
+assume {
+  eq gl i0();
+  eq l i0();
+  eq pc i0();
+}
+
+always guarantee {
+
+  eq pc i0() -> ([pc <- i2()] && [l <- l] && [gl <- gl]) || ([pc <- i4()] && [l <- l] && [gl <- gl]);
+  (eq pc i2() && (lt l i0() || eq l i0())) ->  ([pc <- i4()] && [l <- l]);
+  eq pc i4() -> ([pc <- i6()] && [l <- l] && [gl <- gl]);
+  (eq pc i5() && (ge l i1())) ->  ([pc <- i6()] && [l <- i0()] && [gl <- gl]);
+  eq pc i6() -> ([pc <- i0()] && [l <- l]);
+
+  G (! (( eq pc i2() && eq l i1() ) || ( eq pc i5() && eq l i0()) ));
+}
