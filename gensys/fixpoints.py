@@ -355,7 +355,7 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
         g.add(W1)
         W1 = tactic_qe_fixpoint(g).as_expr()
         C.append(And(W1, Not(W0)))
-
+        print(W1)
         i = i + 1
         if valid(Implies(W1, W0),0):
             break

@@ -13,10 +13,10 @@ def environment(x,x_):
 #2. Define Controller moves
 
 def move1(x,x_):
-    return And(x_ == x)
+    return And(x_ == x+1)
 
 def move2(x,x_):
-    return And(x_ == x+2)
+    return And(x_ == x-1)
 
 controller_moves = [move1, move2]
 
@@ -24,15 +24,15 @@ mode = 0
 
 # 3. Define Guarantee
 def guarantee(x):
-    return Or(x == 3)
+    return x<0
 
 # 3. Define Guarantee
 def init(x):
-    return False
+    return x >= 0
 
 # safety_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
-# reachability_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
-buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
+reachability_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
+# buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
 # cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), game_type, init)
 
 
