@@ -1014,10 +1014,10 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
         controller = Or(move(*contransitionVars), controller)
 
     #Create list of tuples for substitution pre variables with post
-    # substList = []
-    # for (var, var__) in zip(s,s__):
-    #     substList = substList+[(var,var__)]  
-    # substList = substList+[(q, q__)]  
+    substList = []
+    for (var, var__) in zip(s,s__):
+        substList = substList+[(var,var__)]  
+    substList = substList+[(q, q__)]  
 
     substList_ = []
     for (var, var_) in zip(s,s_):
@@ -1114,7 +1114,10 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     W = W0c
 
     # Extract the winning region from the initial automaton state
+    WWpre = W
     W = Exists(q, And(W, q == 0))
+
+    WW = W
 
     if not (valid(Implies(init(*s), W),0) and satisfiable(W,0)):
         print("Invariant is Unsatisifiable i.e. False")
@@ -1122,6 +1125,180 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
     else:
         print("Invariant is Satisfiable")
         print("REALIZABLE")
+
+    # Weakening algorithm
+
+    envtransitionVars = s_+s__
+    contransitionVars = s+s_
+
+    controller = False
+    for move in controller_moves:
+        controller = Or(move(*contransitionVars), controller)
+
+    # Weaken guarantee by adjusting for the environment states
+
+    # Measuring time
+    import time
+    start_time = time.time()
+
+    odd_length_con_states = Exists(s_+[q_], And(controller, automaton(q,q_,*s), guarantee_automaton(q_)))
+    g =Goal()
+    g.add(odd_length_con_states)
+    odd_length_con_states = tactic_qe_fixpoint(g).as_expr()
+
+    weakened_guarantee = Or(odd_length_con_states, guarantee_automaton(q))
+    
+    i = 1
+
+    W0 = And(True)
+    W1 = And(True)
+
+    while True:
+        print("Iteration", i )
+        W0 = W1
+        #Substitute current variables with post variables
+        W0__ = substitute(W0, *substList)
+
+        # WPW = And(getFormulation(s_, s__, controller, environment(*envtransitionVars), And(False), W0__, "general"), weakened_guarantee)
+        WPW = And(Exists(s_+[q_], And(And(controller, automaton(q,q_,*s)), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)) , W0__)) )), weakened_guarantee)
+        g =Goal()
+        g.add(WPW)
+        WPW = tactic_qe_fixpoint(g).as_expr()
+        j = 1
+        
+
+        H0 = And(False)
+        H1 = And(False)
+
+        # Map for controller states
+        C = []
+        C.append(H0)
+
+        while True:
+            print("Sub-Iteration", j )
+            H0 = H1
+            #Substitute current variables with post variables
+            H0__ = substitute(H0, *substList)
+            # WPH = getFormulation(s_, s__, controller, environment(*envtransitionVars), And(False), H0__, "general")
+            WPH = Exists(s_+[q_], And(And(controller, automaton(q,q_,*s)), ForAll(s__+[q__], Implies(And(environment(*envtransitionVars), automaton(q_,q__,*s_)) , H0__)) ))
+            H1 = Not(And(Not(WPH), Not(WPW)))
+            # H1 = Or(WPH, WPW)
+            g =Goal()
+            g.add(H1)
+            H1 = tactic_qe_fixpoint(g).as_expr()
+
+            C.append(And(H1, Not(H0)))
+            
+            j = j + 1
+            iterations = j-1
+            if valid(Implies(H1, H0),0):
+                break
+
+        W1 = H0
+        i = i + 1
+        print()
+        if valid(Implies(W0, W1),0):
+            break
+
+    print("")
+    print("Number of iterations: ", i-1)
+    print("")
+
+    print("Invariant: ")
+    print(W0)
+    
+    W0pre = W0
+
+    W0 = Exists(q, And(W0, q == 0))
+    #3. Output: Controller Extraction or Unrealizable
+    if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
+        print("Invariant is Unsatisifiable i.e. False")
+        print("UNREALIZABLE")
+    else:
+        print("Invariant is Satisfiable")
+        print("REALIZABLE")
+    end_time = time.time()
+    print("Time taken: ", end_time - start_time)
+
+    # g =Goal()
+    # g.add(W0)
+    # W0 = tactic_qe_fixpoint(g).as_expr()
+    # # print(W0)
+    print("Game States equal?")
+    assert (valid(WW == W0,1))
+    print("KVR => Weakening?")
+    assert (valid(Implies(WWpre, W0pre),1))
+    print("KVR == Weakening?")
+    assert (valid(WWpre == W0pre,1))
+
+        # print("Extracting Controller...")
+
+        # # In the invariant, substitute with post variables
+        # # Take backup of invariant to analyse in the end
+        # Invariant = W0
+
+        # with open("controller.txt", "w") as text_file:
+        #     print("Controller Logic", file=text_file)
+
+        # assert (len(C) == iterations+1)
+
+        # disjunction_of_conditions = False
+        # for move_i in controller_moves:
+            
+        #     condition_move_i = False
+
+        #     C_Union = False
+        #     for j in range(2, iterations+1):
+        #         # Must reach union of all previous states
+        #         C_Union = Or(C_Union, C[j-1])
+        #         #Get AE/EA Formula with postcondition C[j-1]
+        #         c_ = substitute(C_Union, *substList)
+        #         wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), c_ , "general")
+        #         if satisfiable(And(wp, C[j]),0):
+        #             condition_move_i = Or(condition_move_i, And(wp, C[j]))
+        #             #Move i condition extraction
+        #             #Eliminate quantifiers and simplify to get the conditions for each move
+        #             g = Goal()
+        #             g.add(condition_move_i)
+        #             condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+        #     # Add the last move condition, specific to Buchi: WP(G, W0) and C[1] and X
+        #     W0__ = substitute(W0, *substList)
+        #     wp = getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), And(False), W0__ , "general")
+        #     if satisfiable(And(wp, And(C[1], guarantee(*s))),0):
+        #         condition_move_i = Or(condition_move_i, And(wp, And(C[1], guarantee(*s))))
+        #         g = Goal()
+        #         g.add(condition_move_i)
+        #         condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+        #     # Adjust for odd moves
+        #     substList_ = []
+        #     for (var, var_) in zip(s,s_):
+        #         substList_ = substList_+[(var,var_)]
+        #     W0_ = substitute(And(C[1], guarantee(*s)), *substList_)
+
+        #     wp = Exists(s_, And(move_i(*contransitionVars), W0_))
+        #     if satisfiable(And(wp, W0),0):
+        #         condition_move_i = Or(condition_move_i, And(wp, W0))
+        #         g = Goal()
+        #         g.add(condition_move_i)
+        #         condition_move_i = tactic_qe_fixpoint(g).as_expr()
+
+        #     with open("controller.txt", "a") as text_file:
+        #         print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
+        #         print(condition_move_i, file=text_file)
+
+        #     #For final sanity check
+        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+
+        # # close the file
+        # text_file.close()
+        # print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
+
+        # #Sanity check: Disjunction of controller conditions is equal to Invariant without guarantee
+        # formula = Invariant == disjunction_of_conditions
+
+        # assert(valid(formula,0)) 
 
 # -----------------------------------------------------------------------------------------
 # 2.1.2 Product Co-Buchi Fixpoint Procedure (Deterministic Co-Buchi Automaton)

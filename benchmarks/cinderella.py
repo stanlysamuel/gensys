@@ -71,21 +71,21 @@ else:
         # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
         # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-        nQ = 2
-        def automaton(q, q_, b1, b2, b3, b4, b5):
-            return Or(
-                    And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-                    And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
-                    And(q == 1, q_==1),
-                    )
-        # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
-        def isFinal(p):
-            return p == 0
+        # nQ = 2
+        # def automaton(q, q_, b1, b2, b3, b4, b5):
+        #     return Or(
+        #             And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+        #             And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
+        #             And(q == 1, q_==1),
+        #             )
+        # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+        # def isFinal(p):
+        #     return p == 0
 
-        # Spec 2: Buchi, GF(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
-        # Only Buchi automaton is deterministic. Co-Buhci automaton is not deterministic.
-        # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
-        # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+        # # Spec 2: Buchi, GF(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)))
+        # # Only Buchi automaton is deterministic. Co-Buhci automaton is not deterministic.
+        # # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+        # # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
         # nQ = 2
         # def automaton(q, q_, b1, b2, b3, b4, b5):
@@ -100,33 +100,33 @@ else:
         #     return p == 0
 
 
-        def guarantee(q):
-            return True
-        buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
-        # cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
-
-        # # Spec 3: Environment Reach F(Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))))
-        # # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
-        # # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
-
-        # nQ = 2
-        # def automaton(q, q_, b1, b2, b3, b4, b5):
-        #     return Or(
-        #             And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
-        #             And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
-        #             And(q == 1, q_==1),
-        #             )
-        # # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
-        # def isFinal(p):
-        #     return p == 1
-
         # def guarantee(q):
         #     return True
+        # buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        # cobuchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+
+        # Spec 3: Environment Reach F(Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))))
+        # Complete Universal Co-Buchi Automaton from spot encoded in LRA.
+        # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
+
+        nQ = 2
+        def automaton(q, q_, b1, b2, b3, b4, b5):
+            return Or(
+                    And(q == 0, q_==1, Not(And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0))),
+                    And(q == 0, q_==0, And(b1 <= C , b2 <=C , b3 <=C , b4 <=C , b5 <=C , b1 >= 0.0 , b2 >= 0.0 , b3 >= 0.0 , b4 >= 0.0 , b5 >= 0.0)),
+                    And(q == 1, q_==1),
+                    )
+        # Denotes which states in the UCW are final states i.e, those states that should be visited finitely often for every run
+        def isFinal(p):
+            return p == 1
+
+        def guarantee(q):
+            return True
         
-        # def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
-        #     return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
+        def controller(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_):
+            return Or(move1(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move2(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move3(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move4(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_), move5(b1, b2, b3, b4, b5, b1_, b2_, b3_, b4_, b5_))
     
-        # buchi_fixedpoint([environment], controller , guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+        buchi_fixedpoint([environment], controller , guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
         # cobuchi_fixedpoint([environment], controller , guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
 
     else:

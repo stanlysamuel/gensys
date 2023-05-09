@@ -171,7 +171,7 @@ else:
         # Deterministic Buchi Automaton of 40 states
         # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
-        nQ = 2
+        nQ = 40
         def automaton(q, q_, f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2):
             return Or(
                     Or(And(q == 39, q_==0, And(pc1 == 4, pc1 == 8, pc2 == 4, pc2 == 7)), And(q == 39, q_==1, And(pc1 == 4, Not(pc1 == 8), pc2 == 4, pc2 == 7)), And(q == 39, q_==2, And(Not(pc1 == 4), pc1 == 8, pc2 == 4, pc2 == 7)), And(q == 39, q_==3, And(Not(pc1 == 4), Not(pc1 == 8), pc2 == 4, pc2 == 7)), And(q == 39, q_==4, And(pc1 == 4, pc1 == 8, Not(pc2 == 4), pc2 == 7)), And(q == 39, q_==5, And(pc1 == 4, Not(pc1 == 8), Not(pc2 == 4), pc2 == 7)), And(q == 39, q_==6, And(Not(pc1 == 4), pc1 == 8, Not(pc2 == 4), pc2 == 7)), And(q == 39, q_==7, And(Not(pc1 == 4), Not(pc1 == 8), Not(pc2 == 4), pc2 == 7)), And(q == 39, q_==20, And(pc1 == 4, pc1 == 8, pc2 == 4, Not(pc2 == 7))), And(q == 39, q_==21, And(pc1 == 4, Not(pc1 == 8), pc2 == 4, Not(pc2 == 7))), And(q == 39, q_==22, And(Not(pc1 == 4), pc1 == 8, pc2 == 4, Not(pc2 == 7))), And(q == 39, q_==23, And(Not(pc1 == 4), Not(pc1 == 8), pc2 == 4, Not(pc2 == 7))), And(q == 39, q_==36, And(pc1 == 4, pc1 == 8, Not(pc2 == 4), Not(pc2 == 7))), And(q == 39, q_==37, And(pc1 == 4, Not(pc1 == 8), Not(pc2 == 4), Not(pc2 == 7))), And(q == 39, q_==38, And(Not(pc1 == 4), pc1 == 8, Not(pc2 == 4), Not(pc2 == 7))), And(q == 39, q_==39, And(Not(pc1 == 4), Not(pc1 == 8), Not(pc2 == 4), Not(pc2 == 7)))),
