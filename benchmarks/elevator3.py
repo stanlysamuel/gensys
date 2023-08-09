@@ -53,7 +53,7 @@ if spec == "product":
         return And(True)
 
     # Call the fixpoint engine for omega regular specifications.
-    buchi_fixedpoint(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
+    buchi_fixedpoint_gensys(controller_moves, environment, guarantee, int(mode), automaton, isFinal, nQ, game_type, init)
 
 
 else:
