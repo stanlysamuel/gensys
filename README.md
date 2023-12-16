@@ -1,13 +1,13 @@
 # GenSys
-This repository hosts the code for the tool: GenSys (Version 1.0).
+This repository hosts the code for the tool: GenSys (Version 1.0), based on our [ESEC/FSE 2021 paper](https://2021.esec-fse.org/details/fse-2021-demonstrations/19/GenSys-A-Scalable-Fixed-Point-Engine-for-Maximal-Controller-Synthesis-over-Infinite-): *GenSys: A Scalable Fixed-Point Engine for Maximal Controller Synthesis over Infinite State Spaces.*
 
 ## Introduction 
 
 GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinite state games. This branch supports safety as the winning condition. GenSys uses the Z3 theorem prover by Microsoft Research for solving SMT formulae. GenSys is scalable and is validated on two benchmark suites.
 
-This branch is based on our [ESEC/FSE 2021 paper](https://2021.esec-fse.org/details/fse-2021-demonstrations/19/GenSys-A-Scalable-Fixed-Point-Engine-for-Maximal-Controller-Synthesis-over-Infinite-). You can find the extended version [here](https://arxiv.org/pdf/2107.08794.pdf). The results for this paper can be reproduced in this branch.
+This branch is based on our [ESEC/FSE 2021 paper](https://2021.esec-fse.org/details/fse-2021-demonstrations/19/GenSys-A-Scalable-Fixed-Point-Engine-for-Maximal-Controller-Synthesis-over-Infinite-). You can find the extended version of the paper on [arXiv](https://arxiv.org/pdf/2107.08794.pdf). The results for this paper can be reproduced in this branch.
 
-For the tool GenSys-LTL based on the [ASE 2023 paper](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games), that extends GenSys to support full LTL winning conditions, please see this [branch](https://github.com/stanlysamuel/gensys/tree/gensys-ltl). 
+For the tool [GenSys-LTL](https://github.com/stanlysamuel/gensys/tree/gensys-ltl) based on the [ASE 2023 paper](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games), that extends GenSys to support full LTL winning conditions, please see this [branch](https://github.com/stanlysamuel/gensys/tree/gensys-ltl). 
 
 ## Author
 
