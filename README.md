@@ -1,15 +1,22 @@
 # GenSys
-This repository hosts the code for the tool: GenSys and is currently at version 1.0.
+This repository hosts the code for the tool: GenSys (Version 1.0).
 
 ## Introduction 
 
-GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinite state games. GenSys currently supports safety as the winning condition. GenSys uses the Z3 theorem prover by Microsoft Research for solving SMT formulae. GenSys is scalable and is validated on two benchmark suites.
+GenSys is a scalable fixpoint engine for the synthesis of strategies in inifinite state games. This branch supports safety as the winning condition. GenSys uses the Z3 theorem prover by Microsoft Research for solving SMT formulae. GenSys is scalable and is validated on two benchmark suites.
 
-## Authors
+This branch is based on our [ESEC/FSE 2021 paper](https://2021.esec-fse.org/details/fse-2021-demonstrations/19/GenSys-A-Scalable-Fixed-Point-Engine-for-Maximal-Controller-Synthesis-over-Infinite-). You can find the extended version [here](https://arxiv.org/pdf/2107.08794.pdf). The results for this paper can be reproduced in this branch.
+
+For the tool GenSys-LTL based on the [ASE 2023 paper](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games), that extends GenSys to support full LTL winning conditions, please see this [branch](https://github.com/stanlysamuel/gensys/tree/gensys-ltl). 
+
+## Author
 
 - Stanly Samuel, Indian Institute of Science, Bangalore
-- Deepak D'Souza, Indian Institute of Science, Bangalore
-- Raghavan Komondoor, Indian Institute of Science, Bangalore
+
+## Mentored by
+
+- Prof. Deepak D'Souza, Indian Institute of Science, Bangalore
+- Prof. Raghavan Komondoor, Indian Institute of Science, Bangalore
 
 ### Installation
 You should have installed Python 2/3 on your system. We successfully ran GenSys with Python 2.7.1.
