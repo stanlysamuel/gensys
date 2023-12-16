@@ -275,3 +275,9 @@ b5 = 0.0
 ```
 
 If Cinderella plays first (EA Formulation), she can empty buckets b1 and b2 and still ensure that the system always satisfies safety. If the Stepmother plays first (AE Formulation), then she will overflow bucket b1 or b2 in the first step. Thus, the state mentioned above will not be in the controller in the AE mode, but will be present in the controller when in EA mode.
+
+## Related Papers
+
+1. [ESEC/FSE 2021](https://github.com/stanlysamuel/gensys): *GenSys: A Scalable Fixed-Point Engine for Maximal Controller Synthesis over Infinite State Spaces*
+2. [ASE 2023](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games): *Symbolic Fixpoint Algorithms for Logical LTL Games*
+3. [Extended arXiv version of ASE 2023 paper](https://arxiv.org/abs/2306.02427) : *Towards Efficient Controller Synthesis Techniques for Logical LTL Games*.
