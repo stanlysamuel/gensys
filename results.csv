@@ -1,2 +1,2 @@
-Benchmark,G-S,GF-P,FG-P,G
-repairLock.py,0.48,1.7,2.08,0.48
+Benchmark,G-S,GF-P,FG-P,OTF,G
+1_cinderella_C2.py,0.49,4.26,0.87,1.21,0.49

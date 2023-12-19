@@ -228,8 +228,8 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
     print("")
     print("Number of iterations: ", i-1)
     print("")
-    print("Invariant is")
-    print(W0)
+    # print("Invariant is")
+    # print(W0)
     #3. Output: Controller Extraction or Unrealizable
     if not (valid(Implies(init(*s), W0),0) and satisfiable(W0,0)):
         print("Invariant is Unsatisifiable i.e. False")
@@ -238,41 +238,41 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
         print("Invariant is Satisfiable")
         print("REALIZABLE")
 
-        print("EXTRACTING CONTROLLER...")
-        # In the invariant, substitute with post variables
-        #Take backup of invariant to analyse in the end
-        Invariant = W0
-        F = substitute(W0, *substList)
+        # print("EXTRACTING CONTROLLER...")
+        # # In the invariant, substitute with post variables
+        # #Take backup of invariant to analyse in the end
+        # Invariant = W0
+        # F = substitute(W0, *substList)
 
-        disjunction_of_conditions = False
+        # disjunction_of_conditions = False
 
-        with open("controller.txt", "w") as text_file:
-            print("Controller Logic", file=text_file)
+        # with open("controller.txt", "w") as text_file:
+        #     print("Controller Logic", file=text_file)
 
-        for move_i in controller_moves:
-            #Get AE/EA Formula with postcondition F
-            condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F, "safety"), guarantee(*s))
+        # for move_i in controller_moves:
+        #     #Get AE/EA Formula with postcondition F
+        #     condition_move_i = And(getFormulation(s_, s__, move_i(*contransitionVars), environment(*envtransitionVars), guarantee(*s_), F, "safety"), guarantee(*s))
 
-            #Move i condition extraction
-            #Eliminate quantifiers and simplify to get the conditions for each move
-            g = Goal()
-            g.add(condition_move_i)
-            condition_move_i = tactic_qe_controller(g).as_expr()
+        #     #Move i condition extraction
+        #     #Eliminate quantifiers and simplify to get the conditions for each move
+        #     g = Goal()
+        #     g.add(condition_move_i)
+        #     condition_move_i = tactic_qe_controller(g).as_expr()
 
-            with open("controller.txt", "a") as text_file:
-                print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
-                print(condition_move_i, file=text_file)
+        #     with open("controller.txt", "a") as text_file:
+        #         print("\nCondition for the controller action: "+ str(move_i.__name__), file=text_file)
+        #         print(condition_move_i, file=text_file)
 
-            #For final sanity check
-            disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
+        #     #For final sanity check
+        #     disjunction_of_conditions = Or(condition_move_i, disjunction_of_conditions)
 
-        # close the file
-        text_file.close()
-        print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
-        #Sanity check: Disjunction of controller conditions is equal to Invariant
-        formula = disjunction_of_conditions == Invariant
+        # # close the file
+        # text_file.close()
+        # print("Controller printed in controller.txt file in the form 'condition_i -> move_i'")
+        # #Sanity check: Disjunction of controller conditions is equal to Invariant
+        # formula = disjunction_of_conditions == Invariant
 
-        assert(valid(formula,0))
+        # assert(valid(formula,0))
 
 
 # -----------------------------------------------------------------------------------------
