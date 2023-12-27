@@ -1,4 +1,4 @@
-# GenSys-LTL
+# GenSys-LTL (GenSys 2.0)
 This branch hosts the code for the tool: GenSys-LTL (i.e., [GenSys](https://github.com/stanlysamuel/gensys) Version 2.0), based on our [ASE 2023 paper](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games): *Symbolic Fixpoint Algorithms for Logical LTL Games.*
 
 ## Introduction 
@@ -16,9 +16,48 @@ For the extended arXiv version of the [ASE 2023 paper](https://conf.researchr.or
 - Prof. Deepak D'Souza, Indian Institute of Science, Bangalore
 - Prof. Raghavan Komondoor, Indian Institute of Science, Bangalore
 
-## Installation, Usage, and Replicating Results
+## Installation
+You should have Python 3 installed on your system. We successfully ran GenSys-LTL with Python 3.10.12.
 
-More details regarding running GenSys-LTL will be available soon. If you wish to play around with GenSys for safety specifications where the documentation is exhaustive, please visit this [branch](https://github.com/stanlysamuel/gensys).
+**Install Python packages**
+
+```
+pip install z3-solver
+```
+
+**Add base project directory to PYTHONPATH**
+
+```
+export PYTHONPATH=${PYTHONPATH}:/path/to/gensys
+```
+
+### Usage
+
+**Setup GenSys-LTL**
+
+```
+git clone https://github.com/stanlysamuel/gensys.git
+
+git checkout gensys-ltl
+```
+
+**Run Benchmarks**
+
+The benchmarks for the ASE 2023 paper are contained in gensys/benchmarks/. 
+The GenSys-LTL library and helper functions are contained in gensys/gensys/.
+
+## Replicating Results for the ASE 2023 paper
+
+Running the command
+```
+python3 run_experiments.py
+```
+
+will run all the benchmarks for simple, product, and otf fixpoints; the results will be stored in `./results.csv`. This process may take few hours (~3 hours). Documentation explaining each benchmark is present in the file.
+
+### Notes: 
+- Although we require the Spot tool to convert LTL formulas into buchi automata, for this version of GenSys, this process is done manually and hence the input to GenSys-LTL is a buchi automaton and not an LTL formula. If the user wishes to encode custom LTL formulas, they must replace predicates with propositions, feed the resulting propositonal LTL formula to Spot, and replace the propositions in the resulting Buchi automaton to the corresponding predicates, manually. Future versions of GenSys will automate this. The version of Spot we used is version 2.9.8 and is present in `./tools/spot-2.9.8`.
+- For the OTF results, we manually iterate to the correct value of k that is required. This process will be automated in a future version of GenSys.
 
 ## Related Papers
 

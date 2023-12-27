@@ -4,7 +4,7 @@ import csv
 import time
 
 # Define the folder path containing the benchmark files
-folder_path = './benchmarks_ASE_2023'
+folder_path = './benchmarks'
 
 # Define the output CSV file path
 output_csv = './results.csv'
