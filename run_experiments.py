@@ -18,7 +18,7 @@ with open(output_csv, 'w', newline='') as csvfile:
     csvwriter.writerow(['Benchmark', 'G-S', 'GF-P', 'FG-P', 'OTF', 'G'])
 
     # Get a list of all files in the folder
-    files = os.listdir(folder_path)
+    files = sorted(os.listdir(folder_path))
 
     # Loop through each file in the folder
     for file in files:
@@ -54,7 +54,10 @@ with open(output_csv, 'w', newline='') as csvfile:
                     if exit_code == 5:
                             # exit code 5 corresponds to total time -1 viz. N/A 
                             total_time = -1
-                    if exit_code != 0 and exit_code != 5:
+                    if exit_code == 6:
+                            # exit code 6 corresponds to total time -2 viz. (manual) T/O
+                            total_time = -2
+                    if exit_code != 0 and exit_code != 5 and exit_code != 6:
                         print(f"Error running {file}:")
                         print(stderr)
                         print('-' * 30)

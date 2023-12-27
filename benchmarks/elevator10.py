@@ -2,7 +2,7 @@ from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
 
-# Three floor elevator example.
+# Ten floor elevator example.
 
 # 0. Define game type (Int/ Real)
 game_type = "Int"
@@ -24,7 +24,7 @@ def move3(x,x_):
 
 # Define initial state
 def init(x):
-    return And(x>=1, x<=5)
+    return And(x>=1, x<=10)
 
 # def init(x):
 #     return False

@@ -2,7 +2,7 @@ from  gensys.helper import *
 from  gensys.fixpoints import *
 from z3 import *
 
-# Three floor elevator example.
+# Five floor elevator example.
 
 # 0. Define game type (Int/ Real)
 game_type = "Int"
@@ -35,7 +35,7 @@ mode = sys.argv[1]
 spec = sys.argv[2]
 
 if spec == "product":
-    # Spec: Liveness, G(1<=x<=3) and G(F(x==1) and F(x==2) and F(x==3) and F(x==4))
+    # Spec: Liveness, G(1<=x<=5) and G(F(x==1) and F(x==2) and F(x==3) and F(x==4) and F(x==5))
     # Automaton information such as automaton, isFinal and nQ can be retreived from spot tool manually.
 
     # Deterministic Buchi Automaton
