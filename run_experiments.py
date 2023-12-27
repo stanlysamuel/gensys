@@ -83,7 +83,7 @@ with open(output_csv, 'w', newline='') as csvfile:
                 if row[i] == -2:
                     row[i] = "T/O"
                 if row[i] == 100000000:
-                    row[i] = "Unable to solve"
+                    row[i] = "T/O"
             # Write the results to the CSV file
             csvwriter.writerow(row)
 

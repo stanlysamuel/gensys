@@ -53,7 +53,7 @@ Running the command
 python3 run_experiments.py
 ```
 
-will run all the benchmarks for simple, product, and otf fixpoints; the results will be stored in `./results.csv`. This process may take few hours (~3 hours). Documentation explaining each benchmark is present in the file.
+will run all the benchmarks for simple, product, and otf fixpoints; the results will be stored in `./results.csv`. This process may take few hours (2 hours on an i7-8700 machine with 64GB RAM). Documentation explaining each benchmark is present in the file.
 
 ### Notes: 
 - Although we require the Spot tool to convert LTL formulas into buchi automata, for this version of GenSys, this process is done manually and hence the input to GenSys-LTL is a buchi automaton and not an LTL formula. If the user wishes to encode custom LTL formulas, they must replace predicates with propositions, feed the resulting propositonal LTL formula to Spot, and replace the propositions in the resulting Buchi automaton to the corresponding predicates, manually. Future versions of GenSys will automate this. The version of Spot we used is version 2.9.8 and is present in `./tools/spot-2.9.8`.
