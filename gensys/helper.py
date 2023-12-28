@@ -1,6 +1,6 @@
-#  GenSys v0.1
+#  GenSys v2.0
 
-#  Copyright (C) 2021 Stanly Samuel
+#  Copyright (C) 2023 Stanly Samuel
 
 #  This software is available under the MIT license. Please see LICENSE in the
 #  top-level directory for details.
