@@ -72,6 +72,8 @@ python3 run_experiments.py
 
 will run all the benchmarks for simple, product, and otf fixpoints; the results will be stored in `./results.csv` and the average mean speedup over Consynth and Raboniel tools will be printed. This process may take few hours (2 hours on an i7-8700 machine with 64GB RAM). Documentation explaining each benchmark is present in the file.
 
+The tool is also uploaded to [Zenodo](https://zenodo.org/records/10439578).
+
 ### Notes: 
 - We only run all approaches of GenSys-LTL in this script; we do not run ConSynth and Raboniel in this script but use the values from the ASE 2023 paper. 
 - In the ASE 2023 paper, as mentioned, we were only able to run Raboniel, but not ConSynth and Temos. All three tools are present in the `./tools` folder, for reference.
