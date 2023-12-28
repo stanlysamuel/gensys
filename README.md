@@ -17,13 +17,15 @@ For the extended arXiv version of the [ASE 2023 paper](https://conf.researchr.or
 - Prof. Raghavan Komondoor, Indian Institute of Science, Bangalore
 
 ## Installation
-You should have Python `3` installed on your system. We successfully ran GenSys-LTL with Python `3.10.12` and Z3 version `4.12.1 - 64 bit`.
+You should have Python `3` installed on your system. We successfully ran GenSys-LTL on Ubuntu `22.04.3 LTS` with Python `3.10.12` and Z3 version `4.12.1 - 64 bit`.
 
 **Install Python packages**
 
 ```
-pip install z3-solver
+pip install z3-solver==4.12.1.0
 ```
+
+The latest version of Z3 `4.12.4` introduces some type errors, which will be handled in a later version.
 
 **Add base project directory to PYTHONPATH**
 
@@ -48,7 +50,22 @@ The GenSys-LTL library and helper functions are contained in gensys/gensys/.
 
 ## Replicating Results for the ASE 2023 paper
 
-Running the command
+### Dockerfile
+The easiest way to reproduce the results is by creating a Docker image from the Dockerfile.
+
+```
+sudo docker build -t gensys-ltl .
+
+sudo docker run -it gensys-ltl /bin/bash
+
+/gensys# export PYTHONPATH=${PYTHONPATH}:/gensys 
+
+/gensys# python3 run_experiments.py
+```
+
+### Manually
+
+Running the command in the root folder
 ```
 python3 run_experiments.py
 ```
