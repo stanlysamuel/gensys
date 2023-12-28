@@ -28,7 +28,7 @@ raboniel_speedup = []
 # Create or overwrite the CSV file
 with open(output_csv, 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
-    csvwriter.writerow(['Benchmark', 'G-S (Simple)', 'GF-P (Product-Buchi)', 'FG-P (Product-Co-Buchi)', 'OTF (On-The-Fly)', 'G (Fastest Time - Gensys)', 'Fastest Approach - GenSys', 'ConSynth Results', 'Raboniel Results', 'Speedup (over ConSynth)', 'Speedup (over Raboniel)'])
+    csvwriter.writerow(['Benchmark', 'G-S (Simple)', 'GF-P (Product-Buchi)', 'FG-P (Product-Co-Buchi)', 'OTF (On-The-Fly)','ConSynth Results', 'Raboniel Results', 'G (Fastest Time - Gensys)', 'Fastest Approach - GenSys', 'Speedup (over ConSynth)', 'Speedup (over Raboniel)'])
 
     # Flush the buffer to ensure the line is written immediately
     csvfile.flush()
