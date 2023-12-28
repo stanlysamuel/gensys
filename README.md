@@ -17,7 +17,7 @@ For the extended arXiv version of the [ASE 2023 paper](https://conf.researchr.or
 - Prof. Raghavan Komondoor, Indian Institute of Science, Bangalore
 
 ## Installation
-You should have Python 3 installed on your system. We successfully ran GenSys-LTL with Python 3.10.12.
+You should have Python `3` installed on your system. We successfully ran GenSys-LTL with Python `3.10.12` and Z3 version `4.12.1 - 64 bit`.
 
 **Install Python packages**
 
@@ -53,11 +53,14 @@ Running the command
 python3 run_experiments.py
 ```
 
-will run all the benchmarks for simple, product, and otf fixpoints; the results will be stored in `./results.csv`. This process may take few hours (2 hours on an i7-8700 machine with 64GB RAM). Documentation explaining each benchmark is present in the file.
+will run all the benchmarks for simple, product, and otf fixpoints; the results will be stored in `./results.csv` and the average mean speedup over Consynth and Raboniel tools will be printed. This process may take few hours (2 hours on an i7-8700 machine with 64GB RAM). Documentation explaining each benchmark is present in the file.
 
 ### Notes: 
+- We only run all approaches of GenSys-LTL in this script; we do not run ConSynth and Raboniel in this script but use the values from the ASE 2023 paper. 
+- In the ASE 2023 paper, as mentioned, we were only able to run Raboniel, but not ConSynth and Temos. All three tools are present in the `./tools` folder, for reference.
+- All benchmarks for Raboniel are present in the folder `./tools/raboniel/artifact/raboniel/examples`. We manually wrote a few benchmarks in Raboniel such as the Cinderella-Stepmother benchmarks. These benchmarks are found in `./tools/raboniel/artifact/raboniel/examples/gensys`.
 - Although we require the Spot tool to convert LTL formulas into buchi automata, for this version of GenSys, this process is done manually and hence the input to GenSys-LTL is a buchi automaton and not an LTL formula. If the user wishes to encode custom LTL formulas, they must replace predicates with propositions, feed the resulting propositonal LTL formula to Spot, and replace the propositions in the resulting Buchi automaton to the corresponding predicates, manually. Future versions of GenSys will automate this. The version of Spot we used is version 2.9.8 and is present in `./tools/spot-2.9.8`.
-- For the OTF results, we manually iterate to the correct value of k that is required. This process will be automated in a future version of GenSys.
+- For the OTF results, the value of K used is the one used in the paper, where which we manually tested every value of K, until realizable for the controller.This process will be automated in a future version of GenSys.
 
 ## Rules for creating your own game
 
