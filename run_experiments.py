@@ -12,15 +12,30 @@ output_csv = './results.csv'
 # Define the timeout duration in seconds (15 minutes)
 timeout_duration = 900
 
+# Custom sorting key function that sorts baseq on the number in the file name
+def get_file_number(filename):
+    # Extract the number from the file name
+    parts = filename.split("_", 1)
+    return int(parts[0])
+
 # Create or overwrite the CSV file
 with open(output_csv, 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(['Benchmark', 'G-S', 'GF-P', 'FG-P', 'OTF', 'G'])
 
+    # Flush the buffer to ensure the line is written immediately
+    csvfile.flush()
+
+    # Move the file pointer to the end of the file
+    csvfile.seek(0, 2)
+    
     # Get a list of all files in the folder
-    files = sorted(os.listdir(folder_path))
+    # sort based on number in file name
+
+    files = sorted(os.listdir(folder_path), key=get_file_number)
 
     # Loop through each file in the folder
+    print("Running ASE 2023 Benchmark Suite. View results.csv for results.")
     for file in files:
         # Check if the file is a Python script
         if file.endswith('.py'):
@@ -38,6 +53,7 @@ with open(output_csv, 'w', newline='') as csvfile:
                 start_time = time.time()
                 # Run the command with a timeout
                 try:
+                    print(file, spec)
                     process = subprocess.run(command,
                                             stdout=subprocess.PIPE,
                                             stderr=subprocess.PIPE,
@@ -86,5 +102,11 @@ with open(output_csv, 'w', newline='') as csvfile:
                     row[i] = "T/O"
             # Write the results to the CSV file
             csvwriter.writerow(row)
+
+            # Flush the buffer to ensure the line is written immediately
+            csvfile.flush()
+
+            # Move the file pointer to the end of the file
+            csvfile.seek(0, 2)
 
 print(f"Benchmark results stored in {output_csv}")
