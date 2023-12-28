@@ -1,11 +1,11 @@
 # GenSys-LTL (GenSys 2.0)
 This branch hosts the code for the tool: GenSys-LTL (i.e., [GenSys](https://github.com/stanlysamuel/gensys) Version 2.0), based on our [ASE 2023 paper](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games): *Symbolic Fixpoint Algorithms for Logical LTL Games.*
 
+For the full arXiv version of the above paper, please see [this paper](https://arxiv.org/abs/2306.02427) titled: *Towards Efficient Controller Synthesis Techniques for Logical LTL Games*.
+
 ## Introduction 
 
 GenSys-LTL is an *infinite-state* reactive synthesis solver using LTL specifications. GenSys-LTL uses the Z3 theorem prover by Microsoft Research for solving and projecting SMT formulae. GenSys-LTL is scalable and is validated on standard benchmarks with compelling results.
-
-For the extended arXiv version of the [ASE 2023 paper](https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games), please see [this paper](https://arxiv.org/abs/2306.02427) titled: *Towards Efficient Controller Synthesis Techniques for Logical LTL Games*.
 
 ## Author
 
@@ -25,7 +25,7 @@ You should have Python `3` installed on your system. We successfully ran GenSys-
 pip install z3-solver==4.12.1.0
 ```
 
-The latest version of Z3 `4.12.4` introduces some type errors, which will be handled in a later version.
+The latest version of Z3 `4.12.4` is not supported.
 
 **Add base project directory to PYTHONPATH**
 
@@ -87,7 +87,7 @@ GenSys-LTL provides API's to model many various versions of logical LTL games. T
 ```
 safety_fixedpoint(controller_moves, environment, guarantee, mode)
 ```
-The details for the above API are mentioned [here](https://github.com/stanlysamuel/gensys/blob/main/README.md), and is deprecated in this version. In GenSys-LTL, the above safety fixpoint now has the form:
+The details for the above API are mentioned [in a previous version of GenSys](https://github.com/stanlysamuel/gensys/blob/main/README.md), and is extended in GenSys-LTL. In GenSys-LTL, the above safety fixpoint now has the form:
 ```
 safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init)
 ```
