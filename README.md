@@ -50,7 +50,7 @@ The GenSys-LTL library and helper functions are contained in gensys/gensys/.
 
 ## Replicating Results for the ASE 2023 paper
 
-### Dockerfile
+### Using Dockerfile
 The easiest way to reproduce the results is by creating a Docker image from the Dockerfile.
 
 ```
@@ -75,7 +75,7 @@ will run all the benchmarks for simple, product, and otf fixpoints; the results 
 The tool is also uploaded to [Zenodo](https://zenodo.org/records/10439578).
 
 ### Notes: 
-- We only run all approaches of GenSys-LTL in this script; we do not run ConSynth and Raboniel in this script but use the values from the ASE 2023 paper. 
+- We only run all approaches of GenSys-LTL in this script; we do not run ConSynth and Raboniel in this script but use the values from the ASE 2023 paper. Thus, using Docker to reproduce the results will ensure fair comparison (wrt speedup of GenSys-LTL over Raboniel) as GenSys-LTL will be run in the same environment where the numbers for Raboniel were generated from.
 - In the ASE 2023 paper, as mentioned, we were only able to run Raboniel, but not ConSynth and Temos. All three tools are present in the `./tools` folder, for reference.
 - All benchmarks for Raboniel are present in the folder `./tools/raboniel/artifact/raboniel/examples`. We manually wrote a few benchmarks in Raboniel such as the Cinderella-Stepmother benchmarks. These benchmarks are found in `./tools/raboniel/artifact/raboniel/examples/gensys`.
 - Although we require the Spot tool to convert LTL formulas into buchi automata, for this version of GenSys, this process is done manually and hence the input to GenSys-LTL is a buchi automaton and not an LTL formula. If the user wishes to encode custom LTL formulas, they must replace predicates with propositions, feed the resulting propositonal LTL formula to Spot, and replace the propositions in the resulting Buchi automaton to the corresponding predicates, manually. Future versions of GenSys will automate this. The version of Spot we used is version 2.9.8 and is present in `./tools/spot-2.9.8`.
