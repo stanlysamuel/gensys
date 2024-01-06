@@ -15,3 +15,6 @@ WORKDIR /gensys
 
 # Copy GenSys-LTL code to the container
 COPY . /gensys
+
+# Setup Z3 path for Raboniel tool
+RUN cp /gensys/tools/raboniel/opt/Z3/libz3.so /usr/lib && cp /gensys/tools/raboniel/opt/Z3/*.h /usr/include

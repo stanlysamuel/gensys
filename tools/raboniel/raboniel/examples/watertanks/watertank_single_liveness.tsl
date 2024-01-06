@@ -1,0 +1,14 @@
+//-- State: r_x
+
+assume {
+ge r_x r0.0() && !(ge r_x r0.7());
+}
+
+always guarantee {
+ge r_x r0.0();   /* INV */
+!(ge r_x r0.7()); /* INV */
+
+[r_x <- mul r0.9635() r_x] || [r_x <- add (mul r0.9635() r_x) r0.1()];
+
+!(ge r_x r0.1()) -> F (ge r_x r0.4());
+}
