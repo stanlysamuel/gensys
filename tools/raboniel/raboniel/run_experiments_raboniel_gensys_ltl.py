@@ -4,10 +4,7 @@ import time
 import re
 
 # Define the folder path containing the benchmark files
-raboniel_folder_path = '/gensys/tools/raboniel/raboniel/examples/gensys-ltl'
-
-# Define the output CSV file path
-output_csv = './results.csv'
+raboniel_benchmarks_folder_path = '/gensys/tools/raboniel/raboniel/examples/gensys-ltl'
 
 # Define the timeout duration in seconds (15 minutes)
 timeout_duration = 900
@@ -27,13 +24,13 @@ def get_raboniel_results():
     # Define the regular expression pattern for intermediate files of the form _R[0-9]+.tsl. Eg: "_R0.tsl". We do not want to synthesize for these files.
     pattern = r"_R\d+\.tsl"
 
-    files = sorted(os.listdir(raboniel_folder_path), key=get_file_number)
+    files = sorted(os.listdir(raboniel_benchmarks_folder_path), key=get_file_number)
 
     for file in files:
         # Check if the file is a TSL file and not an intermediate tsl file.
         if file.endswith('.tsl') and not re.search(pattern, file):
             # Get the full path to the benchmark file
-            benchmark_path = os.path.join(raboniel_folder_path, file)
+            benchmark_path = os.path.join(raboniel_benchmarks_folder_path, file)
             
             command = ['./raboniel', '--spec', benchmark_path]
             # Record start time
@@ -67,17 +64,15 @@ def get_raboniel_results():
                 raboniel_results.append(round(total_time,2))
 
     # Cleanup all intermediate files (.kiss, .tlsf, _R*.tsl)
-    files_ = os.listdir(raboniel_folder_path)
+    files_ = os.listdir(raboniel_benchmarks_folder_path)
 
     for file_ in files_:
         # Check if the file matches the patterns
         if re.search(pattern, file_) or file_.endswith('.tlsf') or file_.endswith('.kiss'):
             # Construct the file path
-            file_path = os.path.join(raboniel_folder_path, file_)
+            file_path = os.path.join(raboniel_benchmarks_folder_path, file_)
             
             # Delete the file
             os.remove(file_path)
 
     return raboniel_results
-
-print(get_raboniel_results())

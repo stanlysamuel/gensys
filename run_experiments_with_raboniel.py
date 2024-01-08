@@ -2,9 +2,10 @@ import os
 import subprocess
 import csv
 import time
+from tools.raboniel.raboniel import run_experiments_raboniel_gensys_ltl as raboniel
 
 # Define the folder path containing the benchmark files
-folder_path = './benchmarks'
+benchmarks_folder_path = './benchmarks'
 
 # Define the output CSV file path
 output_csv = './results.csv'
@@ -20,12 +21,22 @@ def get_file_number(filename):
 
 consynth_results = ['-', 'T/O', '765.3', '2.5', '19.52', '10.01', '18', '436', '4.7', '-', '53.3', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '3.7', '0.4', '1.9', '1.5', 'T/O', '0.4', 'T/O']
 
-raboniel_results = ['-', 'T/O', 'T/O', '3.1', '-', '-', 'T/O', 'T/O', 'T/O', 'T/O', '-', '1.8', '2.2', '5.1', '27.4', '108.0', '19.4', '51.0', '51.0', '650.1', 'T/O', '1.2', '0.3', '6.4', '3.4', '94.0', '0.3', 'T/O']
-# raboniel_results_docker = ['-', 'T/O', 'T/O', 3.92, 3.13, 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 2.02, 2.35, 6.77, 39.27, 136.9, 22.2, 54.15, 2.0, 702.85, 'T/O', 17.51, 6.16, 37.35, 14.29, 'T/O', 0.87, 141.2]
+# Run Raboniel and get the results.
+# Change the current working directory to the desired folder
+os.chdir('tools/raboniel/raboniel/')
+# print("Current working directory:", os.getcwd())
+raboniel_results = raboniel.get_raboniel_results()
+print("Raboniel results:")
+print(raboniel_results)
+
+# Change the current working directory back to the original folder
+os.chdir('../../../')
+cwd = os.getcwd()
 
 consynth_speedup = []
 raboniel_speedup = []
 
+# Run GenSys-LTL and get the results.
 # Create or overwrite the CSV file
 with open(output_csv, 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
@@ -40,7 +51,7 @@ with open(output_csv, 'w', newline='') as csvfile:
     # Get a list of all files in the folder
     # sort based on number in file name
 
-    files = sorted(os.listdir(folder_path), key=get_file_number)
+    files = sorted(os.listdir(benchmarks_folder_path), key=get_file_number)
 
     # Loop through each file in the folder
     print("Running ASE 2023 Benchmark Suite. View results.csv for results.")
@@ -48,7 +59,7 @@ with open(output_csv, 'w', newline='') as csvfile:
         # Check if the file is a Python script
         if file.endswith('.py'):
             # Get the full path to the benchmark file
-            benchmark_path = os.path.join(folder_path, file)
+            benchmark_path = os.path.join(benchmarks_folder_path, file)
             
             row = []
             row.append(file)
@@ -153,5 +164,5 @@ with open(output_csv, 'w', newline='') as csvfile:
             csvfile.seek(0, 2)
 
 print(f"Benchmark results stored in {output_csv}")
-print(f"Average speedup over ConSynth: {round(sum(consynth_speedup)/len(consynth_speedup),2)}")
-print(f"Average speedup over Raboniel: {round(sum(raboniel_speedup)/len(raboniel_speedup),2)}")
+print(f"Average (arithmetic mean) speedup over ConSynth: {round(sum(consynth_speedup)/len(consynth_speedup),2)}")
+print(f"Average (arithmetic mean) speedup over Raboniel: {round(sum(raboniel_speedup)/len(raboniel_speedup),2)}")
