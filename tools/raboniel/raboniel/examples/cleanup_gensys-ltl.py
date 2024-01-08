@@ -5,7 +5,7 @@ import os
 import re
 
 # Define the folder path containing the benchmark files
-raboniel_benchmarks_folder_path = './'
+raboniel_benchmarks_folder_path = './gensys-ltl'
 
 # Define the regular expression pattern for intermediate files of the form _R[0-9]+.tsl. Eg: "_R0.tsl". We do not want to synthesize for these files.
 pattern = r"_R\d+\.tsl"
