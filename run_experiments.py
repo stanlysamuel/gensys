@@ -2,6 +2,7 @@ import os
 import subprocess
 import csv
 import time
+import statistics
 
 # Define the folder path containing the benchmark files
 folder_path = './benchmarks'
@@ -153,5 +154,9 @@ with open(output_csv, 'w', newline='') as csvfile:
             csvfile.seek(0, 2)
 
 print(f"Benchmark results stored in {output_csv}")
-print(f"Average speedup over ConSynth: {round(sum(consynth_speedup)/len(consynth_speedup),2)}")
-print(f"Average speedup over Raboniel: {round(sum(raboniel_speedup)/len(raboniel_speedup),2)}")
+print()
+print(f"Average (arithmetic mean) speedup over Raboniel: {statistics.mean(raboniel_speedup)}")
+print(f"Average (geometric mean) speedup over Raboniel: {statistics.geometric_mean(raboniel_speedup)}")
+print()
+print(f"Average (arithmetic mean) speedup over ConSynth: {statistics.mean(consynth_speedup)}")
+print(f"Average (geometric mean) speedup over ConSynth: {statistics.geometric_mean(consynth_speedup)}")
