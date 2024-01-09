@@ -1,0 +1,49 @@
+//-- State: f1a, f1b, t1b, f2a, f2b, t2b, pc1, pc2
+
+assume {
+  eq pc1 i1();
+  eq pc2 i1();
+  eq f1a i0();
+  eq f1b i0();
+  eq t1b i0();
+  eq t2b i0();
+  eq f2a i0();
+  eq f2b i0();
+  
+}
+
+always guarantee {
+
+  eq pc1 i1() -> ([f1a <- i2()] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i2()] && [pc2 <- pc2]);
+  eq pc1 i2() -> ([f1a <- f1a] && [f1b <- f1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i3()] && [pc2 <- pc2]);
+  (eq pc1 i3() && eq f1b i1() && eq t1b i1()) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i3()] && [pc2 <- pc2]);
+  (eq pc1 i3() && (eq f1b i0() || eq t1b i0())) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i4()] && [pc2 <- pc2]);
+  eq pc1 i4() -> ([f1a <- i0()] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i5()] && [pc2 <- pc2]);
+  (eq pc1 i5() && eq t1b i1()) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- i1()] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i6()] && [pc2 <- pc2]);
+  (eq pc1 i5() && eq t1b i1()) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i9()] && [pc2 <- pc2]);
+  (eq pc1 i7() && eq f2b i1() && eq t2b i1()) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i8()] && [pc2 <- pc2]);
+  eq pc1 i8() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- i0()] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i9()] && [pc2 <- pc2]);
+  eq pc1 i9() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- i1()] && [pc2 <- pc2]);
+  eq f1a i1() -> ([f1a <- i0()] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- pc2]);
+  eq pc2 i1() -> ([f1a <- f1a] && [f1b <- i1()] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i2()]);
+  eq pc2 i2() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- i0()] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i3()]);
+  (eq pc2 i3() && eq f1a i1() && eq t1b i0()) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i3()]);
+  (eq pc2 i3() && (eq f1a i0() || eq t1b i1())) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i4()]);
+  eq pc2 i4() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- i1()] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i5()]);
+  eq pc2 i5() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- i0()] && [pc1 <- pc1] && [pc2 <- i6()]);
+  (eq pc2 i6() && eq f2a i1() && eq t2b i0()) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i6()]);
+  (eq pc2 i6() && (eq f2a i0() || eq t2b i1())) -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i7()]);
+  eq pc2 i7() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- i0()] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i8()]);
+  eq pc2 i8() -> ([f1a <- f1a] && [f1b <- i0()] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f1b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i9()]);
+  eq pc2 i9() -> ([f1a <- f1a] && [f1b <- f1b] && [t1b <- t1b] && [f2a <- f2a] && [f2b <- f2b] && [t2b <- t2b] && [pc1 <- pc1] && [pc2 <- i1()]);
+
+  G(eq pc1 i3() -> F eq pc1 i4()) && G(eq pc1 i7() -> F eq pc1 i8()) && G(eq pc2 i3() -> F eq pc2 i4()) && G(eq pc2 i6() -> F eq pc2 i7())
+
+}
+
+
+
+
+
+
+
