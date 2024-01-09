@@ -1,0 +1,29 @@
+//-- State: x, y1, y2, z, pc1, pc2, pc3
+
+assume {
+  eq pc1 i1();
+  eq pc2 i1();
+  eq pc3 i1();
+  eq x i0();
+  eq y1 i0();
+  eq y2 i0();
+  eq z i0();
+}
+
+always guarantee {
+  eq pc1 i1() -> ([x <- (add x z)] && [y1 <- y1] && [y2 <- y2] && [z <- z] && [pc1 <- i2()] && [pc2 <- pc2] && [pc3 <- pc3]);
+  eq pc1 i2() -> ([x <- (add x z)] && [y1 <- y1] && [y2 <- y2] && [z <- z] && [pc1 <- i3()] && [pc2 <- pc2] && [pc3 <- pc3]);
+  (le pc1 i0() || ge pc1 i3()) -> ([x <- x] && [y1 <- y1] && [y2 <- y2] && [z <- z] && [pc1 <- pc1] && [pc2 <- pc2] && [pc3 <- pc3]);
+  eq pc2 i1() -> ([z <- (add i1() z)] && [y1 <- y1] && [y2 <- y2] && [x <- x] && [pc1 <- pc1] && [pc2 <- i2()] && [pc3 <- pc3]);
+  eq pc2 i2() -> ([z <- (add i1() z)] && [y1 <- y1] && [y2 <- y2] && [x <- x] && [pc1 <- pc1] && [pc2 <- i3()] && [pc3 <- pc3]);
+  (le pc2 i0() || ge pc2 i3()) -> ([x <- x] && [y1 <- y1] && [y2 <- y2] && [z <- z] && [pc1 <- pc1] && [pc2 <- pc2] && [pc3 <- pc3]);
+  (eq pc3 i1() && eq x i1()) -> ([y1 <- i3()] && [y2 <- y2] && [z <- z] && [pc2 <- pc2] && [pc1 <- pc1] && [pc3 <- i2()]);
+  (eq pc3 i1() && eq x i2()) -> ([y1 <- i6()] && [y2 <- y2] && [x <- x] && [z <- z] && [pc2 <- pc2] && [pc1 <- pc1] && [pc3 <- i2()]);
+  (eq pc3 i1() && (le x i0() || ge x i3())) -> ([y1 <- i5()] && [y2 <- y2] && [x <- x] && [z <- z] && [pc2 <- pc2] && [pc1 <- pc1] && [pc3 <- i2()]);
+  eq pc3 i2() -> ([y2 <- x] && [x <- x] && [y1 <- y1] && [z <- z] && [pc2 <- pc2] && [pc1 <- pc1] && [pc3 <- i3()]);
+  (eq pc3 i3() && ! (eq y1 y2)) -> ([x <- x] && [y1 <- y1] && [y2 <- y2] && [z <- z] && [pc2 <- pc2] && [pc1 <- pc1] && [pc3 <- i4()]);
+  (le pc3 i0() || ge pc3 i4()) -> ([x <- x] && [y1 <- y1] && [y2 <- y2] && [z <- z] && [pc2 <- pc2] && [pc1 <- pc1] && [pc3 <- pc3]);
+
+  G (! (eq pc3 i3() && eq y1 y2));
+
+}
