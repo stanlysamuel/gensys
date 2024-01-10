@@ -21,9 +21,10 @@ def get_file_number(filename):
 
 consynth_results = ['-', 'T/O', '765.3', '2.5', '19.52', '10.01', '18', '436', '4.7', '-', '53.3', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '3.7', '0.4', '1.9', '1.5', 'T/O', '0.4', 'T/O']
 
-raboniel_results_ase2023 = ['-', 'T/O', 'T/O', '3.1', '-', '-', 'T/O', 'T/O', 'T/O', 'T/O', '-', '1.8', '2.2', '5.1', '27.4', '108.0', '19.4', '51.0', '51.0', '650.1', 'T/O', '1.2', '0.3', '6.4', '3.4', '94.0', '0.3', 'T/O']
-raboniel_results_docker_1 = ['-', 'T/O', 'T/O', 3.92, 3.13, 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 2.02, 2.35, 6.77, 39.27, 136.9, 22.2, 54.15, 2.0, 702.85, 'T/O', 17.51, 6.16, 37.35, 14.29, 'T/O', 0.87, 141.2]
-raboniel_results_docker_2 = ['-', 'T/O', 'T/O', 3.19, 3.15, 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 4.0, 3.31, 7.01, 29.53, 155.55, 22.26, 55.67, 2.51, 772.05, 'T/O', 7.42, 1.58, 9.13, 7.96, 'T/O', 6.55, 180.45]
+# raboniel_results_ase2023 = ['-', 'T/O', 'T/O', '3.1', '-', '-', 'T/O', 'T/O', 'T/O', 'T/O', '-', '1.8', '2.2', '5.1', '27.4', '108.0', '19.4', '51.0', '51.0', '650.1', 'T/O', '1.2', '0.3', '6.4', '3.4', '94.0', '0.3', 'T/O']
+# raboniel_results_docker_1 = ['-', 'T/O', 'T/O', 3.92, 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 2.02, 2.35, 6.77, 39.27, 136.9, 22.2, 54.15, 2.0, 702.85, 'T/O', 17.51, 6.16, 37.35, 14.29, 'T/O', 0.87, 141.2]
+# raboniel_results_docker_2 = ['-', 'T/O', 'T/O', 3.19, 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 4.0, 3.31, 7.01, 29.53, 155.55, 22.26, 55.67, 2.51, 772.05, 'T/O', 7.42, 1.58, 9.13, 7.96, 'T/O', 6.55, 180.45]
+raboniel_results_final = ['-', 'T/O', 'T/O', 3.05, 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 'T/O', 1.91, 2.32, 5.18, 28.13, 110.44, 20.19, 51.4, 1.94, 649.9, 'T/O', 1.82, 0.4, 7.63, 4.89, 'T/O', 5.5, 167.97]
 
 consynth_speedup = []
 raboniel_speedup = []
@@ -105,20 +106,23 @@ with open(output_csv, 'w', newline='') as csvfile:
             
             G = round(min,2)
             C = consynth_results[get_file_number(file)]
-            R = raboniel_results_ase2023[get_file_number(file)]
+            R = raboniel_results_final[get_file_number(file)]
             speedup_C = '-'
             speedup_R = '-'
 
+            # Consider only those benchmarks that were solved by all of ConSynth, Raboniel and GenSys-LTL
             if G != 'T/O' and G != '-':
                 G = float(G)
                 if C != 'T/O' and C != '-':
                     C = float(C)
                     speedup_C = round(C/G,2)
-                    consynth_speedup.append(speedup_C)
+                    if speedup_C >0: # round(53/100000000,2) can cause this (if min stays at 100000000), returns 0.0 and causes problem in geometric mean calculation
+                        consynth_speedup.append(speedup_C)
                 if R != 'T/O' and R != '-':
                     R = float(R)
                     speedup_R = round(R/G,2)
-                    raboniel_speedup.append(speedup_R)
+                    if speedup_R >0: # round(53/100000000,2) can cause this (if min stays at 100000000), returns 0.0 and causes problem in geometric mean calculation
+                        raboniel_speedup.append(speedup_R)
 
             row.append(C)
             row.append(R)
