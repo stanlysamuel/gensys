@@ -51,7 +51,7 @@ The GenSys-LTL library and helper functions are contained in gensys/gensys/.
 ## Replicating Results for the ASE 2023 paper
 
 ### Using Docker
-The easiest way to reproduce the results is by creating a Docker image from the Dockerfile. 
+The easiest way to reproduce the results is by building and running a Docker image from the Dockerfile, as follows:
 
 ```
 sudo docker build -t gensys-ltl .
@@ -62,6 +62,7 @@ sudo docker run -it gensys-ltl /bin/bash
 
 /gensys# python3 run_experiments_with_raboniel.py
 ```
+(If you do not wish to build the docker image, you could directly pull a prebuilt GenSys-LTL image from [Dockerhub](https://hub.docker.com/r/stanlysamuel/gensys-ltl) as well, using the command `sudo docker pull stanlysamuel/gensys-ltl` instead of `sudo docker build -t gensys-ltl .`).
 
 The script `run_experiments_with_raboniel.py` runs the tools GenSys-LTL and Raboniel over all benchmarks and takes about 5 hours to run on an i7-8700 machine with 64GB RAM.  It is easier to run Raboniel in Docker (where Raboniel is setup); otherwise the user will have to follow the instructions in `tools/raboniel/raboniel/README.md` to setup Raboniel manually. The output for the above commands should look as follows:
 
