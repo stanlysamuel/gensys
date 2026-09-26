@@ -50,6 +50,28 @@ set_option(max_depth=100000, rational_to_decimal = True, precision =40, max_line
 set_param("parallel.enable", True)
 # set_param("parallel.threads.max", 5)
 
+#-------------------------------------------------------------------------------------------------------------#
+# Declaration of game variables.
+# The state variables s are the parameters of the environment function whose names have no underscore; s' and
+# s'' append "_" and "__" to their names. A state variable whose name clashes with a local variable of the calling
+# fixpoint procedure (for example, q in the product games) is renamed with the suffix "new123".
+# Variables are created directly rather than through exec() and locals(), which no longer share a namespace in
+# Python 3.13+ (PEP 667).
+#-------------------------------------------------------------------------------------------------------------#
+
+def declare_variable(name, game_type):
+    return globals()[game_type](name)
+
+def declare_state_variables(environment, game_type, procedure):
+    reserved = set(procedure.__code__.co_varnames) | set(procedure.__code__.co_cellvars)
+    s = []
+    for var in environment.__code__.co_varnames:
+        if not str(var).__contains__("_"):
+            s.append(declare_variable(var+"new123" if var in reserved else var, game_type))
+    s_ = [declare_variable(str(var)+"_", game_type) for var in s]
+    s__ = [declare_variable(str(var)+"__", game_type) for var in s]
+    return s, s_, s__
+
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 # 1. Fixpoint Procedures for Simple Games (where LTL formula is of the form: G(formula), F(formula), GF(formula), or FG(formula))
@@ -125,30 +147,8 @@ def getFormulationEA(s_, s__, controller_moves, environment_moves, guarantee_s_,
 # -----------------------------------------------------------------------------------------
 
 def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration 
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s'
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s''
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, safety_fixedpoint_gensys)
 
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode 
@@ -255,30 +255,8 @@ def safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, gam
 # -----------------------------------------------------------------------------------------
 
 def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s'
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s''
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, reachability_fixedpoint_gensys)
 
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode 
@@ -398,30 +376,8 @@ def reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mod
 # -----------------------------------------------------------------------------------------
 
 def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s'
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s''
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, buchi_fixedpoint_gensys)
 
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode 
@@ -555,30 +511,8 @@ def buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game
 # -----------------------------------------------------------------------------------------
 
 def cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init):
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')")
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s'
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')")
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s''
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')")
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, cobuchi_fixedpoint_gensys)
 
     # Decide formulation based on game mode
     # Declare and define transition variables list for controller and environment, depending on the mode 
@@ -748,30 +682,8 @@ def print_q_automaton_states(formula, q, nQ):
 def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type, init):
     print("Buchi Fixed Point Computation")
 
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s' of type game_type
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s'' of type game_type
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, buchi_fixedpoint)
 
     # Create automaton state variables
     q = Int("q")
@@ -930,30 +842,8 @@ def buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, 
 def cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type, init):
     print("Co-Buchi Fixed Point Computation")
 
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-
-    #Declare and define s' of type game_type
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s'' of type game_type
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, cobuchi_fixedpoint)
 
     # Create automaton state variables
     q = Int("q")
@@ -1176,10 +1066,7 @@ def is_downward_closed(W, v, c, nQ, game_type):
     # Output: True if downward closed, else counterexample model.
 
     # Declare and define v1
-    v1 = []
-    for var in v:
-        exec(str(var)+"1" +" = "+game_type+"('"+str(var)+"1" +"')") in globals(), locals()
-        v1.append(locals()[str(var)+"1"])
+    v1 = [declare_variable(str(var)+"1", game_type) for var in v]
 
     c1 = IntVector('c1', nQ)
 
@@ -1203,30 +1090,8 @@ def is_downward_closed(W, v, c, nQ, game_type):
 
 def otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type, init):
 
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s' of type game_type
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s'' of type game_type
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, otfd_fixedpoint)
 
     # Create determinized automaton state variables as IntVectors
     c = IntVector('c', nQ)
@@ -1470,30 +1335,8 @@ def succ_nonsigma(c, s, c_, automaton, isFinal, k):
 
 def otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, k, game_type, init):
 
-    #Get states from environment
-    s=[]
-    for var in environment.__code__.co_varnames:
-        if not str(var).__contains__("_"):
-            # Dynamic variable declaration
-            exec(str(var) +"= "+game_type+"('"+str(var) +"')") in globals(), locals()
-            if var not in locals(): 
-                # Implies variable is already to be used by z3 in the future. Store variable with a new name.
-                exec(str(var)+"new123" +"= "+game_type+"('"+str(var)+"new123" +"')") in globals(), locals()
-                s.append(locals()[str(var)+"new123"])
-            else:
-                s.append(locals()[var])
-    
-    #Declare and define s' of type game_type
-    s_ = []
-    for var in s:
-        exec(str(var)+"_" +" = "+game_type+"('"+str(var)+"_" +"')") in globals(), locals()
-        s_.append(locals()[str(var)+"_"])
-
-    #Declare and define s'' of type game_type
-    s__ = []
-    for var in s:
-        exec(str(var)+"__" +" = "+game_type+"('"+str(var)+"__" +"')") in globals(), locals()
-        s__.append(locals()[str(var)+"__"])
+    #Get states from environment, and declare and define s' and s'' of type game_type
+    s, s_, s__ = declare_state_variables(environment, game_type, otfd_fixedpoint_nonsigma)
 
     # Create determinized automaton state variables as IntVectors
     c = IntVector('c', nQ)

@@ -1,0 +1,34 @@
+{
+  "name": "gensys-ltl-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Browser playground for GenSys-LTL: runs the synthesis engine in Pyodide + Z3 (WebAssembly).",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "prepare-runtime": "node scripts/prepare-runtime.mjs",
+    "dev": "npm run prepare-runtime && vite",
+    "build": "npm run prepare-runtime && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "npm run prepare-runtime && node scripts/smoke-test.mjs",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@lezer/highlight": "^1.2.4",
+    "codemirror": "^6.0.2",
+    "pyodide": "314.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "wrangler": "^4.141.0"
+  }
+}

@@ -7,6 +7,10 @@ For the full arXiv version of the above paper, please see [this paper](https://a
 
 GenSys-LTL is an *infinite-state* reactive synthesis solver using LTL specifications. GenSys-LTL uses the Z3 theorem prover by Microsoft Research for solving and projecting SMT formulae. GenSys-LTL is scalable and is validated on standard benchmarks with compelling results.
 
+## Web Playground
+
+The `web/` folder contains a browser frontend for writing specifications and running synthesis. It runs GenSys-LTL entirely client-side on Pyodide and Z3 (WebAssembly), so it can be hosted as a static site on Cloudflare. See [web/README.md](web/README.md) for development and deployment instructions.
+
 ## Author
 
 - Stanly Samuel, Indian Institute of Science, Bangalore

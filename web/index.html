@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Write logical LTL games and synthesize controllers with GenSys-LTL, running entirely in your browser on Pyodide and Z3."
+    />
+    <title>GenSys-LTL Playground</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="9" cy="16" r="5" />
+          <circle cx="23" cy="9" r="4" />
+          <circle cx="23" cy="23" r="4" />
+          <path d="M13.5 13.8 19.4 10.8M13.5 18.2l5.9 3" />
+        </svg>
+        <div>
+          <h1>GenSys-LTL <span>Playground</span></h1>
+          <p class="tagline">Infinite-state reactive synthesis for logical LTL games, in your browser</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span id="runtime-status" class="status-pill" data-phase="python" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span><span class="label">Starting Python…</span><span class="detail"></span>
+        </span>
+        <button id="help-btn" class="btn ghost" type="button">Guide</button>
+        <a class="btn ghost" href="https://github.com/stanlysamuel/gensys/tree/gensys-ltl" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="pane spec-pane" aria-labelledby="spec-heading">
+        <h2 id="spec-heading" class="visually-hidden">Specification</h2>
+        <div class="toolbar">
+          <label class="field grow">
+            <span class="field-label">Example</span>
+            <select id="example-select"></select>
+          </label>
+          <div class="toolbar-group">
+            <button id="new-game-btn" class="btn" type="button">New game…</button>
+            <button id="upload-btn" class="btn icon" type="button" title="Open a .py file" aria-label="Open a .py file">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3m0 0L6 7m4-4 4 4M4 13v3h12v-3" /></svg>
+            </button>
+            <button id="download-btn" class="btn icon" type="button" title="Download as .py" aria-label="Download as .py">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10m0 0-4-4m4 4 4-4M4 13v3h12v-3" /></svg>
+            </button>
+            <button id="share-btn" class="btn icon" type="button" title="Copy a share link" aria-label="Copy a share link">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1m1.5 3.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1" /></svg>
+            </button>
+            <input id="file-input" type="file" accept=".py,text/x-python,text/plain" hidden />
+          </div>
+        </div>
+        <div id="example-info" class="example-info"></div>
+        <div id="editor" class="editor" aria-label="Specification editor"></div>
+        <div class="runbar">
+          <div class="field">
+            <span class="field-label" id="mode-label">Encoding <span class="hint">sys.argv[1]</span></span>
+            <div class="segmented" role="radiogroup" aria-labelledby="mode-label" id="mode-group">
+              <label><input type="radio" name="mode" value="simple" checked /><span title="Simple fixpoint: G, F, GF or FG games">Simple</span></label>
+              <label><input type="radio" name="mode" value="product-buchi" /><span title="Product game with a deterministic Büchi automaton">Product Büchi</span></label>
+              <label><input type="radio" name="mode" value="product-co-buchi" /><span title="Product game with a deterministic co-Büchi automaton">Product co-Büchi</span></label>
+              <label><input type="radio" name="mode" value="otf" /><span title="On-the-fly determinization (bounded by K)">On-the-fly</span></label>
+            </div>
+          </div>
+          <label class="field">
+            <span class="field-label">Time limit</span>
+            <select id="limit-select">
+              <option value="0">None</option>
+              <option value="60">1 min</option>
+              <option value="300" selected>5 min</option>
+              <option value="900">15 min</option>
+            </select>
+          </label>
+          <div class="run-actions">
+            <button id="stop-btn" class="btn danger" type="button" hidden>Stop</button>
+            <button id="run-btn" class="btn primary" type="button" disabled>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4.5v11l9-5.5z" /></svg>
+              <span>Synthesize</span>
+              <kbd class="shortcut" aria-hidden="true">Ctrl ↵</kbd>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="pane output-pane" aria-labelledby="output-heading">
+        <h2 id="output-heading" class="visually-hidden">Result</h2>
+        <div id="result" class="result" data-state="idle" aria-live="polite">
+          <div class="result-icon" aria-hidden="true"></div>
+          <div class="result-body">
+            <div class="result-title">Ready when you are</div>
+            <div class="result-detail">Pick an example or build a new game, then press Synthesize.</div>
+          </div>
+          <dl class="result-stats"></dl>
+        </div>
+        <div class="console-head">
+          <span class="console-title">Output</span>
+          <div class="toolbar-group">
+            <button id="copy-log-btn" class="btn small ghost" type="button">Copy</button>
+            <button id="download-log-btn" class="btn small ghost" type="button">Save log</button>
+            <button id="clear-log-btn" class="btn small ghost" type="button">Clear</button>
+          </div>
+        </div>
+        <pre id="console" class="console" tabindex="0" aria-label="Solver output"></pre>
+      </section>
+    </main>
+
+    <dialog id="builder-dialog" class="dialog wide" aria-labelledby="builder-title">
+      <form id="builder-form" method="dialog">
+        <header class="dialog-head">
+          <div>
+            <h2 id="builder-title">New game</h2>
+            <p>Describe a two-player game over infinite state. The controller moves first, then the environment responds.</p>
+          </div>
+          <button class="btn icon ghost" value="cancel" formnovalidate aria-label="Close">✕</button>
+        </header>
+        <div class="dialog-body builder-grid">
+          <div class="builder-col">
+            <label class="field">
+              <span class="field-label">Name</span>
+              <input name="title" type="text" autocomplete="off" />
+            </label>
+            <div class="field-row">
+              <label class="field grow">
+                <span class="field-label">State variables</span>
+                <input name="variables" type="text" autocomplete="off" spellcheck="false" placeholder="x, y" />
+              </label>
+              <label class="field">
+                <span class="field-label">Type</span>
+                <select name="type">
+                  <option value="Int">Int</option>
+                  <option value="Real">Real</option>
+                  <option value="Bool">Bool</option>
+                </select>
+              </label>
+            </div>
+            <p class="help">Write <code>x</code> for the current value and <code>x_</code> for the next one. One constraint per line; lines are combined with <code>And</code>. Z3 syntax works: <code>And</code>, <code>Or</code>, <code>Not</code>, <code>Implies</code>, <code>If</code>.</p>
+            <div class="field">
+              <span class="field-label">Objective</span>
+              <div class="segmented" id="objective-group" role="radiogroup" aria-label="Objective">
+                <label><input type="radio" name="objective" value="safety" /><span>G · Safety</span></label>
+                <label><input type="radio" name="objective" value="reachability" /><span>F · Reach</span></label>
+                <label><input type="radio" name="objective" value="buchi" /><span>GF · Büchi</span></label>
+                <label><input type="radio" name="objective" value="cobuchi" /><span>FG · co-Büchi</span></label>
+              </div>
+            </div>
+            <label class="field">
+              <span class="field-label">Goal predicate <span class="hint" id="objective-hint"></span></span>
+              <textarea name="goal" rows="3" spellcheck="false"></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Initial states <span class="hint">empty = maximal winning region</span></span>
+              <textarea name="init" rows="2" spellcheck="false"></textarea>
+            </label>
+          </div>
+          <div class="builder-col">
+            <label class="field">
+              <span class="field-label">Environment move <span class="hint">relation over x and x_</span></span>
+              <textarea name="environment" rows="3" spellcheck="false"></textarea>
+            </label>
+            <div class="field">
+              <span class="field-label">Controller moves</span>
+              <div id="moves-list" class="moves-list"></div>
+              <button id="add-move-btn" class="btn small" type="button">+ Add move</button>
+            </div>
+          </div>
+        </div>
+        <div id="builder-errors" class="form-errors" role="alert"></div>
+        <footer class="dialog-foot">
+          <button class="btn ghost" value="cancel" formnovalidate>Cancel</button>
+          <button id="builder-submit" class="btn primary" value="create">Open in editor</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="help-dialog" class="dialog" aria-labelledby="help-title">
+      <header class="dialog-head">
+        <div>
+          <h2 id="help-title">Guide</h2>
+          <p>GenSys-LTL decides whether a controller can win a logical LTL game, and computes the winning region by symbolic fixpoints over Z3 formulas.</p>
+        </div>
+        <form method="dialog"><button class="btn icon ghost" aria-label="Close">✕</button></form>
+      </header>
+      <div class="dialog-body prose">
+        <h3>How it runs</h3>
+        <p>Everything runs on your machine. The page loads Python (Pyodide) and the Z3 solver as WebAssembly, and runs the GenSys-LTL engine from this repository. Nothing is sent to a server. Z3 is single-threaded in the browser, so runs are slower than the native tool; use <em>Stop</em> or a time limit for heavy benchmarks.</p>
+        <h3>Writing a specification</h3>
+        <p>A specification is a Python script. It defines the state variables through the parameters of the environment function (<code>x</code> is the current value, <code>x_</code> the next one), a list of controller moves, a guarantee, and initial states, then calls a fixpoint procedure. The encoding picked above is passed as <code>sys.argv[1]</code>, which the benchmarks use to choose a procedure.</p>
+        <h3>Simple games</h3>
+        <pre><code>safety_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init)       # G(φ)
+reachability_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init) # F(φ)
+buchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init)        # GF(φ)
+cobuchi_fixedpoint_gensys(controller_moves, environment, guarantee, mode, game_type, init)      # FG(φ)</code></pre>
+        <p><code>game_type</code> is <code>"Int"</code>, <code>"Real"</code> or <code>"Bool"</code>. <code>mode</code> is always <code>0</code> (the controller plays first). An <code>init</code> of <code>False</code> computes the maximal winning region.</p>
+        <h3>Product games</h3>
+        <p>For an LTL formula with a deterministic Büchi or co-Büchi automaton, encode the automaton as a Z3 relation over <code>q</code>, <code>q_</code> and the state variables:</p>
+        <pre><code>buchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type, init)
+cobuchi_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, nQ, game_type, init)</code></pre>
+        <h3>General LTL</h3>
+        <p>When no deterministic automaton exists, the on-the-fly determinization procedure bounds the automaton counters by <code>K</code>. <code>sigma</code> partitions the automaton's predicates.</p>
+        <pre><code>otfd_fixedpoint(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, K, game_type, init)
+otfd_fixedpoint_nonsigma(controller_moves, environment, guarantee, mode, automaton, isFinal, sigma, nQ, K, game_type, init)</code></pre>
+        <p>Automata are currently written by hand from the output of <a href="https://spot.lre.epita.fr/" target="_blank" rel="noopener">Spot</a>. The benchmarks show complete encodings.</p>
+        <h3>Exit codes used by the benchmarks</h3>
+        <p><code>5</code>: the chosen encoding does not apply to this benchmark. <code>6</code>: the encoding is known not to scale and was not written.</p>
+        <h3>Papers</h3>
+        <ul>
+          <li><a href="https://conf.researchr.org/details/ase-2023/ase-2023-papers/101/Symbolic-Fixpoint-Algorithms-for-Logical-LTL-Games" target="_blank" rel="noopener">Symbolic Fixpoint Algorithms for Logical LTL Games</a> (ASE 2023)</li>
+          <li><a href="https://arxiv.org/abs/2306.02427" target="_blank" rel="noopener">Towards Efficient Controller Synthesis Techniques for Logical LTL Games</a> (arXiv)</li>
+          <li><a href="https://github.com/stanlysamuel/gensys" target="_blank" rel="noopener">GenSys: A Scalable Fixed-Point Engine for Maximal Controller Synthesis over Infinite State Spaces</a> (ESEC/FSE 2021)</li>
+        </ul>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

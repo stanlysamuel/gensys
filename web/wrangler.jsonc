@@ -1,0 +1,10 @@
+// Cloudflare Workers static-assets deployment: `npm run deploy` builds the site and uploads ./dist.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gensys-ltl-playground",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
